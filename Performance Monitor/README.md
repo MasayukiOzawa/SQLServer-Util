@@ -4,7 +4,7 @@
 ### OS 系のカウンター
 
 |オブジェクト|インスタンス|備考|
-|:---|:---||
+|:---|:---|:---|
 |Memory|-||
 |NUMA Node Memory|NUMA ノード単位|≧Windows Server 2012|
 |Paging File|ページングファイル単位||

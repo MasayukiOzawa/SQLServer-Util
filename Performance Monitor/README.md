@@ -71,7 +71,7 @@
 |% Usage|70% 未満|ページングファイルの使用状況|
 |% Usage Peak|70% 未満|ページングファイルの使用状況のピーク|
 
-## Network Interface
+### Network Interface
 
 |カウンター|閾値|備考|
 |:---|:---|:---|
@@ -81,13 +81,13 @@
 |Output Queue Length|2 未満||
 
 
-## Network Segment
+### Network Segment
 
 |カウンター|閾値|備考|
 |:---|:---|:---|
 |%Net Utilization|||
 
-## Physical Disk<br>Logical Disk
+### Physical Disk<br>Logical Disk
 
 |カウンター|閾値|備考|
 |:---|:---|:---|
@@ -109,7 +109,7 @@
 |Avg. Disk Bytes/Transfer| 50 ～ 80 MB/sec<br>150 ～ 300 MB/sec|単一の物理ディスクの場合 : 一般的には 50 ～ 80 MB/sec で高負荷<br>SAN を使用している場合 : 150 ～ 300 MB/sec で高負荷<br>各ディスクの接続方式に応じて帯域の上限が変わってくるため、ディスク接続方式も意識する必要がある|
 |Avg. Disk Bytes/Write|||
 
-## Process
+### Process
 
 |カウンター|閾値|備考|
 |:---|:---|:---|
@@ -125,13 +125,13 @@
 |Private Bytes||「メモリ内のページロック」を使用している場合は Working Set ではなく Private Bytes を確認する|
 |Virtual Bytes|||
 
-## Processor
+### Processor
 
 |カウンター|閾値|備考|
 |:---|:---|:---|
 |Processor Frequency||プロセッサの周波数。電源プランによっては周波数が一定していないことがある。一定していない場合は、電源プランが高パフォーマンスになっているかを確認する|
 
-## System
+### System
 
 |カウンター|閾値|備考|
 |:---|:---|:---|
@@ -262,7 +262,7 @@
 |Extension page unreferenced time|||
 |Extension pages writes/sec|||
 
-## SQLServer:Plan Cache
+### SQLServer:Plan Cache
 
 |カウンター|閾値|備考|
 |:---|:---|:---|
@@ -271,7 +271,7 @@
 |Cache Object in use|||
 |Cache Pages|||
 
-## SQLServer:SQL Errors
+### SQLServer:SQL Errors
 
 |カウンター|閾値|備考|
 |:---|:---|:---|

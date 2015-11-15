@@ -287,7 +287,7 @@
 |SQL Compilations/sec|||
 |SQL Re-Compilations/sec|||
 
-## SQLServer:SQL Statistics|
+## SQLServer:SQL Statistics
 
 |カウンター|閾値|備考|
 |:---|:---|:---|

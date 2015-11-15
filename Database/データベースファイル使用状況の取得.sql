@@ -1,7 +1,7 @@
 SET NOCOUNT
 ON
 /*********************************************/
---  �f�[�^�x�[�X�t�@�C���̎g�p�󋵂̊m�F
+--  データベースファイルの使用状況の確認
 /*********************************************/
 CREATE TABLE [#TmpTbl]
 (
@@ -32,7 +32,7 @@ COALESCE(NULL, '')
 ELSE
 ([#TmpTbl].[UsedExtents] * 8192 * 8) / 1024
 END AS [UsedExtents(KB)], 
-[sys].[master_files].[max_size],  -- -1:�����Ȃ�, 0:�e�ʌŒ�, ����ȊO�ő�T�C�Y
+[sys].[master_files].[max_size],  -- -1:制限なし, 0:容量固定, それ以外最大サイズ
 [sys].[master_files].[growth], 
 [sys].[master_files].[is_percent_growth],
 [sys].[master_files].[name], 
@@ -58,7 +58,7 @@ DROP TABLE [#TmpTbl]
 
 
 /*********************************************/
---  ���O�t�@�C���̎g�p�󋵂̊m�F
+--  ログファイルの使用状況の確認
 /*********************************************/
 DBCC SQLPERF(LOGSPACE) WITH NO_INFOMSGS
 

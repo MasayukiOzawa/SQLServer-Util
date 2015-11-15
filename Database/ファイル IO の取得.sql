@@ -4,8 +4,8 @@ GO
 USE [master]
 GO
 /*********************************************/
--- �t�@�C�� IO �̎擾
--- sys.dm_io_virtual_file_stats �ł��\
+-- ファイル IO の取得
+-- sys.dm_io_virtual_file_stats でも可能
 /*********************************************/
 SELECT
 	GETDATE() AS [DateTime],
@@ -30,7 +30,7 @@ FROM
 OPTION (RECOMPILE)
 		
 /*********************************************/
--- IO ���N�G�X�g�̑҂��̔����󋵂̎擾
+-- IO リクエストの待ちの発生状況の取得
 /*********************************************/
 SELECT * FROM sys.dm_io_pending_io_requests
 OPTION (RECOMPILE)

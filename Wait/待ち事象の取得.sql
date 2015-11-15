@@ -2,9 +2,9 @@ SET NOCOUNT ON
 GO
 
 /*********************************************/
--- Wait Stats �̎擾
+-- Wait Stats の取得
 /*********************************************/
--- WAITSTATS �̎擾
+-- WAITSTATS の取得
 -- DBCC SQLPERF('sys.dm_os_wait_stats', clear)
 SELECT
 	GETDATE() AS [DateTime], 
@@ -21,7 +21,7 @@ OPTION (RECOMPILE)
 
 	
 /*********************************************/
--- LATCHSTATS �̎擾
+-- LATCHSTATS の取得
 /*********************************************/
 -- DBCC SQLPERF('sys.dm_os_latch_stats', clear)
 SELECT
@@ -31,7 +31,7 @@ FROM
 OPTION (RECOMPILE)
 
 /*********************************************/
--- SpinLock Stats �̎擾 (SQL Server 2008 �ȍ~)
+-- SpinLock Stats の取得 (SQL Server 2008 以降)
 /*********************************************/
 -- DBCC SQLPERF('sys.dm_os_spinlock_stats', clear)
 SELECT

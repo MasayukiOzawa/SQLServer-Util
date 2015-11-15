@@ -2,7 +2,7 @@ SET NOCOUNT ON
 GO
 
 /*********************************************/
--- ƒƒbƒNî•ñ‚ÌŽæ“¾
+-- ãƒ­ãƒƒã‚¯æƒ…å ±ã®å–å¾—
 /*********************************************/
 SELECT DISTINCT
    [Session ID]    = s.session_id, 
@@ -80,8 +80,8 @@ ORDER BY
 	[s].[session_id]
 OPTION (RECOMPILE)
 
--- ƒuƒƒbƒLƒ“ƒO”­¶Žž‚Éƒ`ƒFƒbƒN 
--- DBCC INPUTBUFFER (53) (Blocked BY ‚ª”­¶‚µ‚Ä‚¢‚é Session ID)
--- DBCC INPUTBUFFER (53) (Blocked BY ‚Ì Session ID)
+-- ãƒ–ãƒ­ãƒƒã‚­ãƒ³ã‚°ç™ºç”Ÿæ™‚ã«ãƒã‚§ãƒƒã‚¯ 
+-- DBCC INPUTBUFFER (53) (Blocked BY ãŒç™ºç”Ÿã—ã¦ã„ã‚‹ Session ID)
+-- DBCC INPUTBUFFER (53) (Blocked BY ã® Session ID)
 -- SELECT * FROM sys.partitions WHERE hobt_id = <resource_associated_entity_id>
 

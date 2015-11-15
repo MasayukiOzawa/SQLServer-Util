@@ -1,10 +1,10 @@
--- ƒuƒƒbƒLƒ“ƒO‚ª”­¶‚µ‚Ä‚¢‚éƒZƒbƒVƒ‡ƒ“‚Ìæ“¾
+-- ãƒ–ãƒ­ãƒƒã‚­ãƒ³ã‚°ãŒç™ºç”Ÿã—ã¦ã„ã‚‹ã‚»ãƒƒã‚·ãƒ§ãƒ³ã®å–å¾—
 select session_id, wait_duration_ms, wait_type, blocking_session_id 
 from sys.dm_os_waiting_tasks 
 where blocking_session_id IS NOT NULL 
 order by session_id
 
--- ƒuƒƒbƒLƒ“ƒO‚ÉŠÖ˜A‚·‚éƒZƒbƒVƒ‡ƒ“‚ÌƒƒbƒNî•ñ‚Ìæ“¾
+-- ãƒ–ãƒ­ãƒƒã‚­ãƒ³ã‚°ã«é–¢é€£ã™ã‚‹ã‚»ãƒƒã‚·ãƒ§ãƒ³ã®ãƒ­ãƒƒã‚¯æƒ…å ±ã®å–å¾—
 select request_session_id, resource_type,resource_subtype, DB_NAME(resource_database_id) AS dbname,  resource_description,
 resource_lock_partition, request_mode,request_type,request_status, request_owner_type
 from sys.dm_tran_locks
@@ -15,7 +15,7 @@ request_session_id in
 (select blocking_session_id from sys.dm_os_waiting_tasks where blocking_session_id IS NOT NULL)
 order by request_session_id
 
--- ƒuƒƒbƒLƒ“ƒO‚Ì”­¶‚ÌŒ´ˆö‚Æ‚È‚Á‚Ä‚¢‚éƒNƒGƒŠî•ñ‚Ìæ“¾
+-- ãƒ–ãƒ­ãƒƒã‚­ãƒ³ã‚°ã®ç™ºç”Ÿã®åŸå› ã¨ãªã£ã¦ã„ã‚‹ã‚¯ã‚¨ãƒªæƒ…å ±ã®å–å¾—
 select er.session_id, start_time, er.status, command,DB_NAME(database_id) as dbname
 , blocking_session_id, wait_type,last_wait_type, wait_resource, er.lock_timeout, er.deadlock_priority,
 es.login_time,es.host_name,es.program_name,es.login_name,es.status as session_status, es.row_count,

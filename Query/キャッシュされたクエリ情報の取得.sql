@@ -1,4 +1,4 @@
-/*******************************************/
+﻿/*******************************************/
 -- ファイルに保存する場合は、SSMS のツール→オプションから
 -- クエリ結果→ SQL Server → 結果をテキストで表示を
 -- タブ区切り / 各列に表示される最大文字数を 8000 で取得する
@@ -26,6 +26,10 @@ SELECT TOP 300
 	[total_logical_reads] AS [total_logical_reads (page)],
 	[total_logical_writes] AS [total_logical_writes (page)],
 	[execution_count], 
+	[total_rows],
+	[last_rows],
+	[min_rows],
+	[max_rows],
 	[plan_generation_num],
 	[creation_time],
 	[last_execution_time],
@@ -67,6 +71,10 @@ SELECT TOP 300
 	[total_logical_reads] AS [total_logical_reads (page)],
 	[total_logical_writes] AS [total_logical_writes (page)],
 	[execution_count], 
+	[total_rows],
+	[last_rows],
+	[min_rows],
+	[max_rows],
 	[plan_generation_num],
 	[creation_time],
 	[last_execution_time],
@@ -108,6 +116,10 @@ SELECT TOP 300
 	[total_logical_reads] AS [total_logical_reads (page)],
 	[total_logical_writes] AS [total_logical_writes (page)],
 	[execution_count], 
+	[total_rows],
+	[last_rows],
+	[min_rows],
+	[max_rows],
 	[plan_generation_num],
 	[creation_time],
 	[last_execution_time],
@@ -151,6 +163,10 @@ SELECT TOP 300
 	[total_logical_reads] AS [total_logical_reads (page)],
 	[total_logical_writes] AS [total_logical_writes (page)],
 	[execution_count], 
+	[total_rows],
+	[last_rows],
+	[min_rows],
+	[max_rows],
 	[plan_generation_num],
 	[creation_time],
 	[last_execution_time],
@@ -192,6 +208,10 @@ SELECT TOP 300
 	[total_logical_reads] AS [total_logical_reads (page)],
 	[total_logical_writes] AS [total_logical_writes (page)],
 	[execution_count], 
+	[total_rows],
+	[last_rows],
+	[min_rows],
+	[max_rows],
 	[plan_generation_num],
 	[creation_time],
 	[last_execution_time],
@@ -215,4 +235,3 @@ FROM
 ORDER BY
 	[Average Logical Write Count] DESC
 OPTION (RECOMPILE)
-

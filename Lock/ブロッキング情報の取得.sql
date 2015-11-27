@@ -16,7 +16,7 @@ request_session_id in
 order by request_session_id
 
 -- ブロッキングの発生の原因となっているクエリ情報の取得
-select er.session_id, start_time, er.status, command,DB_NAME(database_id) as dbname
+select er.session_id, start_time, er.status, command,DB_NAME(er.database_id) as dbname
 , blocking_session_id, wait_type,last_wait_type, wait_resource, er.lock_timeout, er.deadlock_priority,
 es.login_time,es.host_name,es.program_name,es.login_name,es.status as session_status, es.row_count,
 wait_time , er.total_elapsed_time, 

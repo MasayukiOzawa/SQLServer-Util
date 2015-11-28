@@ -13,7 +13,7 @@ CREATE TABLE [#TmpTbl]
    [FileName] nchar(260)
 )
 
-EXEC sp_Msforeachdb '
+EXEC sp_MSforeachdb '
 INSERT INTO 
 [#TmpTbl]
 EXECUTE 
@@ -24,16 +24,22 @@ DB_NAME([sys].[master_files].[database_id]) AS [DB Name],
 [sys].[master_files].[file_id],
 [sys].[master_files].[data_space_id] AS [FileGroup ID], 
 ([sys].[master_files].[size] * 8192.0) / 1024.0 AS [File Size(KB)], 
-COALESCE([#TmpTbl].[TotalExtents], '') AS [TotalExtents], 
+COALESCE([#TmpTbl].[TotalExtents], '') AS [TotalExtents],
+CASE
+	WHEN [#TmpTbl].[TotalExtents] IS NULL THEN COALESCE(NULL, '')
+	ELSE ([#TmpTbl].[TotalExtents] * 8192 * 8) / 1024
+END AS [TotalExtents (KB)],  
 COALESCE([#TmpTbl].[UsedExtents], '') AS [UsedExtents], 
 CASE
-WHEN [#TmpTbl].[UsedExtents] IS NULL THEN
-COALESCE(NULL, '')
-ELSE
-([#TmpTbl].[UsedExtents] * 8192 * 8) / 1024
+	WHEN [#TmpTbl].[UsedExtents] IS NULL THEN COALESCE(NULL, '')
+	ELSE ([#TmpTbl].[UsedExtents] * 8192 * 8) / 1024
 END AS [UsedExtents(KB)], 
 [sys].[master_files].[max_size],  -- -1:制限なし, 0:容量固定, それ以外最大サイズ
 [sys].[master_files].[growth], 
+CASE [is_percent_growth]
+	WHEN 0 THEN [growth] * 8.0 
+	ELSE [growth]
+END AS [converted_growth],
 [sys].[master_files].[is_percent_growth],
 [sys].[master_files].[name], 
 [sys].[master_files].[physical_name]
@@ -61,4 +67,3 @@ DROP TABLE [#TmpTbl]
 --  ログファイルの使用状況の確認
 /*********************************************/
 DBCC SQLPERF(LOGSPACE) WITH NO_INFOMSGS
-

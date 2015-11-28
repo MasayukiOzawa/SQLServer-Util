@@ -57,8 +57,9 @@ SELECT
     es.client_version,
     es.client_interface_name,
     er_plan.query_plan AS er_plan
---    ,er.query_hash,
---    er.query_plan_hash
+-- 以下は SQL Server 2005 では取得不可
+    ,er.query_hash,
+    er.query_plan_hash
 FROM
     sys.dm_exec_requests er WITH (NOLOCK)
     LEFT JOIN

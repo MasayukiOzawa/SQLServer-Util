@@ -4,17 +4,33 @@
 -- タブ区切り / 各列に表示される最大文字数を 8000 で取得する
 /*******************************************/
 
-SET NOCOUNT ON
-GO
 USE master
 GO
 
+SET NOCOUNT ON
+GO
+
 /*********************************************/
--- 実行回数の高いクエリ TOP 300
+-- mode
+-- 1 : 実行回数の高いクエリ
+-- 2 : 平均 CPU 使用率の高いクエリ
+-- 3 : 実行時間の高いクエリ
+-- 4 : 平均読み取り回数の高いクエリ
+-- 5 : 平均書き込み回数の高いクエリ
 /*********************************************/
+
+DECLARE @mode int = 1
+
 SELECT TOP 300
 	GETDATE() AS DATE,
-	'HighExecution' AS type, 
+	CASE @mode 
+		WHEN 1 THEN 'HighExecution' 
+		WHEN 2 THEN 'HighAvgCPU'
+		WHEN 3 THEN 'HighAvgElapsedTime'
+		WHEN 4 THEN 'HighAvgRead'
+		WHEN 5 THEN 'HighAvgWrite'
+		ELSE 'HighExecution' 
+	END AS type, 
 	[total_elapsed_time] / [execution_count] / 1000.0 AS [Average Elapsed Time (ms)], 
 	[total_worker_time]  / [execution_count] / 1000.0 AS [Average Worker Time (ms)], 
 	[total_physical_reads] / [execution_count] AS [Average Physical Read Count], 
@@ -30,6 +46,33 @@ SELECT TOP 300
 	[last_rows],
 	[min_rows],
 	[max_rows],
+	/*
+	--SQL Server 2012 SP3 / SQL Server 2016 向けの列
+	[total_dop],
+	[last_dop],
+	[min_dop],
+	[max_dop],
+	[total_grant_kb],
+	[last_grant_kb],
+	[min_grant_kb],
+	[max_grant_kb],
+	[total_used_grant_kb],
+	[last_used_grant_kb],
+	[min_used_grant_kb],
+	[max_used_grant_kb],
+	[total_ideal_grant_kb],
+	[last_ideal_grant_kb],
+	[min_ideal_grant_kb],
+	[max_ideal_grant_kb],
+	[total_reserved_threads],
+	[last_reserved_threads],
+	[min_reserved_threads],
+	[max_reserved_threads],
+	[total_used_threads],
+	[last_used_threads]
+	[min_used_threads],
+	[max_used_threads],
+	*/
 	[plan_generation_num],
 	[creation_time],
 	[last_execution_time],
@@ -43,6 +86,7 @@ SELECT TOP 300
 	ELSE [statement_end_offset]
 	END - [statement_start_offset]) / 2) + 1),CHAR(13), ' '), CHAR(10), ' '), CHAR(9), ' ') AS [stmt_text],
 	REPLACE(REPLACE(REPLACE([text],CHAR(13), ''), CHAR(10), ' '), CHAR(9), ' ') AS [text]
+	/* 実行プランは必要に応じて取得する */
 	--,query_plan
 FROM
 	[sys].[dm_exec_query_stats]
@@ -51,187 +95,12 @@ FROM
 	CROSS APPLY
 	[sys].[dm_exec_query_plan]([plan_handle])
 ORDER BY
-	[execution_count] DESC
-OPTION (RECOMPILE)
-
-/*********************************************/
--- 平均 CPU 使用率の高いクエリ TOP 300
-/*********************************************/
-SELECT TOP 300
-	GETDATE() AS DATE,
-	'HighAvgCPU' AS type, 
-	[total_elapsed_time] / [execution_count] / 1000.0 AS [Average Elapsed Time (ms)], 
-	[total_worker_time]  / [execution_count] / 1000.0 AS [Average Worker Time (ms)], 
-	[total_physical_reads] / [execution_count] AS [Average Physical Read Count], 
-	[total_logical_reads] / [execution_count] AS [Average Logical Read Count], 
-	[total_logical_writes]  / [execution_count] AS [Average Logical Write Count], 
-	[total_elapsed_time] / 1000.0 AS [total_elapsed_time (ms)],
-	[total_worker_time] / 1000.0  AS [total_worker_time (ms)],
-	[total_physical_reads] AS [total_physical_reads (page)],
-	[total_logical_reads] AS [total_logical_reads (page)],
-	[total_logical_writes] AS [total_logical_writes (page)],
-	[execution_count], 
-	[total_rows],
-	[last_rows],
-	[min_rows],
-	[max_rows],
-	[plan_generation_num],
-	[creation_time],
-	[last_execution_time],
-	[query_hash],
-	[query_plan_hash],
-	DB_NAME(st.dbid) AS db_name,
-	REPLACE(REPLACE(REPLACE(SUBSTRING(text, 
-	([statement_start_offset] / 2) + 1, 
-	((CASE [statement_end_offset]
-	WHEN -1 THEN DATALENGTH(text)
-	ELSE [statement_end_offset]
-	END - [statement_start_offset]) / 2) + 1),CHAR(13), ' '), CHAR(10), ' '), CHAR(9), ' ') AS [stmt_text],
-	REPLACE(REPLACE(REPLACE([text],CHAR(13), ''), CHAR(10), ' '), CHAR(9), ' ') AS [text]
-	--,query_plan
-FROM
-	[sys].[dm_exec_query_stats]
-	CROSS APPLY 
-	[sys].[dm_exec_sql_text]([sql_handle]) AS st
-	CROSS APPLY
-	[sys].[dm_exec_query_plan]([plan_handle])
-ORDER BY
-	[Average Worker Time (ms)] DESC
-OPTION (RECOMPILE)
-
-/*********************************************/
--- 実行時間の高いクエリ TOP 300
-/*********************************************/
-SELECT TOP 300
-	GETDATE() AS DATE,
-	'HighAvgElapsedTime' AS type, 
-	[total_elapsed_time] / [execution_count] / 1000.0 AS [Average Elapsed Time (ms)], 
-	[total_worker_time]  / [execution_count] / 1000.0 AS [Average Worker Time (ms)], 
-	[total_physical_reads] / [execution_count] AS [Average Physical Read Count], 
-	[total_logical_reads] / [execution_count] AS [Average Logical Read Count], 
-	[total_logical_writes]  / [execution_count] AS [Average Logical Write Count], 
-	[total_elapsed_time] / 1000.0 AS [total_elapsed_time (ms)],
-	[total_worker_time] / 1000.0  AS [total_worker_time (ms)],
-	[total_physical_reads] AS [total_physical_reads (page)],
-	[total_logical_reads] AS [total_logical_reads (page)],
-	[total_logical_writes] AS [total_logical_writes (page)],
-	[execution_count], 
-	[total_rows],
-	[last_rows],
-	[min_rows],
-	[max_rows],
-	[plan_generation_num],
-	[creation_time],
-	[last_execution_time],
-	[query_hash],
-	[query_plan_hash],
-	DB_NAME(st.dbid) AS db_name,
-	REPLACE(REPLACE(REPLACE(SUBSTRING(text, 
-	([statement_start_offset] / 2) + 1, 
-	((CASE [statement_end_offset]
-	WHEN -1 THEN DATALENGTH(text)
-	ELSE [statement_end_offset]
-	END - [statement_start_offset]) / 2) + 1),CHAR(13), ' '), CHAR(10), ' '), CHAR(9), ' ') AS [stmt_text],
-	REPLACE(REPLACE(REPLACE([text],CHAR(13), ''), CHAR(10), ' '), CHAR(9), ' ') AS [text]
-	--,query_plan
-FROM
-	[sys].[dm_exec_query_stats]
-	CROSS APPLY 
-	[sys].[dm_exec_sql_text]([sql_handle]) AS st
-	CROSS APPLY
-	[sys].[dm_exec_query_plan]([plan_handle])
-ORDER BY
-	[Average Elapsed Time (ms)] DESC
-OPTION (RECOMPILE)
-
-	
-
-/*********************************************/
--- 平均読み取り回数の高いクエリ TOP 300
-/*********************************************/
-SELECT TOP 300
-	GETDATE() AS DATE,
-	'HighAvgRead' AS type, 
-	[total_elapsed_time] / [execution_count] / 1000.0 AS [Average Elapsed Time (ms)], 
-	[total_worker_time]  / [execution_count] / 1000.0 AS [Average Worker Time (ms)], 
-	[total_physical_reads] / [execution_count] AS [Average Physical Read Count], 
-	[total_logical_reads] / [execution_count] AS [Average Logical Read Count], 
-	[total_logical_writes]  / [execution_count] AS [Average Logical Write Count], 
-	[total_elapsed_time] / 1000.0 AS [total_elapsed_time (ms)],
-	[total_worker_time] / 1000.0  AS [total_worker_time (ms)],
-	[total_physical_reads] AS [total_physical_reads (page)],
-	[total_logical_reads] AS [total_logical_reads (page)],
-	[total_logical_writes] AS [total_logical_writes (page)],
-	[execution_count], 
-	[total_rows],
-	[last_rows],
-	[min_rows],
-	[max_rows],
-	[plan_generation_num],
-	[creation_time],
-	[last_execution_time],
-	[query_hash],
-	[query_plan_hash],
-	DB_NAME(st.dbid) AS db_name,
-	REPLACE(REPLACE(REPLACE(SUBSTRING(text, 
-	([statement_start_offset] / 2) + 1, 
-	((CASE [statement_end_offset]
-	WHEN -1 THEN DATALENGTH(text)
-	ELSE [statement_end_offset]
-	END - [statement_start_offset]) / 2) + 1),CHAR(13), ' '), CHAR(10), ' '), CHAR(9), ' ') AS [stmt_text],
-	REPLACE(REPLACE(REPLACE([text],CHAR(13), ''), CHAR(10), ' '), CHAR(9), ' ') AS [text]
-	--,query_plan
-FROM
-	[sys].[dm_exec_query_stats]
-	CROSS APPLY 
-	[sys].[dm_exec_sql_text]([sql_handle]) AS st
-	CROSS APPLY
-	[sys].[dm_exec_query_plan]([plan_handle])
-ORDER BY
-	([total_physical_reads] / [execution_count]) + ([total_logical_reads] / [execution_count]) DESC
-OPTION (RECOMPILE)
-
-/*********************************************/
--- 平均書き込み回数の高いクエリ TOP 300
-/*********************************************/
-SELECT TOP 300
-	GETDATE() AS DATE,
-	'HighAvgWrite' AS type, 
-	[total_elapsed_time] / [execution_count] / 1000.0 AS [Average Elapsed Time (ms)], 
-	[total_worker_time]  / [execution_count] / 1000.0 AS [Average Worker Time (ms)], 
-	[total_physical_reads] / [execution_count] AS [Average Physical Read Count], 
-	[total_logical_reads] / [execution_count] AS [Average Logical Read Count], 
-	[total_logical_writes]  / [execution_count] AS [Average Logical Write Count], 
-	[total_elapsed_time] / 1000.0 AS [total_elapsed_time (ms)],
-	[total_worker_time] / 1000.0  AS [total_worker_time (ms)],
-	[total_physical_reads] AS [total_physical_reads (page)],
-	[total_logical_reads] AS [total_logical_reads (page)],
-	[total_logical_writes] AS [total_logical_writes (page)],
-	[execution_count], 
-	[total_rows],
-	[last_rows],
-	[min_rows],
-	[max_rows],
-	[plan_generation_num],
-	[creation_time],
-	[last_execution_time],
-	[query_hash],
-	[query_plan_hash],
-	DB_NAME(st.dbid) AS db_name,
-	REPLACE(REPLACE(REPLACE(SUBSTRING(text, 
-	([statement_start_offset] / 2) + 1, 
-	((CASE [statement_end_offset]
-	WHEN -1 THEN DATALENGTH(text)
-	ELSE [statement_end_offset]
-	END - [statement_start_offset]) / 2) + 1),CHAR(13), ' '), CHAR(10), ' '), CHAR(9), ' ') AS [stmt_text],
-	REPLACE(REPLACE(REPLACE([text],CHAR(13), ''), CHAR(10), ' '), CHAR(9), ' ') AS [text]
-	--,query_plan
-FROM
-	[sys].[dm_exec_query_stats]
-	CROSS APPLY 
-	[sys].[dm_exec_sql_text]([sql_handle]) AS st
-	CROSS APPLY
-	[sys].[dm_exec_query_plan]([plan_handle])
-ORDER BY
-	[Average Logical Write Count] DESC
+	CASE @mode
+		WHEN 1 THEN [execution_count]
+		WHEN 2 THEN [total_worker_time]  / [execution_count] / 1000.0
+		WHEN 3 THEN [total_elapsed_time] / [execution_count] / 1000.0
+		WHEN 4 THEN ([total_physical_reads] / [execution_count]) + ([total_logical_reads] / [execution_count]) 
+		WHEN 5 THEN [total_logical_writes]  / [execution_count]
+		ELSE [execution_count]
+	END DESC
 OPTION (RECOMPILE)

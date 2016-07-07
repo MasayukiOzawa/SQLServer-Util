@@ -1,0 +1,49 @@
+﻿:CONNECT SQL-01
+CREATE MASTER KEY ENCRYPTION BY PASSWORD = '<Master Key Password>'
+
+CREATE LOGIN AlwaysOnEndpoint WITH PASSWORD = '<Login Password>',CHECK_EXPIRATION=ON
+CREATE USER AlwaysOnEndpoint FOR LOGIN AlwaysOnEndpoint
+
+CREATE CERTIFICATE AlwaysOnEndpoint_Cert AUTHORIZATION AlwaysOnEndpoint 
+WITH SUBJECT = 'AlwaysOn Endpoint',START_DATE = '01/01/2015',EXPIRY_DATE = '01/01/2100'
+
+CREATE ENDPOINT [Hadr_endpoint] 
+AS TCP (LISTENER_PORT = 5022)
+FOR DATA_MIRRORING 
+(ROLE = ALL, 
+AUTHENTICATION = CERTIFICATE AlwaysOnEndpoint_Cert,
+ENCRYPTION = REQUIRED ALGORITHM AES)
+
+!!mkdir c:\temp
+BACKUP CERTIFICATE AlwaysOnEndpoint_Cert 
+TO FILE = 'C:\temp\certbak.cer'
+WITH PRIVATE KEY (FILE='C:\temp\certbackup.pvk', ENCRYPTION BY PASSWORD='<Encryption Password>')
+-- バックアップした証明書をセカンダリにコピーする
+
+
+:CONNECT SQL-02
+CREATE MASTER KEY ENCRYPTION BY PASSWORD = '<Master Key Password>'
+
+CREATE LOGIN AlwaysOnEndpoint WITH PASSWORD = '<Login Password>',CHECK_EXPIRATION=ON
+CREATE USER AlwaysOnEndpoint FOR LOGIN AlwaysOnEndpoint
+
+CREATE CERTIFICATE AlwaysOnEndpoint_Cert AUTHORIZATION AlwaysOnEndpoint 
+FROM FILE = 'C:\temp\certbak.cer'
+WITH PRIVATE KEY (FILE='C:\temp\certbackup.pvk', DECRYPTION BY PASSWORD='<Encryption Password>')
+
+CREATE ENDPOINT [Hadr_endpoint] 
+AS TCP (LISTENER_PORT = 5022)
+FOR DATA_MIRRORING 
+(ROLE = ALL, 
+AUTHENTICATION = CERTIFICATE AlwaysOnEndpoint_Cert,
+ENCRYPTION = REQUIRED ALGORITHM AES)
+
+
+:CONNECT SQL-01
+GRANT CONNECT ON ENDPOINT::[Hadr_endpoint] TO AlwaysOnEndpoint
+GO
+
+:CONNECT SQL-02
+GRANT CONNECT ON ENDPOINT::[Hadr_endpoint] TO AlwaysOnEndpoint
+GO
+

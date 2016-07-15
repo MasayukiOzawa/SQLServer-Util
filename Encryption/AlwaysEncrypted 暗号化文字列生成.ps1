@@ -18,4 +18,4 @@ $cmkprov = New-Object System.Data.SqlClient.SqlColumnEncryptionCertificateStoreP
 # https://msdn.microsoft.com/ja-jp/library/system.data.sqlclient.sqlcolumnencryptioncertificatestoreprovider(v=vs.110).aspx
 
 $OutBytes = $cmkprov.EncryptColumnEncryptionKey("LocalMachine/My/$($cert.Thumbprint)","RSA_OAEP",$InBytes)
-# "0x" + [System.BitConverter]::ToString($OutBytes) -Replace '[-]','' | Out-GridView
+"0x" + [System.BitConverter]::ToString($OutBytes) -Replace '[-]','' | Out-GridView

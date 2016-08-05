@@ -39,6 +39,9 @@ ADD EVENT sqlserver.sql_batch_completed(
 ADD EVENT sqlserver.sql_statement_completed(SET collect_parameterized_plan_handle=(0),collect_statement=(1)
     ACTION(sqlserver.client_app_name,sqlserver.client_hostname,sqlserver.database_id,sqlserver.database_name,sqlserver.nt_username,sqlserver.query_hash,sqlserver.query_plan_hash,sqlserver.session_nt_username,sqlserver.sql_text,sqlserver.username)
     WHERE ([duration]>=(3000000))),
+ADD EVENT sqlserver.plan_affecting_convert(
+    ACTION(sqlserver.client_app_name,sqlserver.client_hostname,sqlserver.database_id,sqlserver.database_name,sqlserver.nt_username,sqlserver.query_hash,sqlserver.query_plan_hash,sqlserver.session_nt_username,sqlserver.sql_text,sqlserver.username)
+    WHERE ([package0].[equal_uint64]([convert_issue],(2)) AND [sqlserver].[database_id]>=(5))),
 ADD EVENT sqlserver.xml_deadlock_report(
     ACTION(sqlserver.client_app_name,sqlserver.client_hostname,sqlserver.database_id,sqlserver.database_name,sqlserver.nt_username,sqlserver.query_hash,sqlserver.query_plan_hash,sqlserver.session_nt_username,sqlserver.sql_text,sqlserver.username))
 ADD TARGET package0.event_file(SET filename=N'Basic_Trace',max_file_size=(100),max_rollover_files=(10))

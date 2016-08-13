@@ -1,3 +1,8 @@
+-- Correlating XE query_hash and query_plan_hash to sys.dm_exec_query_stats in order to retrieve Execution plans for high Resource statements.
+-- https://blogs.msdn.microsoft.com/sql_pfe_blog/2013/08/19/correlating-xe-query_hash-and-query_plan_hash-to-sys-dm_exec_query_stats-in-order-to-retrieve-execution-plans-for-high-resource-statements/
+-- Query hash and plan hash conversions
+-- https://sqlscope.wordpress.com/2013/10/20/query-hash-and-plan-hash-conversions/
+
 -- xEvent to DMV
 DECLARE @query_hash decimal(20,0) = 9974222887417559106
  

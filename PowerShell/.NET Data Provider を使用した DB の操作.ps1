@@ -104,7 +104,7 @@ try{
     $con2.Open()
 
     $cmd2 = $con2.CreateCommand()
-    $cmd2.CommandText = "CREATE TABLE test2(Col1 int);INSERT INTO test1 VALUES(1)"
+    $cmd2.CommandText = "CREATE TABLE test2(Col1 int);INSERT INTO test2 VALUES(1)"
     $cmd2.ExecuteNonQuery() > $null
     
     $transcope.Complete()

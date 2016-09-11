@@ -2,7 +2,8 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/mxr4mrm2jf4nnntr?svg=true)](https://ci.appveyor.com/project/MasayukiOzawa/sqlserverutil)
 
 SQL Server の各種システムビュー/動的管理ビューから情報を取得するためのクエリ群です。
-本リポジトリでは、以下の情報を取得するための各種クエリを公開しています。
+
+本リポジトリでは、以下の情報を取得するための各種クエリ/ツールを公開しています。
 
 |ディレクトリ|内容|
 |:--------|:---|
@@ -22,5 +23,5 @@ SQL Server の各種システムビュー/動的管理ビューから情報を�
 |Query|実行中のクエリの情報を取得|
 |Session|セッション情報を取得|
 |tempdb|tempdb の使用状況を取得|
-|Wait|待ち事象の情報を所得|
+|Wait|待ち事象の情報を取得|
 |xEvent|拡張イベントの取得と解析|

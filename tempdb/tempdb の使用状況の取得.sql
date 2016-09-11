@@ -19,6 +19,18 @@ FROM
 OPTION (RECOMPILE)
 GO
 
-select * from sys.dm_db_file_space_usage
-select * from sys.dm_db_session_space_usage where (user_objects_alloc_page_count > 0 or user_objects_dealloc_page_count > 0 or internal_objects_alloc_page_count > 0 or internal_objects_dealloc_page_count > 0)
-select * from sys.dm_db_task_space_usage  where (user_objects_alloc_page_count > 0 or user_objects_dealloc_page_count > 0 or internal_objects_alloc_page_count > 0 or internal_objects_dealloc_page_count > 0)
+-- セッション単位の使用状況
+SELECT 
+	*
+FROM 
+	sys.dm_db_session_space_usage 
+WHERE 
+	(user_objects_alloc_page_count > 0 or user_objects_dealloc_page_count > 0 or internal_objects_alloc_page_count > 0 or internal_objects_dealloc_page_count > 0)
+
+-- タスク単位の使用状況
+SELECT 
+	* 
+FROM
+	sys.dm_db_task_space_usage  
+WHERE 
+	(user_objects_alloc_page_count > 0 or user_objects_dealloc_page_count > 0 or internal_objects_alloc_page_count > 0 or internal_objects_dealloc_page_count > 0)

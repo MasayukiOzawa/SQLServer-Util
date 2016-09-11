@@ -1,19 +1,22 @@
-/*********************************************/
+﻿/*********************************************/
 -- インデックス使用状況の取得
 /*********************************************/
 SET NOCOUNT ON
 GO
+DECLARE @DB_ID int
+SET @DB_ID = DB_ID()
+
 SELECT 
 	DB_NAME() as db_name
 	, SCHEMA_NAME(so.schema_id) AS [schema_name]
 	, OBJECT_NAME(si.object_id) AS [object_name]
 	, si.name
 	, si.index_id
-	, SUBSTRING(idxcolinfo.idxcolname,1,LEN(idxcolinfo.idxcolname) -1) AS idxcolname
-	, SUBSTRING(idxinccolinfo.idxinccolname,1,LEN(idxinccolinfo.idxinccolname) -1) AS idxinccolname
+	, ios.hobt_id
 	, dps.partition_number
 	, si.type_desc
-	, sp.data_compression_desc
+	, SUBSTRING(idxcolinfo.idxcolname,1,LEN(idxcolinfo.idxcolname) -1) AS idxcolname
+	, SUBSTRING(idxinccolinfo.idxinccolname,1,LEN(idxinccolinfo.idxinccolname) -1) AS idxinccolname
 	, dps.reserved_page_count
 	, dps.row_count
 	, ius.user_seeks
@@ -64,7 +67,7 @@ FROM
 	ON
 		si.object_id = so.object_id
 	LEFT JOIN
-		sys.dm_db_index_operational_stats(DB_ID(), NULL, NULL, NULL) ios
+		sys.dm_db_index_operational_stats(@DB_ID, NULL, NULL, NULL) ios
 	ON
 		ios.object_id = si.object_id
 	AND
@@ -129,7 +132,6 @@ WHERE
 	so.schema_id <> SCHEMA_ID('sys')
 ORDER BY
 	object_name,
-	index_id,
-	partition_number
+	si.index_id,
+	dps.partition_number
 OPTION (RECOMPILE)
-

@@ -43,6 +43,14 @@
 |SQLServer:Wait Statistics||待ち事象を時系列データとして取得|
 |SQLServer:Workload Group Stats|||
 
+### AlwaysOn 系のカウンター
+|オブジェクト|インスタンス|備考|
+|:---|:---|:---|
+|SQLServer:Availability Replica||送受信のレートがネットワーク帯域の上限となっていないことを確認<br>プライマリとセカンダリで送信/受信のトレンドが異なる<br>プライマリで取得した場合 : 更新データの送信状況が取得可能<br>セカンダリで取得した場合 : 更新データの受信状況が取得可能<br>|
+|SQLServer:Availability Replica||この項目はプライマリ側ではカウンターは上昇しないのでセカンダリー側で取得する必要がある<br>Redone Bytes/sec : 受信したログの適用 (Redo) 状況|
+|SQLServer:Broker/DBM Transport||キューの情報が取れるというわけではないので参考情報<br>エンドポイント間のデータ通信状況|
+
+
 
 ## OS 系のカウンター
 
@@ -277,7 +285,7 @@
 |:---|:---|:---|
 |Info Errors||クエリタイムアウト等でクライアントにエラーを返した場合に発生|
 
-## SQLServer:SQL Statistics
+### SQLServer:SQL Statistics
 
 |カウンター|閾値|備考|
 |:---|:---|:---|
@@ -287,7 +295,7 @@
 |SQL Compilations/sec|||
 |SQL Re-Compilations/sec|||
 
-## SQLServer:SQL Statistics
+### SQLServer:SQL Statistics
 
 |カウンター|閾値|備考|
 |:---|:---|:---|
@@ -297,8 +305,28 @@
 |SQL Compilations/sec|||
 |SQL Re-Compilations/sec|||
 
-## SQLServer:Transactions
+### SQLServer:Transactions
 |カウンター|閾値|備考|
 |:---|:---|:---|
 |Free Space in tempdb (KB)|||
 |Version Store Size (KB)|||
+
+## AlwaysOn 系のカウンター
+### SQLServer:Availability Replica
+|カウンター|閾値|備考|
+|:---|:---|:---|
+|Bytes Received from Replica/sec||
+|Bytes Sent to Replica/sec||
+|Receives from Replica / sec||
+|Resent Messages/sec||
+|Sends to Replica to Replica/sec||
+|Sends to Transport/sec||
+
+### SQLServer:Availability Replica
+|カウンター|閾値|備考|
+|:---|:---|:---|
+|Log Bytes Received/sec||
+|Log Send Queue||
+|Recovery Queue||
+|Redone Bytes/sec||
+|Transaction Delay||

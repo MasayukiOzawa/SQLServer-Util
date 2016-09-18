@@ -1,0 +1,40 @@
+[
+{
+"CounterName":[
+    "\\LogicalDisk(*)\\*",
+    "\\Memory\\*",
+    "\\Network Adapter(*)\\*",
+    "\\Network Interface(*)\\*",
+    "\\NUMA Node Memory(*)\\*",
+    "\\Paging File(*)\\*",
+    "\\PhysicalDisk(*)\\*",
+    "\\Process(*)\\*",
+    "\\Processor(*)\\*",
+    "\\Processor Information(*)\\*",
+    "\\Server\\*",
+    "\\Server Work Queues(*)\\*",
+    "\\SQLServer:Access Methods\\*",
+    "\\SQLServer:Batch Resp Statistics(*)\\*",
+    "\\SQLServer:Buffer Manager\\*",
+    "\\SQLServer:Buffer Node(*)\\*",
+    "\\SQLServer:Catalog Metadata(*)\\*",
+    "\\SQLServer:Databases(*)\\*",
+    "\\SQLServer:Deprecated Features(*)\\*",
+    "\\SQLServer:Exec Statistics(*)\\*",
+    "\\SQLServer:General Statistics\\*",
+    "\\SQLServer:HTTP Storage(*)\\*",
+    "\\SQLServer:Latches\\*",
+    "\\SQLServer:Locks(*)\\*",
+    "\\SQLServer:Memory Manager\\*",
+    "\\SQLServer:Memory Node(*)\\*",
+    "\\SQLServer:Plan Cache(*)\\*",
+    "\\SQLServer:Resource Pool Stats(*)\\*",
+    "\\SQLServer:SQL Errors(*)\\*",
+    "\\SQLServer:SQL Statistics\\*",
+    "\\SQLServer:Transactions\\*",
+    "\\SQLServer:Wait Statistics(*)\\*",
+    "\\SQLServer:Workload Group Stats(*)\\*",
+    "\\System\\*"
+]
+}
+]

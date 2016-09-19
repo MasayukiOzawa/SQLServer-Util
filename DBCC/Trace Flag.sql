@@ -6,6 +6,15 @@ DBCC TRACEON(1117, -1)
 -- SQL Server 2016 以降は tempdb はデフォルトで有効, ユーザーデータベースはデータベースオプションでも設定可能
 DBCC TRACEON(1118, -1)
 
+-- デッドロックの情報取得
+DBCC TRACEON(1204, -1)
+DBCC TRACEON(1222, -1) -- SQL Server 2005 以降で追加されたフラグ
+
+-- ロックエスカレーションの設定変更
+-- メモリ / ロック数に基づいてのロックエスカレーションの無効化
+DBCC TRACEON(1211, -1)
+-- ロック数に基づいてのロックエスカレーションの無効化
+DBCC TRACEON(1224, -1)
 
 -- CardinalityEstimationModelVersion = 70 の基数見積もり (推定) の利用
 -- SQL Server 2016 以降はデータベースオプションでも設定可能

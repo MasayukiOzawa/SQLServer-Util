@@ -34,3 +34,8 @@ FROM
 	sys.dm_db_task_space_usage  
 WHERE 
 	(user_objects_alloc_page_count > 0 or user_objects_dealloc_page_count > 0 or internal_objects_alloc_page_count > 0 or internal_objects_dealloc_page_count > 0)
+
+
+-- 行バージョンにアクセスする可能性のあるトランザクションの取得
+SELECT * FROM sys.dm_tran_active_snapshot_database_transactions 
+ORDER BY transaction_sequence_num ASC 

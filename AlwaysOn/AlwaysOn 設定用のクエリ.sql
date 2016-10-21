@@ -75,3 +75,28 @@ GO
 ALTER AVAILABILITY GROUP [AG-01]  MODIFY REPLICA ON N'VM-02' 
 WITH (SEEDING_MODE= AUTOMATIC)
 GO
+
+
+-- =========================================================
+-- リスナーの悪性
+USE [master]
+GO
+ALTER AVAILABILITY GROUP [AG-01]
+ADD LISTENER N'AG-01-LN' (
+WITH IP
+((N'10.0.0.122', N'255.255.255.0')
+)
+, PORT=1433);
+GO
+
+/*
+USE [master]
+GO
+ALTER AVAILABILITY GROUP [AG-01]
+ADD LISTENER N'AG-01-LN' (
+WITH DHCP
+ ON (N'10.0.0.0', N'255.0.0.0'
+)
+, PORT=1433);
+GO
+*/

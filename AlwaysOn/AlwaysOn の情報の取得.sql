@@ -31,17 +31,30 @@ ORDER BY
 	ar.replica_server_name
 	, drs.database_id
 
--- 	可用性グループの状態の取得
-SELECT
-	nip.ag_name
-	, ags.synchronization_health_desc
-	, primary_replica
-FROM
-	Sys.dm_hadr_availability_group_states AS ags
+-- 可用性グループの状態の取得
+SELECT 
+	ag.name,
+	ags.primary_replica,
+	DB_NAME(drs.database_id) AS database_name,
+	drs.database_state_desc,
+	ags.secondary_recovery_health_desc, -- プライマリ以外は NULL
+	ags.synchronization_health_desc, -- プライマリでは NOT_HEALTHY, セカンダリでは状態が取得される
+	drs.synchronization_state_desc,
+	drs.last_commit_time,
+	drs.last_redone_time,
+	drs.last_sent_time,
+	drs.last_received_time,
+	drs.last_hardened_time
+FROM 
+	sys.dm_hadr_availability_group_states ags
 	LEFT JOIN
-		sys.dm_hadr_name_id_map AS nip
+	sys.availability_groups ag
 	ON
-		nip.ag_id = ags.group_id
+	ags.group_id = ag.group_id
+	LEFT JOIN
+	sys.dm_hadr_database_replica_states drs
+	ON
+	drs.group_id = ag.group_id
 
 -- 可用性レプリカの情報の取得
 SELECT

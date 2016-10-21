@@ -78,7 +78,7 @@ GO
 
 
 -- =========================================================
--- リスナーの悪性
+-- リスナーの作成
 USE [master]
 GO
 ALTER AVAILABILITY GROUP [AG-01]
@@ -100,3 +100,38 @@ WITH DHCP
 , PORT=1433);
 GO
 */
+
+-- =========================================================
+-- 読み取りセカンダリの設定
+USE [master] 
+GO
+
+-- 従来までのセカンダリへのアクセス方法
+ALTER AVAILABILITY GROUP [AG-01] 
+MODIFY REPLICA ON N'VM-01'
+WITH ( 
+PRIMARY_ROLE(READ_ONLY_ROUTING_LIST=(N'VM-02', N'VM-01') 
+))
+GO
+
+ALTER AVAILABILITY GROUP [AG-01] 
+MODIFY REPLICA ON N'VM-02'
+WITH ( 
+PRIMARY_ROLE(READ_ONLY_ROUTING_LIST=(N'VM-01', N'VM-02') 
+))
+GO
+
+-- 負荷分散セカンダリ
+ALTER AVAILABILITY GROUP [AG-01] 
+MODIFY REPLICA ON N'VM-01'
+WITH ( 
+PRIMARY_ROLE(READ_ONLY_ROUTING_LIST=((N'VM-02', N'VM-01')) 
+))
+GO
+
+ALTER AVAILABILITY GROUP [AG-01] 
+MODIFY REPLICA ON N'VM-02'
+WITH ( 
+PRIMARY_ROLE(READ_ONLY_ROUTING_LIST=((N'VM-01', N'VM-02'))
+))
+GO

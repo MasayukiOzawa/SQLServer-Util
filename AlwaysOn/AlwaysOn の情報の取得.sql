@@ -34,6 +34,8 @@ ORDER BY
 -- 可用性グループの状態の取得
 SELECT 
 	ag.name,
+	ar.replica_server_name,
+	drs.is_primary_replica,
 	ags.primary_replica,
 	DB_NAME(drs.database_id) AS database_name,
 	drs.database_state_desc,
@@ -55,6 +57,10 @@ FROM
 	sys.dm_hadr_database_replica_states drs
 	ON
 	drs.group_id = ag.group_id
+	LEFT JOIN
+	sys.availability_replicas ar
+	ON 
+	ar.replica_id = drs.replica_id
 
 -- 可用性レプリカの情報の取得
 SELECT

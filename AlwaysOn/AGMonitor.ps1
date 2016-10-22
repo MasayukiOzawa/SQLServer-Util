@@ -9,6 +9,7 @@ $Resource | Start-ClusterResource
 #>
 
 $QueryTimeout = 30
+$WaitTime = 5
 
 Import-Module SQLPS -DisableNameChecking
 $sql = @"
@@ -43,25 +44,27 @@ FROM
 	ar.replica_id = drs.replica_id
 WHERE
 	replica_server_name = @@SERVERNAME
+    {0}
+OPTION (RECOMPILE)
 "@
 
 While ($true){
     # セカンダリとなっている AG を取得
-    $SecondaryAGs = Invoke-Sqlcmd -ServerInstance . -Database master -Query ($sql + " AND is_primary_replica = 0") -QueryTimeout $QueryTimeout
+    $SecondaryAGs = Invoke-Sqlcmd -ServerInstance . -Database master -Query ($sql -f "AND is_primary_replica = 0") -QueryTimeout $QueryTimeout
 
     foreach ($AG in $SecondaryAGs){
-        $AGState = Invoke-Sqlcmd -ServerInstance . -Database master -Query ($sql + " AND ag.name = '$($AG.name)'") -QueryTimeout $QueryTimeout
+        $AGState = Invoke-Sqlcmd -ServerInstance . -Database master -Query ($sql -f "AND ag.name = '$($AG.name)'") -QueryTimeout $QueryTimeout
 
         # フェールオーバー対象の AG が同期済みの状態でない場合は、フェールオーバーを待機
         while($AGState.synchronization_state_desc -ne "SYNCHRONIZED"){
             Write-Host ("AG:[{0}] Sync Status:{1}.Sync Wait... " -f $AG.name, $agstate.synchronization_state_desc)
-            Start-Sleep -Seconds 5
-            $AGState = Invoke-Sqlcmd -ServerInstance . -Database master -Query ($sql + " AND ag.name = '$($AG.name)'") -QueryTimeout $QueryTimeout
+            Start-Sleep -Seconds $WaitTime
+            $AGState = Invoke-Sqlcmd -ServerInstance . -Database master -Query ($sql -f "AND ag.name = '$($AG.name)'") -QueryTimeout $QueryTimeout
         }
         Write-Host ("AG:[{0}] Failover Start" -f $AG.name)
         Invoke-Sqlcmd -ServerInstance . -Database master -Query "ALTER AVAILABILITY GROUP [$($AG.Name)] FAILOVER" -QueryTimeout 0
         Write-Host ("AG:[{0}] Failover End" -f $AG.name)
     }
     Write-Host "Waiting..."
-    Start-Sleep -Seconds 5
+    Start-Sleep -Seconds $WaitTime
 }

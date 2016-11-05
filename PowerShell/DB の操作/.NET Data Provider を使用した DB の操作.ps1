@@ -1,4 +1,6 @@
+﻿################################################
 # .NET Data Provider
+################################################
 
 $constring = New-Object System.Data.SqlClient.SqlConnectionStringBuilder
 $constring.psbase.DataSource = "."
@@ -10,7 +12,9 @@ $con = New-Object System.Data.SqlClient.SqlConnection
 $con.ConnectionString = $constring
 $con.Open()
 
+################################################
 # SELECT の実行 (平文)
+################################################
 $cmd = $con.CreateCommand()
 $cmd.CommandText = "SELECT object_id, name FROM sys.objects"
 $ret = $cmd.ExecuteReader()
@@ -19,7 +23,9 @@ while($ret.Read()){
 }
 $ret.Close()
 
+################################################
 # SELECT の実行 (パラメーター)
+################################################
 $cmd = $con.CreateCommand()
 $cmd.CommandText = "SELECT object_id, name FROM sys.objects WHERE name like @param1"
 $cmd.CommandType = [System.Data.CommandType]::Text
@@ -32,7 +38,9 @@ while($ret.Read()){
 }
 $ret.Close()
 
+################################################
 # ストアドプロシージャの実行 
+################################################
 $cmd = $con.CreateCommand()
 $cmd.CommandText = "sp_configure"
 $cmd.CommandType = [System.Data.CommandType]::StoredProcedure
@@ -47,8 +55,9 @@ while($ret.Read()){
     "{0} {1}" -f $ret[0], $ret[1]
 }
 $ret.Close()
-
+################################################
 # ストアドプロシージャの実行 (OUTPUT)
+################################################
 <#
 create procedure usp_test
     @param1 int output
@@ -71,7 +80,9 @@ $cmd.ExecuteNonQuery() > $null
 $cmd.Parameters["@param1"].Value
 $ret.Close()
 
+################################################
 # トランザクション
+################################################
 $tran = $con.BeginTransaction([System.Data.IsolationLevel]::Serializable)
 $cmd = $con.CreateCommand()
 
@@ -83,14 +94,15 @@ $cmd.ExecuteNonQuery() > $null
 
 $tran.Rollback()
 
+################################################
 # トランザクションスコープ
+################################################
 $con1 = New-Object System.Data.SqlClient.SqlConnection
 $con1.ConnectionString = $constring
 
 $con2 = New-Object System.Data.SqlClient.SqlConnection
 $con2.ConnectionString = $constring
 
-# トランザクションスコープ 
 # オブジェクト生成後に Open し、try / catch でエラー時には、Complete しないようにする
 try{
     $transcope = New-Object System.Transactions.TransactionScope
@@ -125,7 +137,10 @@ if($con2){
     $con2.Close()
     $con2.Dispose()
 }
+
+################################################
 # MARS
+################################################
 $constring_mars = $constring
 $constring_mars.MultipleActiveResultSets = $true
 
@@ -156,3 +171,48 @@ if($con){
     $con.Close()
     $con.Dispose()
 }
+
+################################################
+# BINARY の操作
+################################################
+<#
+CREATE TABLE BinaryTest (Col1 varbinary(max))
+#>
+# [Byte[]]$file = Get-Content -Path "C:\temp\ReplayEvents.irf" -Encoding Byte
+$file = [System.IO.File]::ReadAllBytes("C:\temp\ReplayEvents.irf")
+$cmd = $con.CreateCommand()
+$cmd.CommandText = "INSERT INTO BinaryTest VALUES(@param1)"
+$cmd.CommandType = [System.Data.CommandType]::Text
+$cmd.Parameters.Add("@param1", [System.Data.SqlDbType]::VarBinary) > $null
+$cmd.Parameters["@param1"].Value = $file
+$cmd.ExecuteNonQuery()
+$cmd.Dispose()
+
+# https://social.technet.microsoft.com/wiki/contents/articles/890.export-sql-server-blob-data-with-powershell.aspx
+$bufferSize = 8192
+$ExportPath = "C:\temp\test.txt"
+
+$cmd = $con.CreateCommand()
+$cmd.CommandText = "SELECT TOP 1 * FROM BinaryTest"
+$ret = $cmd.ExecuteReader()
+
+$out = [array]::CreateInstance("Byte", $bufferSize)
+
+While($ret.Read()){
+    $fs = New-Object System.IO.FileStream ($ExportPath), Create, Write       
+    $bw = New-Object System.IO.BinaryWriter $fs       
+               
+    $start = 0             
+    $received = $ret.GetBytes(0, $start, $out, 0, $bufferSize - 1)
+    While ($received -gt 0)
+    {            
+       $bw.Write($out, 0, $received)       
+       $bw.Flush()       
+       $start += $received                 
+       $received = $ret.GetBytes(0, $start, $out, 0, $bufferSize - 1)       
+    }            
+            
+    $bw.Close()       
+    $fs.Close()
+}
+$ret.Close()

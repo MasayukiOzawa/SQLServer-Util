@@ -178,19 +178,26 @@ if($con){
 <#
 CREATE TABLE BinaryTest (Col1 varbinary(max))
 #>
+# 以下の方法だとサイズの大きいファイルの読み込みに時間がかかるため、Binary Read する
+# http://mtgpowershell.blogspot.jp/2012/11/blog-post_8534.html
 # [Byte[]]$file = Get-Content -Path "C:\temp\ReplayEvents.irf" -Encoding Byte
-$file = [System.IO.File]::ReadAllBytes("C:\temp\ReplayEvents.irf")
+$file = [System.IO.File]::ReadAllBytes("C:\temp\status.log")
 $cmd = $con.CreateCommand()
 $cmd.CommandText = "INSERT INTO BinaryTest VALUES(@param1)"
 $cmd.CommandType = [System.Data.CommandType]::Text
 $cmd.Parameters.Add("@param1", [System.Data.SqlDbType]::VarBinary) > $null
 $cmd.Parameters["@param1"].Value = $file
 $cmd.ExecuteNonQuery()
+
+# パラメーターを使用しない場合の INSERT (バイト配列の編集に時間がかかるため推奨しない)
+$Cmd.CommandText = "INSERT INTO BinaryTest VALUES({0})" -f ("0x" + [System.String]::Join("", ($file | %{"{0:X2}" -f $_})))
+$cmd.ExecuteNonQuery()
 $cmd.Dispose()
 
+# バイナリのファイルの書き込み
 # https://social.technet.microsoft.com/wiki/contents/articles/890.export-sql-server-blob-data-with-powershell.aspx
 $bufferSize = 8192
-$ExportPath = "C:\temp\test.txt"
+$ExportPath = "C:\temp\AdventureWorks2014_2.bak"
 
 $cmd = $con.CreateCommand()
 $cmd.CommandText = "SELECT TOP 1 * FROM BinaryTest"

@@ -178,6 +178,7 @@ if($con){
 <#
 CREATE TABLE BinaryTest (Col1 varbinary(max))
 #>
+# https://msdn.microsoft.com/ja-jp/library/3517w44b(v=vs.90).aspx
 # 以下の方法だとサイズの大きいファイルの読み込みに時間がかかるため、Binary Read する
 # http://mtgpowershell.blogspot.jp/2012/11/blog-post_8534.html
 # [Byte[]]$file = Get-Content -Path "C:\temp\ReplayEvents.irf" -Encoding Byte

@@ -1,5 +1,7 @@
 ﻿# https://github.com/PowerShell/xSQLServer
 # C:\Program Files\WindowsPowerShell\Modules に DSC Resource を配置
+# PowerShell v5 以降を使用する場合、以下で　DSC Resource をインストールすることが可能
+# Install-Module xSQLServer -Scope AllUsers -Force
 
 if(!(Test-Path (Join-Path $ENV:ProgramFiles "WindowsPowerShell\Modules\xSQLServer\ja-jp"))){
     Copy-Item (Join-Path $ENV:ProgramFiles "WindowsPowerShell\Modules\xSQLServer\en-us") (Join-Path $ENV:ProgramFiles "WindowsPowerShell\Modules\xSQLServer\ja-jp") -Recurse

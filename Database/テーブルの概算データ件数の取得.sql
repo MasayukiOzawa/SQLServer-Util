@@ -1,11 +1,12 @@
-﻿SET NOCOUNT ON
+SET NOCOUNT ON
 GO
 
 SELECT
 	DB_NAME() AS DbName,
 	SCHEMA_NAME(so.schema_id) AS SchemaName,
 	so.name,
-	dps.*
+	dps.*,
+	dps.reserved_page_count * 8.0 AS reserved_page_count_kb
 FROM
 	sys.dm_db_partition_stats dps
 	INNER JOIN

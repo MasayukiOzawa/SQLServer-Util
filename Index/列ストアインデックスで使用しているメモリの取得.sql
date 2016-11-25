@@ -15,6 +15,10 @@ from sys.dm_os_memory_clerks
 where type = 'CACHESTORE_COLUMNSTOREOBJECTPOOL'
 GO
 
+SELECT *
+FROM sys.dm_os_memory_broker_clerks;
+
+
 -- https://github.com/jdanton/CSMemoryUse/blob/master/ColumnstoreBuffers.sql
 DECLARE @dbid INT;
 DECLARE @offset INT;

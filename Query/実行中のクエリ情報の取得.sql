@@ -1,4 +1,4 @@
-﻿SET NOCOUNT ON
+SET NOCOUNT ON
 GO
 
 SELECT
@@ -60,6 +60,8 @@ SELECT
 -- 以下は SQL Server 2005 では取得不可
     ,er.query_hash,
     er.query_plan_hash
+-- 以下は SQL Server のバージョンによっては取得負荷
+	,er.dop
 FROM
     sys.dm_exec_requests er WITH (NOLOCK)
     LEFT JOIN

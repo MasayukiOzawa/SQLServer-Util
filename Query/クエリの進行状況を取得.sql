@@ -1,4 +1,7 @@
-﻿-- SET STATISTICS PROFILE ON を有効にしているクエリに関して情報を取得
+-- SET STATISTICS PROFILE ON / SET STATISTICS XML ON を有効にしているクエリに関して情報を取得
+-- 拡張イベントの query_post_execution_showplan を有効にすることで、個別のクエリで SET 句を付与しなくても取得できるが、拡張イベントを使用する場合はパフォーマンスの劣化に注意する
+-- SQL Server 2014 SP2 / SQL Server 2016 SP1 以降は TF7412 を使用することで、軽量プロファイルを用いた情報の取得が可能
+-- https://blogs.msdn.microsoft.com/sql_server_team/query-progress-anytime-anywhere/ 
 SELECT
     qp.session_id, 
     qp.request_id, 

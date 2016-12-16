@@ -60,8 +60,9 @@ SELECT
 -- 以下は SQL Server 2005 では取得不可
     ,er.query_hash,
     er.query_plan_hash
--- 以下は SQL Server のバージョンによっては取得負荷
+-- 以下は SQL Server のバージョンによっては取得不可
 	,er.dop
+	,qx.query_plan -- DBCC TRACEON(7412, -1) 設定以降に実行されたクエリについての実行プランを取得
 FROM
     sys.dm_exec_requests er WITH (NOLOCK)
     LEFT JOIN
@@ -84,6 +85,8 @@ FROM
 	tsu.session_id = er.session_id
 	AND
 	tsu.request_id = er.request_id
+	OUTER APPLY
+	sys.dm_exec_query_statistics_xml(er.session_id) qx
 WHERE
     es.session_id <> @@SPID
 	AND

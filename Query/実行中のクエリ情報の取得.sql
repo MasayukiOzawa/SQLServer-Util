@@ -4,6 +4,8 @@ GO
 SELECT
     es.session_id,
     er.request_id,
+	er.scheduler_id,
+	tsu.exec_context_id,
     er.start_time,
     er.start_time,
     es.last_request_start_time,
@@ -56,6 +58,7 @@ SELECT
     es.login_name,
     es.client_version,
     es.client_interface_name,
+	es.is_user_process,
     er_plan.query_plan AS er_plan
 -- 以下は SQL Server 2005 では取得不可
     ,er.query_hash,

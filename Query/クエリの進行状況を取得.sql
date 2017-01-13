@@ -4,21 +4,33 @@
 -- https://blogs.msdn.microsoft.com/sql_server_team/query-progress-anytime-anywhere/ 
 -- DBCC TRACEON(7412, -1)
 
+DECLARE @starttime datetime = (SELECT sqlserver_start_time FROM sys.dm_os_sys_info)
 SELECT
     qp.session_id, 
+	DB_NAME(qp.database_id) AS db_name,
     qp.request_id, 
-    t.text,
-    --p.query_plan,
     ot.task_state,
     qp.physical_operator_name, 
     qp.node_id, 
     qp.thread_id, 
     qp.row_count,
     qp.estimate_row_count,
-    CASE row_count
-        WHEN 0 THEN 0.0
+    CASE 
+        WHEN row_count = 0 OR estimate_row_count = 0 THEN 0.0
         ELSE convert(float,qp.row_count) / qp.estimate_row_count * 100.0
-    END as progress
+    END as progress,
+	DATEADD(ms, qp.first_active_time, @starttime) AS FirstActiveTime,
+	DATEADD(ms, qp.last_active_time, @starttime) AS LastActiveTime,
+	CASE qp.open_time
+		WHEN 0 THEN NULL
+		ELSE DATEADD(ms, qp.open_time, @starttime) 
+	END AS OpenTime,
+	CASE qp.close_time
+		WHEN 0 THEN NULL
+		ELSE DATEADD(ms, qp.close_time, @starttime) 
+	END AS CloseTime,
+	qp.elapsed_time_ms,
+	qp.cpu_time_ms
 FROM
     sys.dm_exec_query_profiles qp
     CROSS APPLY
@@ -33,3 +45,4 @@ WHERE
 	qp.session_id <> @@SPID
 ORDER BY
     session_id, request_id, node_id, thread_id
+OPTION (RECOMPILE)

@@ -1,5 +1,6 @@
-﻿SET NOCOUNT ON
+SET NOCOUNT ON
 GO
+-- テスト用のテーブル作成
 DROP TABLE IF EXISTS T1
 DROP TABLE IF EXISTS T2
 GO
@@ -53,24 +54,34 @@ GO
 CHECKPOINT
 GO
 
+-- データからページ番号を取得する
+-- ページ番号が正しくない場合、sys.dm_os_buffer_descriptors から情報を取得する
 DBCC DROPCLEANBUFFERS
 GO
-SELECT * FROM T1 CROSS APPLY sys.fn_PhysLocCracker(%%physloc%%) 
-SELECT * FROM T2 CROSS APPLY sys.fn_PhysLocCracker(%%physloc%%) 
+
+SELECT * FROM T1 CROSS APPLY sys.fn_PhysLocCracker(%%physloc%%) WHERE C1 BETWEEN 1 AND  200000
+SELECT * FROM T2 CROSS APPLY sys.fn_PhysLocCracker(%%physloc%%) WHERE C1 BETWEEN 1 AND  200000
 GO
 
+
+-- fn_PhysLocCracker から正しいページ番号を取得できなかった場合、キャッシュの情報から取得する
 SELECT   
 	db_name(database_id) AS Database_name,  
 	OBJECT_NAME(p.object_id) AS object_name,  
-	p.index_id,
-	page_id,  
 	p.partition_number,
-	page_type,
-	type_Desc,
-	row_count,
-	page_level,
-	total_pages,
-	data_pages
+	i.index_id,
+	i.name,
+	au.total_pages,
+	au.data_pages,
+	au.used_pages,
+	p.rows,
+	bd.page_id,
+	p.partition_number,
+	bd.page_type,
+	p.data_compression_desc,
+	au.type_desc,
+	bd.page_level,
+	bd.row_count
 FROM  
 	sys.dm_os_buffer_descriptors bd WITH (NOLOCK)  
 	LEFT JOIN   
@@ -80,7 +91,13 @@ FROM
 	LEFT JOIN  
 		sys.partitions p WITH (NOLOCK)  
 	ON  
-		p.hobt_id = au.container_id  
+		p.hobt_id = au.container_id 
+	LEFT JOIN
+		sys.indexes i WITH (NOLOCK)
+	ON
+		p.object_id = i.object_id
+		AND
+		p.index_id = i.index_id
 WHERE  
 	database_id = DB_ID()  
 	AND
@@ -90,9 +107,12 @@ WHERE
 ORDER BY
 	object_name,
 	page_type,
-	page_id
+	page_id,
+	page_level
 GO
 
+
+-- ページの実情報の確認
 DBCC TRACEON(3604)
 DBCC PAGE(N'TESTDB', 1, 360, 3) WITH TABLERESULTS
 GO

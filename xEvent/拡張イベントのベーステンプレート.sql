@@ -11,6 +11,7 @@
 -- sort_warning : ソート時に tempdb が利用されたクエリ
 -- lock_escalation : ロックエスカレーションが発生したクエリ
 -- 実行完了に 3 秒以上かかったクエリ (Statement / Batch / RPC)
+-- 複数のイベントの損失を許可 (パフォーマンス優先)
 /********************************************************************************/
 CREATE EVENT SESSION [Basic_Trace] ON SERVER 
 ADD EVENT sqlserver.blocked_process_report(
@@ -52,7 +53,7 @@ ADD EVENT sqlserver.lock_escalation(
 ADD EVENT sqlserver.xml_deadlock_report(
     ACTION(sqlserver.client_app_name,sqlserver.client_hostname,sqlserver.database_id,sqlserver.database_name,sqlserver.is_system,sqlserver.nt_username,sqlserver.query_hash,sqlserver.query_plan_hash,sqlserver.session_nt_username,sqlserver.sql_text,sqlserver.username))
 ADD TARGET package0.event_file(SET filename=N'Basic_Trace',max_file_size=(100),max_rollover_files=(10))
-WITH (MAX_MEMORY=4096 KB,EVENT_RETENTION_MODE=ALLOW_SINGLE_EVENT_LOSS,MAX_DISPATCH_LATENCY=30 SECONDS,MAX_EVENT_SIZE=0 KB,MEMORY_PARTITION_MODE=NONE,TRACK_CAUSALITY=OFF,STARTUP_STATE=ON)
+WITH (MAX_MEMORY=4096 KB,EVENT_RETENTION_MODE=ALLOW_MULTIPLE_EVENT_LOSS,MAX_DISPATCH_LATENCY=30 SECONDS,MAX_EVENT_SIZE=0 KB,MEMORY_PARTITION_MODE=NONE,TRACK_CAUSALITY=OFF,STARTUP_STATE=ON)
 GO
 
 

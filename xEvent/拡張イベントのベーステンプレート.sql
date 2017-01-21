@@ -1,4 +1,4 @@
-/********************************************************************************/
+﻿/********************************************************************************/
 -- 拡張イベントでクエリ情報を取得する際のベーステンプレート
 /********************************************************************************/
 -- blocked_process_report : ロック競合が発生したクエリ (blocked prosess threshold の設定が必要)
@@ -19,7 +19,7 @@ ADD EVENT sqlserver.blocked_process_report(
     WHERE ([duration]>=(3000000))),
 ADD EVENT sqlserver.error_reported(
     ACTION(sqlserver.client_app_name,sqlserver.client_hostname,sqlserver.database_id,sqlserver.database_name,sqlserver.is_system,sqlserver.nt_username,sqlserver.query_hash,sqlserver.query_plan_hash,sqlserver.session_nt_username,sqlserver.sql_text,sqlserver.username)
-    WHERE ([error_number]<>(5701) AND [error_number]<>(5703) AND [error_number]<>(0) AND [error_number]<>(14205) AND [error_number]<>(14570) AND [error_number]<>(14705) AND [error_number]<>(14709) AND [error_number]<>(50000))),
+    WHERE ([error_number]<>(3612) AND [error_number]<>(3613) AND [error_number]<>(3615) AND [error_number]<>(5701) AND [error_number]<>(5703) AND [error_number]<>(0) AND [error_number]<>(14205) AND [error_number]<>(14570) AND [error_number]<>(14705) AND [error_number]<>(14709) AND [error_number]<>(50000))),
 ADD EVENT sqlserver.execution_warning(
     ACTION(sqlserver.client_app_name,sqlserver.client_hostname,sqlserver.database_id,sqlserver.database_name,sqlserver.is_system,sqlserver.nt_username,sqlserver.query_hash,sqlserver.query_plan_hash,sqlserver.session_nt_username,sqlserver.sql_text,sqlserver.username)),
 ADD EVENT sqlserver.hash_warning(

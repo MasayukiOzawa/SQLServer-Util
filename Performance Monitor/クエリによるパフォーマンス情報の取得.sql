@@ -4,9 +4,9 @@
 IF CHARINDEX('SQL Azure', CAST(SERVERPROPERTY('Edition') AS nvarchar(255))) = 0
 BEGIN
 	SELECT 
-		pr.object_name,
+		RTRIM(pr.object_name) AS object_name,
 		'CPU usage %' AS counter_name,
-		pr.instance_name,
+		RTRIM(pr.instance_name) AS instance_name,
 		CASE
 			WHEN pr.cntr_value = 0 THEN 0
 			ELSE CAST((CAST(pr.cntr_value AS FLOAT) / pb.cntr_value) * 100 AS numeric(5,2))
@@ -29,9 +29,9 @@ END
 ELSE
 BEGIN
 	SELECT 
-		pr.object_name,
+		RTRIM(pr.object_name) AS object_name,
 		'CPU usage %' AS counter_name,
-		pr.instance_name,
+		RTRIM(pr.instance_name) AS instance_name,
 		CASE
 			WHEN pr.cntr_value = 0 THEN 0
 			ELSE CAST((CAST(pr.cntr_value AS FLOAT) / pb.cntr_value) * 100 AS numeric(5,2))

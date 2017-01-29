@@ -21,7 +21,7 @@ BEGIN
 			WHERE sj.name = @job AND sh.step_id = 0 AND 
 			sh.run_date >= @date and sh.run_time >= @time) <> 1
 			BEGIN
-				RAISERROR('Job Run Error', 15,1)
+				RAISERROR('Job Execution Error', 15,1)
 			END
 			BREAK
 		END
@@ -33,5 +33,5 @@ BEGIN
 END
 ELSE
 BEGIN
-	RAISERROR('Job Start Error', 15,1)
+	RAISERROR('Job Execution Error', 15,1)
 END

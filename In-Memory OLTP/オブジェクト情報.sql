@@ -1,4 +1,4 @@
--- ƒIƒuƒWƒFƒNƒg’PˆÊ‚Ìƒƒ‚ƒŠg—p—Ê (DB ’PˆÊ)
+ï»¿-- ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå˜ä½ã®ãƒ¡ãƒ¢ãƒªä½¿ç”¨é‡ (DB å˜ä½)
 SELECT 
 	object_id,
 	OBJECT_NAME(object_id) AS object_name,
@@ -9,7 +9,7 @@ SELECT
 FROM 
 	sys.dm_db_xtp_table_memory_stats
 
--- ƒnƒbƒVƒ…ƒCƒ“ƒfƒbƒNƒX‚Ìİ’èó‹µ
+-- ãƒãƒƒã‚·ãƒ¥ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã®è¨­å®šçŠ¶æ³
 SELECT
 	DB_NAME() AS database_name,
 	OBJECT_NAME(his.object_id) AS object_name,  
@@ -28,7 +28,7 @@ FROM
 	AND
 	i.index_id = his.index_id
 
--- ”ñƒNƒ‰ƒXƒ^[‰»ƒCƒ“ƒfƒbƒNƒX‚Ìİ’èó‹µ
+-- éã‚¯ãƒ©ã‚¹ã‚¿ãƒ¼åŒ–ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã®è¨­å®šçŠ¶æ³
 SELECT
 	DB_NAME() AS database_name,
 	OBJECT_NAME(nis.object_id) AS object_name,
@@ -60,7 +60,7 @@ FROM
 	AND
 	i.index_id = nis.index_id
 
--- ƒCƒ“ƒfƒbƒNƒX‚Ì“Œvî•ñ
+-- ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã®çµ±è¨ˆæƒ…å ±
 SELECT
 	OBJECT_NAME(s.object_id) AS object_name,
 	i.name,
@@ -88,7 +88,7 @@ FROM
 	AND
 	i.index_id = s.index_id
 
--- ƒIƒuƒWƒFƒNƒg‚Ì‘€ì“Œv
+-- ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®æ“ä½œçµ±è¨ˆ
 SELECT
 	OBJECT_NAME(object_id) AS object_name,
 	row_insert_attempts,

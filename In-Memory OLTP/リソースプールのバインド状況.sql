@@ -1,4 +1,4 @@
---���\�[�X�v�[���ւ̃o�C���h��
+﻿--リソースプールへのバインド状況
 SELECT
 	d.name,
 	rp.name,
@@ -12,7 +12,7 @@ FROM
 	rp.pool_id =  COALESCE(d.resource_pool_id, 2)
 
 /*
-���\�[�X�v�[���̃o�C���h
+リソースプールのバインド
 CREATE RESOURCE POOL Pool_IMOLTP   
 WITH( 
 MIN_MEMORY_PERCENT = 50,   

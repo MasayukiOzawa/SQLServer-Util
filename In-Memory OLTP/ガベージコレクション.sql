@@ -1,6 +1,6 @@
-SELECT * FROM sys.dm_db_xtp_gc_cycle_stats
+ï»¿SELECT * FROM sys.dm_db_xtp_gc_cycle_stats
 SELECT * FROM sys.dm_xtp_gc_queue_stats
 SELECT * FROM sys.dm_xtp_gc_stats
 
--- è“®‚Ì GC Às
+-- æ‰‹å‹•ã® GC å®Ÿè¡Œ
 EXEC sys.sp_xtp_checkpoint_force_garbage_collection

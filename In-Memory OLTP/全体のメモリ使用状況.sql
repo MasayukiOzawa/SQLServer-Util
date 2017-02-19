@@ -1,4 +1,4 @@
--- �ڍׂȃ������g�p�� (DB �P��)
+﻿-- 詳細なメモリ使用量 (DB 単位)
 SELECT 
 	OBJECT_NAME(object_id) AS object_name,
 	* 
@@ -10,7 +10,7 @@ ORDER BY
 	memory_consumer_id ASC
 GO
 
--- �ڍׂȃ������g�p�� (�V�X�e�����x��)
+-- 詳細なメモリ使用量 (システムレベル)
 SELECT 
 	* 
 FROM 

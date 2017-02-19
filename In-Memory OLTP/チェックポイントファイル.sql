@@ -1,11 +1,11 @@
--- ƒ`ƒFƒbƒNƒ|ƒCƒ“ƒgƒtƒ@ƒCƒ‹‚Ì‘S‘Ì“Œv
+ï»¿-- ãƒã‚§ãƒƒã‚¯ãƒã‚¤ãƒ³ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ã®å…¨ä½“çµ±è¨ˆ
 SELECT
 	*
 FROM
 	sys.dm_db_xtp_checkpoint_stats
 
 
--- ƒ`ƒFƒbƒNƒ|ƒCƒ“ƒgƒtƒ@ƒCƒ‹g—pó‹µ (Ú×)
+-- ãƒã‚§ãƒƒã‚¯ãƒã‚¤ãƒ³ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ä½¿ç”¨çŠ¶æ³ (è©³ç´°)
 SELECT 
 	* 
 FROM 
@@ -13,7 +13,7 @@ FROM
 ORDER BY
 	container_guid ASC
 
--- ƒ`ƒFƒbƒNƒ|ƒCƒ“ƒgƒtƒ@ƒCƒ‹‚ÌƒyƒAî•ñ
+-- ãƒã‚§ãƒƒã‚¯ãƒã‚¤ãƒ³ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒšã‚¢æƒ…å ±
 SELECT
 	T1.checkpoint_file_id, T1.relative_file_path, T1.file_type_desc, T1.file_size_in_bytes, T1.file_size_used_in_bytes, T1.logical_row_count,
 	T2.checkpoint_file_id, T2.relative_file_path, T2.file_type_desc, T2.file_size_in_bytes, T2.file_size_used_in_bytes, T2.logical_row_count
@@ -30,7 +30,7 @@ WHERE
 
 
 /*
--- SQL Server 2016 ˆÈ~‚ÍA“à•”ƒ}[ƒWƒ|ƒŠƒV[‚É‚æ‚è©“®“I‚Éƒtƒ@ƒCƒ‹‚ªƒ}[ƒW‚³‚ê‚é
+-- SQL Server 2016 ä»¥é™ã¯ã€å†…éƒ¨ãƒãƒ¼ã‚¸ãƒãƒªã‚·ãƒ¼ã«ã‚ˆã‚Šè‡ªå‹•çš„ã«ãƒ•ã‚¡ã‚¤ãƒ«ãŒãƒãƒ¼ã‚¸ã•ã‚Œã‚‹
 EXEC sys.sp_xtp_merge_checkpoint_files 
 	@database_name = tpch, 
 	@transaction_lower_bound=0, 

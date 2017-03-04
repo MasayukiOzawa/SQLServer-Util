@@ -1,0 +1,12 @@
+﻿IF DB_ID('DemoDB') IS NULL
+	CREATE DATABASE DemoDB
+GO
+
+USE DemoDB
+GO
+
+IF OBJECT_ID('DynamicDataMasking') IS NOT NULL
+	DROP TABLE DynamicDataMasking
+
+IF USER_ID('TestUser') IS NOT NULL
+	DROP USER TestUser

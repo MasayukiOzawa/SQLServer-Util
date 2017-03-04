@@ -1,0 +1,30 @@
+﻿USE DemoDB
+GO
+
+IF OBJECT_ID('CCITable', 'U') IS NOT NULL
+	DROP TABLE CCITable
+
+CREATE TABLE CCITable( 
+Col1 int PRIMARY KEY CLUSTERED, 
+Col2 uniqueidentifier, 
+Col3 uniqueidentifier, 
+Col4 uniqueidentifier, 
+Col5 uniqueidentifier, 
+) 
+GO 
+CREATE COLUMNSTORE INDEX NCCIX_CCITable ON CCITable (Col2) 
+WHERE Col1 >= 1 AND Col1 <= 5000 
+ 
+SET NOCOUNT ON
+DECLARE @i int = 1 
+ 
+BEGIN TRAN 
+WHILE (@i <100000) 
+BEGIN
+    INSERT INTO CCITable VALUES(@i, NEWID(), NEWID(), NEWID(), NEWID()) 
+    SET @i += 1 
+END
+COMMIT TRAN 
+ 
+SELECT Col2 FROM CCITable WHERE Col1 BETWEEN 5001 AND 7000 
+SELECT Col2 FROM CCITable WHERE Col1 BETWEEN 1 AND 2000 

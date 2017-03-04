@@ -1,0 +1,16 @@
+﻿USE DemoDB
+GO
+
+CREATE TABLE AlwaysEncrypted (
+    CustName nvarchar(60) 
+        ENCRYPTED WITH (COLUMN_ENCRYPTION_KEY = CEK,
+        ENCRYPTION_TYPE = RANDOMIZED,
+        ALGORITHM = 'AEAD_AES_256_CBC_HMAC_SHA_256'), 
+    PersonalId varchar(11) 
+        COLLATE  Latin1_General_100_BIN2 
+        ENCRYPTED WITH (COLUMN_ENCRYPTION_KEY = CEK,
+        ENCRYPTION_TYPE = DETERMINISTIC ,
+        ALGORITHM = 'AEAD_AES_256_CBC_HMAC_SHA_256'), 
+    Age int NULL
+)
+GO

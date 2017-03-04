@@ -3,6 +3,9 @@
 /*********************************************/
 SET NOCOUNT ON
 GO
+DECLARE @DB_ID int
+SET @DB_ID = DB_ID()
+
 SELECT 
 	DB_NAME() as db_name
 	, SCHEMA_NAME(so.schema_id) AS [schema_name]
@@ -14,9 +17,13 @@ SELECT
 	, si.type_desc
 	, SUBSTRING(idxcolinfo.idxcolname,1,LEN(idxcolinfo.idxcolname) -1) AS idxcolname
 	, SUBSTRING(idxinccolinfo.idxinccolname,1,LEN(idxinccolinfo.idxinccolname) -1) AS idxinccolname
-	, sp.data_compression_desc
 	, dps.reserved_page_count
+	, dps.reserved_page_count * 8.0 AS reserved_page_size_kb
 	, dps.row_count
+	, CASE
+		WHEN row_count = 0 THEN 0
+		ELSE dps.reserved_page_count * 8.0 / row_count * 1024
+	END AS avg_row_size_byte
 	, ius.user_seeks
 	, ius.last_user_seek
 	, ius.user_scans
@@ -65,7 +72,7 @@ FROM
 	ON
 		si.object_id = so.object_id
 	LEFT JOIN
-		sys.dm_db_index_operational_stats(DB_ID(), NULL, NULL, NULL) ios
+		sys.dm_db_index_operational_stats(@DB_ID, NULL, NULL, NULL) ios
 	ON
 		ios.object_id = si.object_id
 	AND

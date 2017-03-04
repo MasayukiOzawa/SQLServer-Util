@@ -1,5 +1,6 @@
 ﻿/*********************************************/
 -- インデックス使用状況の取得
+-- 現状、列ストアインデックスのサイズの情報は列ストアインデックス観点の情報から取得
 /*********************************************/
 SET NOCOUNT ON
 GO
@@ -14,6 +15,7 @@ SELECT
 	, si.index_id
 	, ios.hobt_id
 	, dps.partition_number
+	, si.type
 	, si.type_desc
 	, SUBSTRING(idxcolinfo.idxcolname,1,LEN(idxcolinfo.idxcolname) -1) AS idxcolname
 	, SUBSTRING(idxinccolinfo.idxinccolname,1,LEN(idxinccolinfo.idxinccolname) -1) AS idxinccolname

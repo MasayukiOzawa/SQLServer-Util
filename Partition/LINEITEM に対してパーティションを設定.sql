@@ -1,0 +1,105 @@
+/*****************************************************************/
+-- パーティションのための定義
+/*****************************************************************/
+-- パーティション関数の作成
+CREATE PARTITION FUNCTION LINEITEM_PF (date)
+AS RANGE RIGHT FOR VALUES ('1993/1/1','1994/1/1','1995/1/1','1996/1/1','1997/1/1','1998/1/1')
+GO
+
+-- パーティションスキーマの作成
+CREATE PARTITION SCHEME LINEITEM_PS
+AS PARTITION LINEITEM_PF
+ALL TO ([PRIMARY])
+GO
+
+
+/*****************************************************************/
+-- 行ベースのデータのパーティショニング
+/*****************************************************************/
+
+-- ヒープのテーブルをパーティション化
+CREATE CLUSTERED INDEX [ClusteredIndex_on_LINEITEM_PS_636163560028609030] ON [dbo].[LINEITEM]
+(
+	[L_SHIPDATE]
+)WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF) ON [LINEITEM_PS]([L_SHIPDATE])
+
+
+-- データがパーティション化されたため、一時的に付与したCIX を削除
+DROP INDEX [ClusteredIndex_on_LINEITEM_PS_636163560028609030] ON [dbo].[LINEITEM]
+
+
+-- パーティションを解除
+ALTER TABLE LINEITEM
+ADD CONSTRAINT PK_LINEITEM PRIMARY KEY (L_ORDERKEY,L_LINENUMBER) 
+ON [PRIMARY]
+GO
+
+
+-- パーティション化
+ALTER TABLE LINEITEM
+ADD CONSTRAINT PK_LINEITEM PRIMARY KEY CLUSTERED (L_ORDERKEY,L_LINENUMBER, L_SHIPDATE) 
+WITH (STATISTICS_INCREMENTAL = OFF)
+ON [LINEITEM_PS]([L_SHIPDATE])
+GO
+
+-- 増分統計の設定
+ALTER INDEX PK_LINEITEM ON LINEITEM REBUILD WITH(STATISTICS_INCREMENTAL = ON)
+
+/*****************************************************************/
+-- 列ストアインデックスのパーティショニング
+/*****************************************************************/
+-- クラスター化列ストアインデックスはベーステーブルに固定化する必要がある
+
+-- 一度ベーステーブルにクラスター化インデックスを作成
+CREATE CLUSTERED INDEX [CCIX_LINEITEM] ON [dbo].[LINEITEM]
+([L_ORDERKEY] ASC,[L_LINENUMBER] ASC)
+ON LINEITEM_PS(L_SHIPDATE)
+GO
+
+-- その後、クラスター化列ストアインデックスを DROP EXISTING で作成
+CREATE CLUSTERED COLUMNSTORE INDEX [CCIX_LINEITEM] ON [dbo].[LINEITEM]
+WITH (DROP_EXISTING = ON)
+ON LINEITEM_PS(L_SHIPDATE)
+GO
+
+-- 非クラスター化列ストアインデックスの作成
+CREATE NONCLUSTERED COLUMNSTORE INDEX [NCCIX_LINEITEM] ON [dbo].[LINEITEM]
+(
+	[L_ORDERKEY],
+	[L_PARTKEY],
+	[L_SUPPKEY],
+	[L_LINENUMBER],
+	[L_QUANTITY],
+	[L_EXTENDEDPRICE],
+	[L_DISCOUNT],
+	[L_TAX],
+	[L_RETURNFLAG],
+	[L_LINESTATUS],
+	[L_SHIPDATE],
+	[L_COMMITDATE],
+	[L_RECEIPTDATE],
+	[L_SHIPINSTRUCT],
+	[L_SHIPMODE],
+	[L_COMMENT]
+)WITH (DROP_EXISTING = OFF, COMPRESSION_DELAY = 0) 
+ON LINEITEM_PS(L_SHIPDATE)
+GO
+
+-- 行ストアで格納されているデータを既定行数に達しなくても圧縮
+ALTER INDEX [NCCIX_LINEITEM] ON [dbo].[LINEITEM] REORGANIZE PARTITION = 1 WITH (COMPRESS_ALL_ROW_GROUPS =ON)
+GO
+
+-- パーティションの再構成
+ALTER INDEX [NCCIX_LINEITEM] ON [dbo].[LINEITEM] REORGANIZE PARTITION = 1
+GO
+
+-- パーティションの再構築
+ALTER INDEX [NCCIX_LINEITEM] ON [dbo].[LINEITEM] REBUILD PARTITION = 1
+GO
+
+ALTER INDEX [NCCIX_LINEITEM] ON [dbo].[LINEITEM] REBUILD PARTITION = 1 WITH (DATA_COMPRESSION = COLUMNSTORE_ARCHIVE)
+GO
+
+-- パーティション単位の件数を取得
+SELECT $PARTITION.LINEITEM_PF(L_SHIPDATE), COUNT(*) 
+FROM LINEITEM GROUP BY $PARTITION.LINEITEM_PF(L_SHIPDATE)

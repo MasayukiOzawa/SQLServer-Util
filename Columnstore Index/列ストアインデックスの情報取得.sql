@@ -125,6 +125,8 @@ ORDER BY
 	column_id ASC
 OPTION (RECOMPILE)
 
+
+/*
 -- ===================================
 -- SQL Server 2014
 -- ===================================
@@ -178,3 +180,4 @@ GROUP BY
 	si.name,
 	si.type_desc,
 	crg.state_description
+*/

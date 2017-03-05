@@ -177,7 +177,7 @@
 |AWE unmap calls/sec|||
 |AWE unmap pages/sec|||
 |AWE write maps/sec|||
-|Buffer cache hit ratio|100 未満|間接チェックポイントによるデータへの書き込み|
+|Buffer cache hit ratio|100 未満||
 |Checkpoint pages/sec||通常のチェックポイントプロセスによるデータへの書き込み|
 |Database pages||データページ|
 |Free List Stalls/sec|||
@@ -199,13 +199,14 @@
 
 |カウンター|閾値|備考|
 |:---|:---|:---|
-|Log Flush Wait Time|||
-|Log Flush Waits/sec|||
+|Log Flush Wait Time||トランザクションログのディスクへのフラッシュの際の待ち時間|
+|Log Flush Waits/sec||トランザクションログのディスクへのフラッシュの際の待ち発生回数|
 |Log Flush Write Time (ms)|||
 |Log Flushes/sec|||
 |Percent Log Used|||
 |Transactions/sec|||
 |Write transactions/sec|||
+|Log Bytes Flush/sec||トランザクションログのディスクのフラッシュバイト数|
 |Log Cache Hit Ratio|||
 |Log Cache Reads/sec|||
 

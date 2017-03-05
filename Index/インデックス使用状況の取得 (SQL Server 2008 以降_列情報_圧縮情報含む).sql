@@ -1,7 +1,7 @@
-﻿/*********************************************/
+﻿/***********************************************************************************************************/
 -- インデックス使用状況の取得
--- 現状、列ストアインデックスのサイズの情報は列ストアインデックス観点の情報から取得
-/*********************************************/
+-- 列ストアインデックスは列ストアインデックス向けの情報から確認するため、サイズの計算値については 0 を設定
+/***********************************************************************************************************/
 SET NOCOUNT ON
 GO
 DECLARE @DB_ID int
@@ -20,10 +20,13 @@ SELECT
 	, SUBSTRING(idxcolinfo.idxcolname,1,LEN(idxcolinfo.idxcolname) -1) AS idxcolname
 	, SUBSTRING(idxinccolinfo.idxinccolname,1,LEN(idxinccolinfo.idxinccolname) -1) AS idxinccolname
 	, dps.reserved_page_count
-	, dps.reserved_page_count * 8.0 AS reserved_page_size_kb
+	, CASE
+		WHEN si.type IN (5,6,7) THEN 0
+		ELSE dps.reserved_page_count * 8.0 
+	END AS reserved_page_size_kb
 	, dps.row_count
 	, CASE
-		WHEN row_count = 0 THEN 0
+		WHEN row_count = 0 OR si.type IN (5,6,7) THEN 0
 		ELSE dps.reserved_page_count * 8.0 / row_count * 1024
 	END AS avg_row_size_byte
 	, ius.user_seeks

@@ -100,7 +100,7 @@ FROM
 	sp.partition_number = dps.partition_number
 	CROSS APPLY
 	(SELECT 
-		sc.name + ','
+		sc.name + '|'
 	FROM
 		sys.index_columns sic
 		INNER JOIN
@@ -119,7 +119,7 @@ FROM
 	) AS idxcolinfo(idxcolname)
 	CROSS APPLY
 	(SELECT 
-		sc.name + ','
+		sc.name + '|'
 	FROM
 		sys.index_columns sic
 		INNER JOIN

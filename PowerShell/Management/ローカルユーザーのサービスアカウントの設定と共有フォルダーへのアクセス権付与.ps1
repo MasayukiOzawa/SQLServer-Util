@@ -1,4 +1,5 @@
-﻿# パスワード生成function New-RandomPassword {
+﻿# パスワード生成
+function New-RandomPassword {
 	param(
 		$length = 10,
 		$characters = 'abcdefghkmnprstuvwxyzABCDEFGHKLMNPRSTUVWXYZ0123456789'

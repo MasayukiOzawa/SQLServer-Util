@@ -1,4 +1,4 @@
-﻿-- w削除済みバッファ / ビットマップの情報取得
+﻿-- 削除済みバッファ / ビットマップの情報取得
 SELECT 
 	OBJECT_NAME(ip.object_id) object_name,
 	i.name,
@@ -76,11 +76,9 @@ FROM
 	AND
 	i.index_id = pa.index_id
 
+/*
 -- ページ情報
 DBCC TRACEON(3604)
-DBCC PAGE(N'tpch', 1, 66408, 3) WITH TABLERESULTS
-
-
--- ALTER INDEX ALL ON T1 REORGANIZE
--- DELETE TOP (1) FROM T1
-
+DBCC PAGE(N'tpch', 1, 188712, 3) WITH TABLERESULTS
+DBCC PAGE(N'tpch', 1, 165288, 3) WITH TABLERESULTS
+*/

@@ -75,7 +75,10 @@ SELECT
 	css.column_id,
 	css.segment_id,
 	css.row_count,
-	css.on_disk_size
+	css.on_disk_size,
+	css.min_data_id,
+	css.max_data_id,
+	css.null_value
 FROM 
 	sys.column_store_segments  css
 	LEFT JOIN

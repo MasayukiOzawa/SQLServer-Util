@@ -16,10 +16,10 @@ SELECT
 	1 AS level, 
 	CAST(RIGHT(REPLICATE('0', 8) + CAST(spid AS varchar(10)), 8) AS varchar(100)) AS blocked_chain,
 	CAST('' AS varchar(100)) AS blocked_path, 
-	cmd,
-	lastwaittype,
-	waitresource,
-	status
+	RTRIM(cmd) AS cmd,
+	RTRIM(lastwaittype) AS lastwaittype,
+	RTRIM(waitresource) AS waitresource,
+	RTRIM(status) AS status
 	,text
 FROM
 	sp
@@ -36,10 +36,10 @@ SELECT
 	BlockList.level + 1 AS level,
 	CAST(BlockList.blocked_chain + CAST(r.spid AS varchar(10)) AS varchar(100)) AS blocked_chain,
 	CAST(IIF(BlockList.blocked_path='', '', BlockList.blocked_path + '->') + CAST(r.blocked AS varchar(10)) AS varchar(100)) , 
-	r.cmd,
-	r.lastwaittype,
-	r.waitresource,
-	r.status,
+	RTRIM(r.cmd) AS cmd,
+	RTRIM(r.lastwaittype) AS lastwaittype,
+	RTRIM(r.waitresource) AS waitresource,
+	RTRIM(r.status) AS status,
 	r.text
 FROM
 	sp r

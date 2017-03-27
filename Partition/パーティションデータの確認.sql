@@ -48,5 +48,6 @@ FROM
 		AND
 		rv2.function_id = pf.function_id
 ORDER BY
+	i.object_id ASC,
 	i.name ASC,
 	dps.partition_number ASC

@@ -27,21 +27,23 @@ GO
 
 
 /*******************************************************************/
--- パーティショニングされていないヒープテーブル
+-- パーティショニングされていないヒープテーブルの作成
 
 CREATE TABLE TEST(
 	C1 int  NOT NULL,
 	C2 date NOT NULL, 
 	C3 uniqueidentifier,
-	C4 AS CASE WHEN C2 >= '2012/1/1' THEN 1 ELSE 2 END,
-	C5 AS Month(C2)
+	C4 AS CASE WHEN C2 >= '2012/1/1' THEN 1 ELSE 2 END, -- 決定的でない計算列 (決定的でないため PERSISTED は指定できない)
+	C5 AS Month(C2), -- 永続化されていない計算列 (決定的であればインデックス列としては使えるがパーティション分割列としては使えない)
+	C6 AS Month(C2) PERSISTED -- 永続化されている計算列 (永続化されていればパーティション分割列として使える)
 )
 GO
 -- 計算列が決定的かどうかの確認 (計算列を使ったからと言って、必ず非決定的となるわけではない)
 SELECT COLUMNPROPERTY(OBJECT_ID('TEST'), N'C4', 'IsDeterministic')
 SELECT COLUMNPROPERTY(OBJECT_ID('TEST'), N'C5', 'IsDeterministic')
-
+SELECT COLUMNPROPERTY(OBJECT_ID('TEST'), N'C6', 'IsDeterministic')
 /*******************************************************************/
+
 
 /*******************************************************************/
 -- ヒープテーブルのパーティショニング
@@ -50,8 +52,9 @@ CREATE TABLE TEST(
 	C1 int  NOT NULL,
 	C2 date NOT NULL, 
 	C3 uniqueidentifier,
-	C4 AS CASE WHEN C2 >= '2012/1/1' THEN 1 ELSE 2 END,
-	C5 AS Month(C2)
+	C4 AS CASE WHEN C2 >= '2012/1/1' THEN 1 ELSE 2 END, -- 決定的でない計算列 (決定的でないため PERSISTED は指定できない)
+	C5 AS Month(C2), -- 永続化されていない計算列 (決定的であればインデックス列としては使えるがパーティション分割列としては使えない)
+	C6 AS Month(C2) PERSISTED -- 永続化されている計算列 (永続化されていればパーティション分割列として使える)
 )ON TEST_PS(C2)
 GO
 /*******************************************************************/
@@ -62,8 +65,9 @@ CREATE TABLE TEST(
 	C1 int NOT NULL,
 	C2 date NOT NULL, 
 	C3 uniqueidentifier,
-	C4 AS CASE WHEN C2 >= '2012/1/1' THEN 1 ELSE 2 END,
-	C5 AS Month(C2)
+	C4 AS CASE WHEN C2 >= '2012/1/1' THEN 1 ELSE 2 END, -- 決定的でない計算列 (決定的でないため PERSISTED は指定できない)
+	C5 AS Month(C2), -- 永続化されていない計算列 (決定的であればインデックス列としては使えるがパーティション分割列としては使えない)
+	C6 AS Month(C2) PERSISTED -- 永続化されている計算列 (永続化されていればパーティション分割列として使える)
 )
 GO
 CREATE CLUSTERED INDEX CIX_TEST ON TEST (C2) ON TEST_PS(C2)
@@ -97,7 +101,7 @@ CREATE INDEX NCIX_TEST_C3 ON TEST(C3)
 DROP INDEX IF EXISTS NCIX_TEST_CALC ON TEST
 CREATE INDEX NCIX_TEST_CALC ON TEST(C4) 
 
--- 決定的な列についてはインデックスが作成できる (PERSISITED でなくても決定的であれば作成できる)
+-- 決定的な列についてはインデックスが作成できる (PERSISITED でなくても決定的であれば作成できる、ただしパーティション列としては使用できない)
 DROP INDEX IF EXISTS NCIX_TEST_CALC ON TEST
 CREATE INDEX NCIX_TEST_CALC ON TEST(C5) 
 

@@ -31,14 +31,25 @@ if (-not (Test-Path (Join-Path $outputdir "Results"))){
     New-Item -Path (Join-Path $outputdir "Results") -ItemType Directory | Out-Null
 }
 
-
+if (-not[String]::IsNullOrEmpty($user)){
+    $param = @{
+        UserName = $user
+        Password = $password
+    }
+}else{
+    $param = @{}
+}
 while($true){
     foreach($sqlfile in $sqllist){
-        $outfile = ($sqlfile.BaseName -split "_")[0] + ".txt"
-        Invoke-Sqlcmd -ServerInstance $server -Username $user -Password $password -Database $database  -InputFile $sqlfile.FullName | Export-Csv -Path (Join-Path $outfilepath $outfile) -NoTypeInformation -Append -Force
+        try{
+            $outfile = ($sqlfile.BaseName -split "_")[0] + ".txt"
+            Invoke-Sqlcmd -ServerInstance $server @param -Database $database -InputFile $sqlfile.FullName | Export-Csv -Path (Join-Path $outfilepath $outfile) -NoTypeInformation -Append -Force
 
-        # PBI Desktop でオリジナルのファイルを読み込むと、ファイルロックしてしまうことがあるので、二次ディレクトリに退避し、PBI Desktop ではそちらにアクセス
-        Copy-Item (Join-Path $outfilepath $outfile) (Join-Path $outputdir "Results") -Force
+            # PBI Desktop でオリジナルのファイルを読み込むと、ファイルロックしてしまうことがあるので、二次ディレクトリに退避し、PBI Desktop ではそちらにアクセス
+            Copy-Item (Join-Path $outfilepath $outfile) (Join-Path $outputdir "Results") -Force
+        }catch{
+            Write-Host ("{0}:{1}"-f (Get-Date),$Error[0].Exception.Message)
+        }
     }
 
     Start-Sleep -Seconds $interval

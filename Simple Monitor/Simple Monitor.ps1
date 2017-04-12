@@ -43,7 +43,7 @@ while($true){
     foreach($sqlfile in $sqllist){
         try{
             $outfile = ($sqlfile.BaseName -split "_")[0] + ".txt"
-            Invoke-Sqlcmd -ServerInstance $server @param -Database $database -InputFile $sqlfile.FullName | Export-Csv -Path (Join-Path $outfilepath $outfile) -NoTypeInformation -Append -Force
+            Invoke-Sqlcmd -ServerInstance $server @param -Database $database -InputFile $sqlfile.FullName -ErrorAction Stop | Export-Csv -Path (Join-Path $outfilepath $outfile) -NoTypeInformation -Append -Force 
 
             # PBI Desktop でオリジナルのファイルを読み込むと、ファイルロックしてしまうことがあるので、二次ディレクトリに退避し、PBI Desktop ではそちらにアクセス
             Copy-Item (Join-Path $outfilepath $outfile) (Join-Path $outputdir "Results") -Force

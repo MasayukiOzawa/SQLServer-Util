@@ -3,16 +3,16 @@
 SELECT
 	GETDATE() AS counter_date,
 	instance_name,
-	CAST(CAST([CPU usage %] AS float) / CAST([CPU usage % base] AS float) * 100  AS int) AS [CPU Usage],
-	[Max memory (KB)] / 1024 AS [Max memory (MB)],
-	[Used memory (KB)] / 1024 AS [Used memory (KB)] ,
-	[Target memory (KB)] / 1024 AS [Target memory (MB)] ,
+	CAST([CPU usage %] AS float) / CAST([CPU usage % base] AS float) * 100.0 AS [CPU Usage],
+	[Max memory (KB)] / 1024.0 AS [Max memory (MB)],
+	[Used memory (KB)] / 1024.0 AS [Used memory (KB)] ,
+	[Target memory (KB)] / 1024.0 AS [Target memory (MB)] ,
 	[Disk Read IO/sec],
 	[Disk Read IO Throttled/sec],
-	[Disk Read Bytes/sec] / POWER(1024, 2) AS [Disk Read MB/sec] ,
+	[Disk Read Bytes/sec] / POWER(1024.0, 2) AS [Disk Read MB/sec] ,
 	[Disk Write IO/sec],
 	[Disk Write IO Throttled/sec],
-	[Disk Write Bytes/sec] / POWER(1024, 2) AS [Disk Write MB/sec]
+	[Disk Write Bytes/sec] / POWER(1024.0, 2) AS [Disk Write MB/sec]
 FROM
 	(
 	SELECT

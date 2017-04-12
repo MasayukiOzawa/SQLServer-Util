@@ -63,12 +63,12 @@ FROM
 SELECT
 	#T2.counter_date,
 	#T2.name,
-	#T2.NumberReads - #T1.NumberReads AS NumberReads,
-	#T2.BytesRead - #T1.BytesRead AS BytesRead,
-	#T2.IoStallReadMS - #T1.IoStallReadMS AS IoStallReadMS,
-	#T2.NumberWrites - #T1.NumberWrites AS NumberWrites,
-	#T2.BytesWritten - #T1.BytesWritten AS BytesWritten,
-	#T2.IoStallWriteMS - #T1.IoStallWriteMS AS IoStallWriteMS
+	CAST((#T2.NumberReads - #T1.NumberReads) / (DATEDIFF(ms, #T1.counter_date, #T2.counter_date) / 1000.0) AS bigint) AS NumberReads,
+	CAST((#T2.BytesRead - #T1.BytesRead) / (DATEDIFF(ms, #T1.counter_date, #T2.counter_date) / 1000.0) AS bigint) AS BytesRead,
+	CAST((#T2.IoStallReadMS - #T1.IoStallReadMS) / (DATEDIFF(ms, #T1.counter_date, #T2.counter_date) / 1000.0) AS bigint) AS IoStallReadMS,
+	CAST((#T2.NumberWrites - #T1.NumberWrites) / (DATEDIFF(ms, #T1.counter_date, #T2.counter_date) / 1000.0) AS bigint) AS NumberWrites,
+	CAST((#T2.BytesWritten - #T1.BytesWritten) / (DATEDIFF(ms, #T1.counter_date, #T2.counter_date) / 1000.0) AS bigint) AS BytesWritten,
+	CAST((#T2.IoStallWriteMS - #T1.IoStallWriteMS) / (DATEDIFF(ms, #T1.counter_date, #T2.counter_date) / 1000.0) AS bigint) AS IoStallWriteMS
 FROM
 	#T1
 	LEFT JOIN

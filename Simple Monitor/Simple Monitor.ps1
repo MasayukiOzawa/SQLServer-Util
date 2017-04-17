@@ -6,7 +6,8 @@ param(
     $outputdir = "C:\Simple Monitor",
     $database = "",
     $interval = 5,
-    $isAzure = $false
+    $isAzure = $false,
+    $isPDW = $false
 )
 $ErrorActionPreference = "Continue"
 
@@ -16,12 +17,13 @@ Write-Output "Press Ctrl+C to exit."
 
 # PS1 と同じディレクトリ内の SQL ファイルを実行する
 # Box と SQL Database でし応するクエリが異なる場合、Box or Azure のファイル名で使い分ける
-if($isAzure){
+if ($isPDW){
+    $sqllist = Get-ChildItem -Path (Split-Path $MyInvocation.MyCommand.Path -Parent) | ? Name -Match "^[0-9].*sql" | ? Name -Like "*PDW*"
+}elseif($isAzure){
     $sqllist = Get-ChildItem -Path (Split-Path $MyInvocation.MyCommand.Path -Parent) | ? Name -Match "^[0-9].*sql" | ? Name -NotLike "*Box*"
 }else{
     $sqllist = Get-ChildItem -Path (Split-Path $MyInvocation.MyCommand.Path -Parent) | ? Name -Match "^[0-9].*sql" | ? Name -NotLike "*Azure*"
 }
-
 
 $outfilepath = (Join-Path $outputdir (Get-Date).ToString("yyyyMMdd"))
 if (-not (Test-Path $outfilepath)){

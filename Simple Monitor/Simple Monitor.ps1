@@ -20,9 +20,9 @@ Write-Output "Press Ctrl+C to exit."
 if ($isPDW){
     $sqllist = Get-ChildItem -Path (Split-Path $MyInvocation.MyCommand.Path -Parent) | ? Name -Match "^[0-9].*sql" | ? Name -Like "*PDW*"
 }elseif($isAzure){
-    $sqllist = Get-ChildItem -Path (Split-Path $MyInvocation.MyCommand.Path -Parent) | ? Name -Match "^[0-9].*sql" | ? Name -NotLike "*Box*"
+    $sqllist = Get-ChildItem -Path (Split-Path $MyInvocation.MyCommand.Path -Parent) | ? Name -Match "^[0-9].*sql" | ? Name -NotLike "*Box*" | ? Name -NotLike "*PDW*"
 }else{
-    $sqllist = Get-ChildItem -Path (Split-Path $MyInvocation.MyCommand.Path -Parent) | ? Name -Match "^[0-9].*sql" | ? Name -NotLike "*Azure*"
+    $sqllist = Get-ChildItem -Path (Split-Path $MyInvocation.MyCommand.Path -Parent) | ? Name -Match "^[0-9].*sql" | ? Name -NotLike "*Azure*" | ? Name -NotLike "*PDW*"
 }
 
 $outfilepath = (Join-Path $outputdir (Get-Date).ToString("yyyyMMdd"))

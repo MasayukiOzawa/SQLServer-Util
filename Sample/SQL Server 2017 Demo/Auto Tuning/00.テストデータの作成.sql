@@ -1,12 +1,29 @@
+-- CREATE DATABASE DemoDB
+
+USE [DemoDB]
+GO
+
 DROP TABLE IF EXISTS T_Emp
 GO
+DROP TABLE IF EXISTS T_Emp2
+GO
+
 CREATE TABLE T_Emp(
 	ID int NOT NULL, 
 	Name Varchar(20), 
 	Status Varchar(1), 
 	Flag tinyint NOT NULL, 
 	UpdDate Datetime, 
-	CONSTRAINT PK_ID PRIMARY KEY CLUSTERED(ID)) 
+	CONSTRAINT PK_T_Emp PRIMARY KEY CLUSTERED(ID)) 
+GO
+
+CREATE TABLE T_Emp2(
+	ID int NOT NULL, 
+	Name Varchar(20), 
+	Status Varchar(1), 
+	Flag tinyint NOT NULL, 
+	UpdDate Datetime, 
+	CONSTRAINT PK_T_Emp2 PRIMARY KEY CLUSTERED(ID)) 
 GO
 
 CREATE INDEX IX_Name on T_Emp(Name)
@@ -15,7 +32,14 @@ CREATE INDEX IX_Flag on T_Emp(Flag)
 CREATE INDEX IX_UpdDate on T_Emp(UpdDate)
 GO
 
+CREATE INDEX IX_Name on T_Emp2(Name)
+CREATE INDEX IX_Status on T_Emp2(Status)
+CREATE INDEX IX_Flag on T_Emp2(Flag)
+CREATE INDEX IX_UpdDate on T_Emp2(UpdDate)
+GO
+
 TRUNCATE TABLE T_Emp
+TRUNCATE TABLE T_Emp2
 GO
 
 -- 10 件データを登録
@@ -27,7 +51,7 @@ DECLARE @name varchar(10)
 
 WHILE @i <= 10
 	BEGIN SET @name = 'Name' + RIGHT('000000'+ CONVERT(VARCHAR,@i),6)
-	INSERT INTO T_Emp VALUES( @i,@name,1,0,Getdate() )
+	INSERT INTO T_Emp VALUES( @i,@name,1,RAND() * 10 ,Getdate() )
 	SET @i += 1
 END
 GO
@@ -47,7 +71,7 @@ BEGIN TRAN
 WHILE @i <= 1000000
 BEGIN
 	SET @name = 'Name' + RIGHT('000000'+ CONVERT(VARCHAR,@i),6)
-	INSERT INTO T_Emp VALUES( @i,@name,2,1,Getdate() )
+	INSERT INTO T_Emp VALUES( @i,@name,2,RAND() * 10,Getdate() )
 	SET @i += 1
 END
 COMMIT TRAN
@@ -56,6 +80,15 @@ GO
 -- 100 万件の状態の統計情報の STATS STREAM を取得
 UPDATE STATISTICS T_Emp IX_Flag WITH FULLSCAN
 DBCC SHOW_STATISTICS ('T_Emp', 'IX_Flag') WITH STATS_STREAM 
+GO
+
+INSERT INTO T_Emp2 SELECT * FROM T_Emp
+GO
+
+ALTER TABLE T_Emp REBUILD 
+GO
+
+ALTER TABLE T_Emp2 REBUILD 
 GO
 
 /*

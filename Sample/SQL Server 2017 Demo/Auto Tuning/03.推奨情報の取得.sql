@@ -1,3 +1,6 @@
+USE [DemoDB]
+GO
+
 SELECT 
 	r.reason, 
 	score,
@@ -18,3 +21,8 @@ WITH
 	[currentValue] nvarchar(100) '$.currentValue',
 	[reason] nvarchar(100) '$.reason'
     ) as planState
+GO
+
+-- クエリストアの情報の取得
+SELECT * FROM sys.query_store_plan
+WHERE plan_forcing_type <> 0

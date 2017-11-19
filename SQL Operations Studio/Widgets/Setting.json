@@ -1,0 +1,63 @@
+{
+    "name": "Buffer Cache",
+    "gridItemConfig": {
+        "sizex": 2,
+        "sizey": 1
+    },
+    "widget": {
+        "insights-widget": {
+            "type": {
+                "horizontalBar": {
+                    "dataDirection": "vertical",
+                    "dataType": "number",
+                    "legendPosition": "right",
+                    "labelFirstColumn": false,
+                    "columnsAsLabels": true
+                }
+            },
+            "queryFile": "./sql/BufferCache.sql"
+        }
+    }
+},
+{
+    "name": "Plan Cache",
+    "gridItemConfig": {
+        "sizex": 2,
+        "sizey": 1
+    },
+    "widget": {
+        "insights-widget": {
+            "type": {
+                "horizontalBar": {
+                    "dataDirection": "vertical",
+                    "dataType": "number",
+                    "legendPosition": "right",
+                    "labelFirstColumn": false,
+                    "columnsAsLabels": true
+                }
+            },
+            "queryFile": "./sql/PlanCache.sql"
+        }
+    }
+},
+{
+    "name": "OS Info",
+    "gridItemConfig": {
+        "sizex": 1,
+        "sizey": 1
+    },
+    "widget": {
+        "insights-widget": {
+            "type": {
+                "count": {
+                    "dataDirection": "vertical",
+                    "dataType": "number",
+                    "legendPosition": "none",
+                    "labelFirstColumn": false,
+                    "columnsAsLabels": false
+                }
+            },
+            "queryFile": "./sql/OSInfo.sql"
+        }
+    }
+}

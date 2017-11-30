@@ -58,6 +58,7 @@ SELECT
 	, ss.no_recompute
 	, so.create_date
 	, so.modify_date
+
 FROM
 	sys.indexes AS si
 	LEFT JOIN
@@ -142,7 +143,10 @@ WHERE
 	(ius.database_id = DB_ID() OR ius.database_id IS NULL)
 	AND
 	so.schema_id <> SCHEMA_ID('sys')
+	AND
+	sp.data_compression IN(0, NULL)
 ORDER BY
+	dps.reserved_page_count DESC,
 	object_name,
 	si.index_id,
 	dps.partition_number

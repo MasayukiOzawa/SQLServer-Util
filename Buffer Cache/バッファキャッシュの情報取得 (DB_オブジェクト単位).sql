@@ -8,7 +8,7 @@ SELECT
 	p.index_id,  
 	p.partition_number,   
 	count(*) AS [Page Count],   
-	count(*) * 8 / 1024 AS [Page Size (MB)]  
+	count(*) * 8 / 1024.0 AS [Page Size (MB)]  
 FROM  
 	sys.dm_os_buffer_descriptors bd WITH (NOLOCK)  
 	LEFT JOIN   
@@ -29,3 +29,9 @@ WHERE
 	p.index_id,
 	p.partition_number
 OPTION (RECOMPILE)
+
+
+/*
+DBCC DROPCLEANBUFFERS
+GO
+*/

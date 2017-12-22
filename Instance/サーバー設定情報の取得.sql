@@ -17,6 +17,10 @@ GO
 sp_configure
 GO
 
+SELECT * FROM sys.configurations
+GO
+
+
 /*********************************************/
 -- サーバープロパティの取得
 /*********************************************/
@@ -56,5 +60,6 @@ SELECT
 -- SYSINFO
 /*********************************************/
 select GETDATE() AS DATE,* from sys.dm_os_sys_info
+GO
 
 

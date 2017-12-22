@@ -17,7 +17,7 @@ GO
 sp_configure
 GO
 
-SELECT * FROM sys.configurations
+SELECT * FROM sys.configurations ORDER BY name
 GO
 
 

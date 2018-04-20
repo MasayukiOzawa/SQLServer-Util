@@ -2,20 +2,20 @@
 GO
 
 DECLARE @stats TABLE(
-RANGE_HI_KEY sql_variant,
-RANGE_ROWS real,
-EQ_ROWS real,
-DISTINCT_RANGE_ROWS	bigint,
-AVG_RANGE_ROWS real
+	RANGE_HI_KEY sql_variant,
+	RANGE_ROWS real,
+	EQ_ROWS real,
+	DISTINCT_RANGE_ROWS	bigint,
+	AVG_RANGE_ROWS real
 )
 DECLARE @results TABLE(
-object_name sysname,
-stats_name sysname,
-RANGE_HI_KEY sql_variant,
-RANGE_ROWS real,
-EQ_ROWS real,
-DISTINCT_RANGE_ROWS	bigint,
-AVG_RANGE_ROWS real
+	object_name sysname,
+	stats_name sysname,
+	RANGE_HI_KEY sql_variant,
+	RANGE_ROWS real,
+	EQ_ROWS real,
+	DISTINCT_RANGE_ROWS	bigint,
+	AVG_RANGE_ROWS real
 )
 DECLARE @object_name sysname, @stats_name sysname
 
@@ -54,7 +54,7 @@ DEALLOCATE stats_cursor
 SELECT * FROM @results
 
 
--- SQL Server v.Next 向けの統計情報のヒストグラム確認
+-- SQL Server 2016 SP1 CU2 以降の統計情報のヒストグラム確認
 SELECT 
 	OBJECT_SCHEMA_NAME(s.object_id) AS schema_name,
 	object_name(s.object_id) AS object_name, 
@@ -64,7 +64,15 @@ SELECT
 	sh.range_rows,
 	sh.equal_rows,
 	sh.distinct_range_rows,
-	sh.average_range_rows
+	sh.average_range_rows,
+	s.auto_created,
+	s.user_created,
+	s.no_recompute,
+	s.has_filter,
+	s.filter_definition,
+	s.is_temporary,
+	s.is_incremental,
+	STATS_DATE(s.object_id, s.stats_id) AS stats_date
 FROM
 	sys.stats s
 	cross apply

@@ -1,6 +1,6 @@
-﻿# http://tech.guitarrapc.com/entry/2013/10/29/100946
+# http://tech.guitarrapc.com/entry/2013/10/29/100946
 # https://www.gmo.jp/report/single/?art_id=195
-
+# https://blogs.technet.microsoft.com/heyscriptingguy/2015/11/26/beginning-use-of-powershell-runspaces-part-1/
 function Start-AsyncSQLQueryTest(){
     [CmdletBinding()]
     param
@@ -23,7 +23,6 @@ function Start-AsyncSQLQueryTest(){
                 $con = New-Object System.Data.SqlClient.SqlConnection
                 $con.ConnectionString = $ConnectionString
                 $con.Open()
-                
                 $cmd = $con.CreateCommand()
                 $cmd.CommandType = [System.Data.CommandType]::Text
                 $cmd.CommandText = $Query
@@ -49,9 +48,8 @@ function Start-AsyncSQLQueryTest(){
         $aryIAsyncResult  = New-Object System.Collections.ArrayList 
         for ( $i = 0; $i -lt $RunspaceSize; $i++ )   
         {       
-            $powershell = [PowerShell]::Create()   
-            $powershell.RunspacePool = $runspacePool  
             $powershell = [PowerShell]::Create().AddScript($Command).AddArgument($ConnectionString).AddArgument($Query).AddArgument($CommandTimeout)
+            $powershell.RunspacePool = $runspacePool  
             [array]$RunspaceCollection += New-Object -TypeName PSObject -Property @{
                 Runspace = $powershell.BeginInvoke();
                 powershell = $powershell

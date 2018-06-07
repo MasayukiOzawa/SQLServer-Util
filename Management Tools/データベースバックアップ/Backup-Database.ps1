@@ -164,12 +164,14 @@ try{
             
             $cmd.Dispose()
 
-            $con.Close()
-            $con.Dispose()
             Write-Output ("Backup Success [{0}] " -f $dbname)
         }catch{
             return $Error[0]
         }finally{
+            if($con -ne $null){
+                $con.Close()
+                $con.Dispose()
+            }
             $ErrorActionPreference = $orgErrorActionPreference
         }
     }

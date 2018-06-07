@@ -29,7 +29,7 @@ $RunspaceSize = $SQL.Count
 
 Out-Message -Msg ("=" * 50)
 Out-Message "Script Settings:"
-Out-Message ("Connection Timeout:[{0}] / Runspace Size:[{2}]" -f $ConnectionTimeout, $CommandTimeout, $RunspaceSize)
+Out-Message ("Connection Timeout:[{0}] / Runspace Size:[{1}]" -f $ConnectionTimeout,$RunspaceSize)
 Out-Message -Msg ("=" * 50)
 
 $sw = [system.diagnostics.stopwatch]::startNew()
@@ -66,8 +66,10 @@ try{
 
             if ($sql.IsDataSet -ne $True){
                 $cmd = $con.CreateCommand()
-                $cmd.CommandTimeout = $sql.CommandTimeout
-
+                if($sql.CommandTimeout -ne $null){
+                    $cmd.CommandTimeout = $sql.CommandTimeout
+                }
+                
                 $cmd.CommandText = $sql.Text
             
                 [void]$cmd.ExecuteNonQuery()

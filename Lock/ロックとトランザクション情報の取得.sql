@@ -1,13 +1,10 @@
--- ロック情報をベースとしたトランザクションの取得
+﻿-- ロック情報をベースとしたトランザクションの取得
 SELECT
 	er.blocking_session_id,
 	tl.request_session_id,
-	es.host_name,
-	ec.client_net_address,
-	es.program_name,
-	es.client_interface_name,
-	er.command,
-	er.status,
+	ec.protocol_type,
+	SUBSTRING(CONVERT(BINARY(4),ec.protocol_version),1,1) AS tds_version,
+	es.client_version,
 	CASE es.transaction_isolation_level
 		WHEN 0 THEN 'Unspecified'
 		WHEN 1 THEN 'ReadUncomitted'
@@ -16,6 +13,12 @@ SELECT
 		WHEN 4 THEN 'Serializable'
 		WHEN 5 THEN 'Snapshot'
 	END AS transaction_isolation_level,
+		es.host_name,
+	ec.client_net_address,
+	es.program_name,
+	es.client_interface_name,
+	er.command,
+	er.status,
 	DB_NAME(tl.resource_database_id) resource_database_name,
 	tl.request_status,
 	tl.resource_type,

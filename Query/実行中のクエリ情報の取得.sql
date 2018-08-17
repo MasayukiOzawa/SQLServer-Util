@@ -3,21 +3,40 @@ GO
 
 SELECT
     es.session_id,
-    er.request_id,
-    er.start_time,
-    er.start_time,
-    es.last_request_start_time,
-    es.last_request_end_time,
-    REPLACE(REPLACE(ec_text.text,CHAR(13), ''), CHAR(10), ' ') AS ec_text,
-    REPLACE(REPLACE(er_text.text,CHAR(13), ''), CHAR(10), ' ') AS er_text,
-    er.command,
+    er.scheduler_id,
+	ec.local_tcp_port,
+	er.request_id,
+	es.host_name,
+	ec.local_net_address,
+	ec.client_tcp_port,
+    es.program_name,
+	es.login_name,
+	es.nt_user_name,
+    -- er.database_id,
     es.status,
+    er.command,
     er.wait_type,
     er.last_wait_type,
     er.wait_resource,
-    er.database_id,
     DB_NAME(er.database_id) AS database_name,
-    er.user_id,
+	CASE er.transaction_isolation_level 
+		WHEN 0 THEN 'Unspecified' 
+		WHEN 1 THEN 'ReadUncommitted' 
+		WHEN 2 THEN 'ReadCommitted' 
+		WHEN 3 THEN 'Repeatable' 
+		WHEN 4 THEN 'Serializable' 
+		WHEN 5 THEN 'Snapshot' 
+	END AS Transaction_Isolation_Level,
+    --er.user_id,
+    -- er.executing_managed_code,
+    es.client_interface_name,
+    es.login_name,
+    es.client_version,
+	ec.connect_time,
+    es.login_time,
+    er.start_time,
+    es.last_request_start_time,
+    es.last_request_end_time,
     er.wait_time,
     er.open_resultset_count,
     er.open_resultset_count,
@@ -41,26 +60,18 @@ SELECT
 	tsu.user_objects_dealloc_page_count,
 	tsu.internal_objects_dealloc_page_count,
 	tsu.internal_objects_dealloc_page_count,
-	er.start_time,
     er.granted_query_memory,
-    er.scheduler_id,
-    er.transaction_isolation_level,
-    er.executing_managed_code,
     es.lock_timeout,
     er.lock_timeout as exec_requests_lock_timeout,
     es.deadlock_priority,
     er.deadlock_priority AS exec_requests_deadlock_priority,
-    es.host_name,
-    es.program_name,
-    es.login_time,
-    es.login_name,
-    es.client_version,
-    es.client_interface_name,
+    REPLACE(REPLACE(ec_text.text,CHAR(13), ''), CHAR(10), ' ') AS ec_text,
+    REPLACE(REPLACE(er_text.text,CHAR(13), ''), CHAR(10), ' ') AS er_text,
     er_plan.query_plan AS er_plan
 -- 以下は SQL Server 2005 では取得不可
     ,er.query_hash,
     er.query_plan_hash
--- 以下は SQL Server のバージョンによっては取得負荷
+-- 以下は SQL Server のバージョンによっては取得不可
     ,er.dop
 FROM
     sys.dm_exec_requests er WITH (NOLOCK)
@@ -88,6 +99,8 @@ WHERE
     es.session_id <> @@SPID
 	AND
 	es.session_id >=50
+	AND
+	es.is_user_process = 1
 ORDER BY
 	exec_requests_cpu_time DESC,
 	cpu_time DESC, 

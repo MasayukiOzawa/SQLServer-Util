@@ -3,6 +3,7 @@ GO
 
 SELECT
     es.session_id,
+    er.blocking_session_id,
     er.scheduler_id,
 	ec.local_tcp_port,
 	er.request_id,

@@ -9,22 +9,26 @@ DECLARE @InstanceName AS sysname
 DECLARE @MSSQLVersion AS sysname
 SELECT @MSSQLVersion  = CONVERT(sysname, SERVERPROPERTY ('ProductVersion'))
 
-IF (PATINDEX('9.00%', @MSSQLVersion) > 0)
-BEGIN
-	SET @InstanceName = 'SQLServer'
-END
-ELSE
-BEGIN
-	SET @InstanceName = 'MSSQL$' + CONVERT(sysname,SERVERPROPERTY('InstanceName'))
-END
+SET @InstanceName = 'SQLServer'
 
 SELECT
 	GETDATE() AS DATE, 
-	[object_name], 
-	[counter_name], 
-	[instance_name], 
+	RTRIM([object_name]) AS [object_name], 
+	RTRIM([counter_name]) AS [counter_name], 
+	RTRIM([instance_name]) AS [instance_name],
 	[cntr_value], 
-	[cntr_value] * 8.0 AS [Cntr value * 8]
+	CASE 
+		WHEN cntr_type = 65792 AND 
+			counter_name IN ('Database pages', 'Target pages', 'Cache Pages') 
+			THEN [cntr_value] * 8 / 1024
+		WHEN counter_name IN ('Connection Memory (KB)', 'Database Cache Memory (KB)', 
+			'Free Memory (KB)', 'Granted Workspace Memory (KB)', 'Lock Memory (KB)',
+			'Optimizer Memory (KB)', 'Reserved Server Memory (KB)', 'SQL Cache Memory (KB)',
+			'Stolen Server Memory (KB)','Log Pool Memory (KB)','Target Server Memory (KB)','Total Server Memory (KB)')
+			THEN [cntr_value] * 8 / 1024
+		ELSE NULL
+	END AS contr_size_mb,
+	[cntr_type]
 FROM
 	[sys].[dm_os_performance_counters]
 WHERE
@@ -33,4 +37,3 @@ WHERE
 	([object_name] = @InstanceName + ':Buffer Manager')
 	OR
 	([object_name] = @InstanceName + ':Plan Cache')
-

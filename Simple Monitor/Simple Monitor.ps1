@@ -1,10 +1,10 @@
 ﻿[CmdletBinding()]
 param(
-    $server = "",
+    $server = "localhost",
     $user = "",
     $password = "",
     $outputdir = "C:\Simple Monitor",
-    $database = "",
+    $database = "master",
     $interval = 5,
     $isAzure = $false,
     $isPDW = $false
@@ -16,7 +16,7 @@ Clear-Host
 Write-Output "Press Ctrl+C to exit."
 
 # PS1 と同じディレクトリ内の SQL ファイルを実行する
-# Box と SQL Database でし応するクエリが異なる場合、Box or Azure のファイル名で使い分ける
+# Box と SQL Database で使用するクエリが異なる場合、Box or Azure のファイル名で使い分ける
 if ($isPDW){
     $sqllist = Get-ChildItem -Path (Split-Path $MyInvocation.MyCommand.Path -Parent) | ? Name -Match "^[0-9].*sql" | ? Name -Like "*PDW*"
 }elseif($isAzure){
@@ -50,7 +50,7 @@ while($true){
             # PBI Desktop でオリジナルのファイルを読み込むと、ファイルロックしてしまうことがあるので、二次ディレクトリに退避し、PBI Desktop ではそちらにアクセス
             Copy-Item (Join-Path $outfilepath $outfile) (Join-Path $outputdir "Results") -Force
         }catch{
-            Write-Host ("{0}:{1}"-f (Get-Date),$Error[0].Exception.Message)
+            Write-Host ("{0}:[{1}]:{2}"-f (Get-Date), $sqlfile, $Error[0].Exception.Message)
         }
     }
 

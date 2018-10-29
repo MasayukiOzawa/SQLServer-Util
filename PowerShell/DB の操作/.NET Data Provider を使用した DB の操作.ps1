@@ -105,8 +105,11 @@ $con2.ConnectionString = $constring
 
 # オブジェクト生成後に Open し、try / catch でエラー時には、Complete しないようにする
 try{
-    $transcope = New-Object System.Transactions.TransactionScope
+    $tranoption = New-Object System.Transactions.TransactionOptions
+    $tranoption.IsolationLevel = [System.Transactions.IsolationLevel]::ReadCommitted
    
+    $transcope = New-Object System.Transactions.TransactionScope -ArgumentList (New-Object System.Transactions.TransactionScopeOption)::Required, $tranoption
+
     $con1.Open()
 
     $cmd1 = $con1.CreateCommand()

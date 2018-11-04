@@ -1,4 +1,4 @@
--- 実行プランを XML インデックスで検索するため、物理テーブルに格納
+﻿-- 実行プランを XML インデックスで検索するため、物理テーブルに格納
 -- 検索性能が遅くてもよいのであれば、検索クエリの FROM 句に指定することも可能
 DROP TABLE IF EXISTS #tmp
 GO
@@ -14,9 +14,14 @@ OUTER APPLY
 	sys.dm_exec_query_plan(plan_handle)
 OUTER APPLY
 	sys.dm_exec_sql_text(sql_handle)
+GO
+
 ALTER TABLE #tmp ALTER COLUMN  No int NOT NULL
-ALTER TABLE #tmp ADD CONSTRAINT PK_Tmp PRIMARY KEY CLUSTERED(No)
+GO
+ALTER TABLE #tmp ADD CONSTRAINT PK_Tmp_Query PRIMARY KEY CLUSTERED(No)
+GO
 CREATE PRIMARY XML INDEX PIdx_Tmp_Query ON #tmp(query_plan)  
+GO
 
 -- 実行プランから特定のテーブルの全件検索を実施しているクエリを取得
 DECLARE @TableName sysname = QUOTENAME('LINEITEM')

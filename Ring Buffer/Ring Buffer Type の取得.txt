@@ -1,0 +1,16 @@
+SELECT 
+	[type]
+FROM
+(
+SELECT
+	record.value('(/Record/@type)[1]', 'varchar(500)') AS [type]
+FROM
+(
+	SELECT
+		timestamp,
+		CAST(record AS xml) AS record
+	FROM 
+		sys.dm_os_ring_buffers
+) AS T
+) AS T2
+GROUP BY type

@@ -1,0 +1,28 @@
+DROP TABLE IF EXISTS #system_health
+CREATE TABLE #system_health (c1 int primary key, target_data xml)
+CREATE PRIMARY XML INDEX system_health_xml_index ON #system_health (target_data)
+
+INSERT INTO #system_health
+SELECT 
+	1,
+	CAST(target_data AS xml) AS target_data
+FROM 
+	sys.dm_xe_session_targets
+WHERE
+	event_session_address = 
+		(SELECT address FROM sys.dm_xe_sessions WHERE name = 'system_health')
+	AND
+	target_name = 'ring_buffer'
+GO
+
+SELECT  target_event 
+FROM (
+	SELECT
+		CAST(event.query('data(./@name)') AS varchar(100)) AS target_event
+	FROM
+	(
+		SELECT * FROM #system_health
+	) AS T
+	OUTER APPLY target_data.nodes('//event') AS T2(event)
+) AS T2
+GROUP BY target_event

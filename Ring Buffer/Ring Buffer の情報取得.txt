@@ -1,0 +1,15 @@
+SELECT 
+	DATEADD (ms, -1 * (si.ms_ticks - [timestamp]), GETDATE()) AS utc_time, 
+	T.*
+FROM
+(
+SELECT
+	timestamp,
+	CAST(record AS xml) AS record
+FROM 
+	sys.dm_os_ring_buffers
+) AS T
+CROSS JOIN
+    sys.dm_os_sys_info si
+WHERE
+	record.exist('/Record[@type="RING_BUFFER_MEMORY_BROKER"]') > 0

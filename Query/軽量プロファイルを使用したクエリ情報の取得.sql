@@ -8,6 +8,7 @@ SELECT
 	T.session_id,
 	er.command,
 	er.status,
+	er.start_time,
     SUBSTRING(st.text, (qsx.statement_start_offset/2)+1,   
         ((CASE qsx.statement_end_offset  
           WHEN -1 THEN DATALENGTH(st.text)  
@@ -39,6 +40,7 @@ SELECT
 	qp.request_id,
 	er.command,
 	er.status,
+	er.start_time,
 	qp.physical_operator_name,
 	DB_NAME(qp.database_id) AS database_name,
 	OBJECT_NAME(qp.object_id) AS object_name,

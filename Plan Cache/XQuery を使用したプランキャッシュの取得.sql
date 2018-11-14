@@ -1,4 +1,4 @@
--- “Á’è‚ÌƒNƒGƒŠ‚ÌƒXƒe[ƒgƒƒ“ƒg‚ğæ“¾
+ï»¿-- ç‰¹å®šã®ã‚¯ã‚¨ãƒªã®ã‚¹ãƒ†ãƒ¼ãƒˆãƒ¡ãƒ³ãƒˆã‚’å–å¾—
 WITH XMLNAMESPACES (DEFAULT 'http://schemas.microsoft.com/sqlserver/2004/07/showplan' ) 
 SELECT 
 	T2.Stmt.query('data(./@StatementId)') AS StatementId,
@@ -26,7 +26,7 @@ CROSS APPLY query_plan.nodes('//StmtSimple') AS T2(Stmt);
 GO
 
 
--- “Á’è‚ÌƒNƒGƒŠ‚Ì‘€ì‚ğæ“¾
+-- ç‰¹å®šã®ã‚¯ã‚¨ãƒªã®æ“ä½œã‚’å–å¾—
 WITH XMLNAMESPACES (DEFAULT 'http://schemas.microsoft.com/sqlserver/2004/07/showplan' ) 
 SELECT 
 	T2.Stmt.query('data(./@NodeId)') AS NodeId,

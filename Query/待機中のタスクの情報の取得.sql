@@ -1,12 +1,18 @@
+﻿DECLARE @system bit = 1 -- システムセッションを取得
+
 SELECT 
 	wt.session_id,
 	er.status,
 	er.command,
+	at.name AS tran_name,
 	es.login_name,
 	er.start_time,
 	at.transaction_begin_time,
 	datediff(MILLISECOND,  er.start_time, GETDATE()) AS elapsed_time_ms,
-	datediff(MILLISECOND, at.transaction_begin_time, GETDATE()) AS transaction_elapsed_time_ms,
+	CASE at.transaction_type -- 読み取り専用トランザクションのトランザクション経過時間はトランザクション解析のノイズになる可能性があるため、Elapsed で判断
+		WHEN 2 THEN NULL
+		ELSE datediff(MILLISECOND, at.transaction_begin_time, GETDATE())
+	END AS transaction_elapsed_time_ms,
 	er.wait_time,
 	wt.wait_duration_ms,
 	er.open_transaction_count,
@@ -28,7 +34,8 @@ SELECT
 		WHEN 7 THEN N'ロールバック中'
 		WHEN 8 THEN N'ロールバック完了'
 		ELSE CAST(at.transaction_type AS nvarchar(50))
-	END AS transaction_state,	at.dtc_state,
+	END AS transaction_state,	
+	at.dtc_state,
 	at.dtc_status,
 	er.transaction_id,
 	CASE er.transaction_isolation_level
@@ -45,7 +52,9 @@ SELECT
 	er.wait_resource,
 	wt.resource_description,
 	DB_NAME(er.database_id) AS database_name,
+	wt.exec_context_id,
 	wt.blocking_session_id AS wt_blocking_session_id,
+	wt.blocking_exec_context_id,
 	er.blocking_session_id AS er_blocking_session_id,
 	es.host_name,
 	es.program_name,
@@ -61,11 +70,17 @@ SELECT
 	st.text,
 	qp.query_plan
 FROM
-	sys.dm_os_waiting_tasks AS wt
-	LEFT JOIN sys.dm_exec_requests AS er ON	wt.session_id = er.session_id
-	LEFT JOIN sys.dm_tran_active_transactions AS at ON at.transaction_id = er.transaction_id
-	LEFT JOIN sys.dm_exec_sessions AS es ON es.session_id = er.session_id
+	sys.dm_os_waiting_tasks AS wt WITH(NOLOCK)
+	LEFT JOIN sys.dm_exec_requests AS er WITH(NOLOCK) ON wt.session_id = er.session_id
+	LEFT JOIN sys.dm_tran_active_transactions AS at WITH(NOLOCK) ON at.transaction_id = er.transaction_id
+	LEFT JOIN sys.dm_exec_sessions AS es WITH(NOLOCK) ON es.session_id = er.session_id
 	OUTER APPLY sys.dm_exec_query_plan(er.plan_handle) AS qp
 	OUTER APPLY sys.dm_exec_sql_text(er.sql_handle) AS st
+WHERE
+	wt.session_id >= 
+	CASE @system
+		WHEN 0 THEN 50 -- ユーザーセッションものみを取得
+		ELSE 0	-- システムセッションを併せて取得
+	END
 ORDER BY
 	wt.session_id

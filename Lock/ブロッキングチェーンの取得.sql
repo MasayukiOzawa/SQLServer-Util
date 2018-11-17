@@ -1,11 +1,17 @@
-WITH 
+DECLARE @headblocker bit = 0	-- HeadBlocker のみを取得するか
+DECLARE @level int = 100		-- 何レベルまで取得するか
+
+;WITH 
+-- プロセス一覧
 sp AS(
-SELECT spid, blocked, cmd, lastwaittype,waitresource,status, text 
-FROM sys.sysprocesses 
-CROSS APPLY sys.dm_exec_sql_text(sql_handle)
-WHERE spid > 50
+	SELECT spid, blocked, cmd, lastwaittype,waitresource,status, text 
+	FROM sys.sysprocesses 
+	CROSS APPLY sys.dm_exec_sql_text(sql_handle)
+	WHERE spid > 50
 ),
+-- ブロッキングリスト
 BlockList AS(
+
 --  Blocker
 SELECT
 	spid, 
@@ -53,19 +59,24 @@ FROM
 	ON
 	r.blocked = BlockList.spid
 )
+-- ブロッキング情報の取得
 SELECT 
 	BlockList.level, 
 	BlockList.spid, 
-	er.start_time,
-	at.transaction_begin_time,
-	datediff(MILLISECOND, er.start_time,GETDATE()) AS epalsed_time_ms,
-	datediff(MILLISECOND, at.transaction_begin_time, GETDATE()) AS transaction_elapsed_time_ms,
-	er.wait_time,
 	is_HeadBlocker,
 	CASE 
 		WHEN BlockList.blocked_path = '' THEN ''
 		ELSE BlockList.blocked_path + '->' + CAST(BlockList.spid AS varchar(10))
 	END	AS blocked_path,
+	er.start_time,
+	at.transaction_begin_time,
+	datediff(MILLISECOND, er.start_time,GETDATE()) AS epalsed_time_ms,
+	at.name AS transaction_name,
+	CASE at.transaction_type -- 読み取り専用トランザクションのトランザクション経過時間はトランザクション解析のノイズになる可能性があるため、Elapsed で判断
+		WHEN 2 THEN NULL
+		ELSE datediff(MILLISECOND, at.transaction_begin_time, GETDATE())
+	END AS transaction_elapsed_time_ms,
+	er.wait_time,
 	er.status,
 	BlockList.cmd, 
 	er.wait_type,
@@ -73,6 +84,30 @@ SELECT
 	er.wait_resource AS er_wait_resource,
 	BlockList.waitresource AS BlockList_wait_resource, 
 	BlockList.status, 
+	es.host_name,
+	es.program_name,
+	es.login_name,
+	er.open_transaction_count,
+	CASE at.transaction_type
+		WHEN 1 THEN N'読み取り/書き込み'
+		WHEN 2 THEN N'読み取り専用'
+		WHEN 3 THEN N'システム'
+		WHEN 4 THEN N'分散トランザクション'
+		ELSE CAST(at.transaction_type AS nvarchar(50))
+	END AS transaction_type,
+	CASE at.transaction_state
+		WHEN 1 THEN N'初期化待ち'
+		WHEN 1 THEN N'開始待ち'
+		WHEN 2 THEN N'アクティブ'
+		WHEN 3 THEN N'終了'
+		WHEN 4 THEN N'分散トランザクションコミット開始'
+		WHEN 5 THEN N'解決待ち'
+		WHEN 6 THEN N'コミット完了'
+		WHEN 7 THEN N'ロールバック中'
+		WHEN 8 THEN N'ロールバック完了'
+		ELSE CAST(at.transaction_type AS nvarchar(50))
+	END AS transaction_state,		at.transaction_id,
+	at.transaction_uow,
 	BlockList.text,
 		SUBSTRING(st.text, (er.statement_start_offset/2)+1,   
 	((CASE er.statement_end_offset  
@@ -80,10 +115,7 @@ SELECT
 		ELSE er.statement_end_offset  
 		END - er.statement_start_offset)/2) + 1) AS statement_text ,
 	st.text AS st_text,
-	qp.query_plan,
-	es.host_name,
-	es.program_name,
-	es.login_name
+	qp.query_plan
 FROM 
 	BlockList
 	LEFT JOIN sys.dm_exec_requests AS er ON er.session_id = BlockList.spid
@@ -91,7 +123,13 @@ FROM
 	LEFT JOIN sys.dm_exec_sessions as es ON es.session_id = BlockList.spid
 	OUTER APPLY sys.dm_exec_query_plan(er.plan_handle) AS qp
 	OUTER APPLY sys.dm_exec_sql_text(er.sql_handle) AS st
+WHERE
+	is_HeadBlocker >= @headblocker
+	AND
+	level BETWEEN 1 AND @level
 ORDER BY 
 	level ASC,
-	blocked_chain ASC
+	blocked_chain ASC,
+	spid 
+	ASC
 OPTION (MAXRECURSION 100, RECOMPILE)

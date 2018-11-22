@@ -1,7 +1,7 @@
-DECLARE @system bit = 1							-- ƒVƒXƒeƒ€ƒZƒbƒVƒ‡ƒ“‚ðŽæ“¾ (0: ‚·‚×‚Ä‚ÌƒZƒbƒVƒ‡ƒ“‚ðŽæ“¾ / 1 : SPID >= 50 ‚ðŽæ“¾)
-DECLARE @elapsed_time_ms int = 0				-- ŽÀs‚©‚ç‰½•bŒo‰ß‚µ‚Ä‚¢‚éƒNƒGƒŠ‚ðŽæ“¾‚·‚é‚© (0 : ‚·‚×‚Ä)
-DECLARE @wait_time_ms int = 0					-- ‰½•b‘Ò‹@‚ª”­¶‚µ‚Ä‚¢‚éƒNƒGƒŠ‚ðŽæ“¾‚·‚é‚© (0 : ‚·‚×‚Ä)
-DECLARE @transaction_elapsed_time_ms int = 0	-- ƒgƒ‰ƒ“ƒUƒNƒVƒ‡ƒ“ŠJŽn‚©‚ç“ï•aŒo‰ß‚µ‚Ä‚¢‚éƒNƒGƒŠ‚ðŽæ“¾‚·‚é‚© (0 : ‚·‚×‚Ä)
+ï»¿DECLARE @system bit = 0							-- ã‚·ã‚¹ãƒ†ãƒ ã‚»ãƒƒã‚·ãƒ§ãƒ³ã‚’å–å¾— (0: ã™ã¹ã¦ã®ã‚»ãƒƒã‚·ãƒ§ãƒ³ã‚’å–å¾— / 1 : SPID >= 50 ã‚’å–å¾—)
+DECLARE @elapsed_time_sec int = 0				-- å®Ÿè¡Œã‹ã‚‰ä½•ç§’çµŒéŽã—ã¦ã„ã‚‹ã‚¯ã‚¨ãƒªã‚’å–å¾—ã™ã‚‹ã‹ (0 : ã™ã¹ã¦)
+DECLARE @wait_time_sec int = 0					-- ä½•ç§’å¾…æ©ŸãŒç™ºç”Ÿã—ã¦ã„ã‚‹ã‚¯ã‚¨ãƒªã‚’å–å¾—ã™ã‚‹ã‹ (0 : ã™ã¹ã¦)
+DECLARE @transaction_elapsed_time_sec int = 0	-- ãƒˆãƒ©ãƒ³ã‚¶ã‚¯ã‚·ãƒ§ãƒ³é–‹å§‹ã‹ã‚‰é›£ç—…çµŒéŽã—ã¦ã„ã‚‹ã‚¯ã‚¨ãƒªã‚’å–å¾—ã™ã‚‹ã‹ (0 : ã™ã¹ã¦)
 
 SELECT * FROM(
 SELECT 
@@ -15,13 +15,27 @@ SELECT
 	er.wait_type,
 	er.last_wait_type,
 	er.wait_resource,
-
-	COALESCE(DATEDIFF(MILLISECOND, er.start_time, GETDATE()), 0) AS elapsed_time_ms, 
-	COALESCE(er.wait_time, 0) AS wait_time_ms,
-	COALESCE(DATEDIFF(MILLISECOND, tat.transaction_begin_time, GETDATE()), 0) AS transaction_begin_elapsed_time_ms, 
-	COALESCE(DATEDIFF(MILLISECOND, es.login_time, GETDATE()), 0) AS login_elapsed_time_ms, 
-	COALESCE(DATEDIFF(MILLISECOND, es.last_request_start_time, GETDATE()), 0) AS last_request_start_elapsed_time_ms, 
-	COALESCE(DATEDIFF(MILLISECOND, es.last_request_end_time, GETDATE()), 0) AS last_request_end_elapsed_time_ms, 
+	CASE er.start_time
+		WHEN NULL THEN NULL
+		ELSE COALESCE(DATEDIFF(SECOND, er.start_time, GETDATE()), 0) 
+	END AS elapsed_time_sec, 
+	COALESCE(er.wait_time, 0) AS wait_time_sec,
+	CASE tat.transaction_begin_time
+		WHEN NULL THEN NULL
+		ELSE COALESCE(DATEDIFF(SECOND, tat.transaction_begin_time, GETDATE()), 0) 
+	END AS transaction_begin_elapsed_time_sec, 
+	CASE es.login_time
+		WHEN NULL THEN NULL
+		ELSE COALESCE(DATEDIFF(SECOND, es.login_time, GETDATE()), 0) 
+	END AS login_elapsed_time_sec, 
+	CASE es.last_request_start_time
+		WHEN NULL THEN NULL
+		ELSE COALESCE(DATEDIFF(SECOND, es.last_request_start_time, GETDATE()), 0) 
+	END AS last_request_start_elapsed_time_sec, 
+	CASE es.last_request_end_time
+		WHEN NULL THEN NULL
+		ELSE COALESCE(DATEDIFF(SECOND, es.last_request_end_time, GETDATE()), 0) 
+	END AS last_request_end_elapsed_time_sec, 
 
 	es.login_time,
 	es.last_request_start_time,
@@ -54,15 +68,17 @@ WHERE
 	AND
 	session_id >= 
 		CASE @system
-			WHEN 0 THEN 50 -- ƒ†[ƒU[ƒZƒbƒVƒ‡ƒ“‚à‚Ì‚Ý‚ðŽæ“¾
-			ELSE 0	-- ƒVƒXƒeƒ€ƒZƒbƒVƒ‡ƒ“‚ð•¹‚¹‚ÄŽæ“¾
+			WHEN 1 THEN 50 -- ãƒ¦ãƒ¼ã‚¶ãƒ¼ã‚»ãƒƒã‚·ãƒ§ãƒ³ã‚‚ã®ã¿ã‚’å–å¾—
+			ELSE 0	-- ã‚·ã‚¹ãƒ†ãƒ ã‚»ãƒƒã‚·ãƒ§ãƒ³ã‚’ä½µã›ã¦å–å¾—
 		END
 	AND
-	elapsed_time_ms >= @elapsed_time_ms
-	AND
-	transaction_begin_elapsed_time_ms >= @transaction_elapsed_time_ms
-	AND
-	wait_time_ms >= @wait_time_ms
+	(
+		elapsed_time_sec >= @elapsed_time_sec
+		OR
+		transaction_begin_elapsed_time_sec >= @transaction_elapsed_time_sec
+		OR
+		wait_time_sec >= @wait_time_sec
+	)
 ORDER BY
 	session_id
-OPTION (MAXRECURSION 100, RECOMPILE)
+OPTION (RECOMPILE)

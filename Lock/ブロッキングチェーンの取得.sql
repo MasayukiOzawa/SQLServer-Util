@@ -1,15 +1,15 @@
-DECLARE @headblocker bit = 0	-- HeadBlocker ‚Ì‚İ‚ğæ“¾‚·‚é‚©
-DECLARE @level int = 100		-- ‰½ƒŒƒxƒ‹‚Ü‚Åæ“¾‚·‚é‚©
+ï»¿DECLARE @headblocker bit = 0	-- HeadBlocker ã®ã¿ã‚’å–å¾—ã™ã‚‹ã‹
+DECLARE @level int = 100		-- ä½•ãƒ¬ãƒ™ãƒ«ã¾ã§å–å¾—ã™ã‚‹ã‹
 
 ;WITH 
--- ƒvƒƒZƒXˆê——
+-- ãƒ—ãƒ­ã‚»ã‚¹ä¸€è¦§
 sp AS(
 	SELECT spid, blocked, cmd, lastwaittype,waitresource,status, text 
 	FROM sys.sysprocesses 
 	CROSS APPLY sys.dm_exec_sql_text(sql_handle)
 	WHERE spid > 50
 ),
--- ƒuƒƒbƒLƒ“ƒOƒŠƒXƒg
+-- ãƒ–ãƒ­ãƒƒã‚­ãƒ³ã‚°ãƒªã‚¹ãƒˆ
 BlockList AS(
 
 --  Blocker
@@ -59,7 +59,7 @@ FROM
 	ON
 	r.blocked = BlockList.spid
 )
--- ƒuƒƒbƒLƒ“ƒOî•ñ‚Ìæ“¾
+-- ãƒ–ãƒ­ãƒƒã‚­ãƒ³ã‚°æƒ…å ±ã®å–å¾—
 SELECT 
 	BlockList.level, 
 	BlockList.spid, 
@@ -72,7 +72,7 @@ SELECT
 	at.transaction_begin_time,
 	datediff(MILLISECOND, er.start_time,GETDATE()) AS epalsed_time_ms,
 	at.name AS transaction_name,
-	CASE at.transaction_type -- “Ç‚İæ‚èê—pƒgƒ‰ƒ“ƒUƒNƒVƒ‡ƒ“‚Ìƒgƒ‰ƒ“ƒUƒNƒVƒ‡ƒ“Œo‰ßŠÔ‚Íƒgƒ‰ƒ“ƒUƒNƒVƒ‡ƒ“‰ğÍ‚ÌƒmƒCƒY‚É‚È‚é‰Â”\«‚ª‚ ‚é‚½‚ßAElapsed ‚Å”»’f
+	CASE at.transaction_type -- èª­ã¿å–ã‚Šå°‚ç”¨ãƒˆãƒ©ãƒ³ã‚¶ã‚¯ã‚·ãƒ§ãƒ³ã®ãƒˆãƒ©ãƒ³ã‚¶ã‚¯ã‚·ãƒ§ãƒ³çµŒéæ™‚é–“ã¯ãƒˆãƒ©ãƒ³ã‚¶ã‚¯ã‚·ãƒ§ãƒ³è§£æã®ãƒã‚¤ã‚ºã«ãªã‚‹å¯èƒ½æ€§ãŒã‚ã‚‹ãŸã‚ã€Elapsed ã§åˆ¤æ–­
 		WHEN 2 THEN NULL
 		ELSE datediff(MILLISECOND, at.transaction_begin_time, GETDATE())
 	END AS transaction_elapsed_time_ms,
@@ -89,22 +89,22 @@ SELECT
 	es.login_name,
 	er.open_transaction_count,
 	CASE at.transaction_type
-		WHEN 1 THEN N'“Ç‚İæ‚è/‘‚«‚İ'
-		WHEN 2 THEN N'“Ç‚İæ‚èê—p'
-		WHEN 3 THEN N'ƒVƒXƒeƒ€'
-		WHEN 4 THEN N'•ªUƒgƒ‰ƒ“ƒUƒNƒVƒ‡ƒ“'
+		WHEN 1 THEN N'èª­ã¿å–ã‚Š/æ›¸ãè¾¼ã¿'
+		WHEN 2 THEN N'èª­ã¿å–ã‚Šå°‚ç”¨'
+		WHEN 3 THEN N'ã‚·ã‚¹ãƒ†ãƒ '
+		WHEN 4 THEN N'åˆ†æ•£ãƒˆãƒ©ãƒ³ã‚¶ã‚¯ã‚·ãƒ§ãƒ³'
 		ELSE CAST(at.transaction_type AS nvarchar(50))
 	END AS transaction_type,
 	CASE at.transaction_state
-		WHEN 1 THEN N'‰Šú‰»‘Ò‚¿'
-		WHEN 1 THEN N'ŠJn‘Ò‚¿'
-		WHEN 2 THEN N'ƒAƒNƒeƒBƒu'
-		WHEN 3 THEN N'I—¹'
-		WHEN 4 THEN N'•ªUƒgƒ‰ƒ“ƒUƒNƒVƒ‡ƒ“ƒRƒ~ƒbƒgŠJn'
-		WHEN 5 THEN N'‰ğŒˆ‘Ò‚¿'
-		WHEN 6 THEN N'ƒRƒ~ƒbƒgŠ®—¹'
-		WHEN 7 THEN N'ƒ[ƒ‹ƒoƒbƒN’†'
-		WHEN 8 THEN N'ƒ[ƒ‹ƒoƒbƒNŠ®—¹'
+		WHEN 1 THEN N'åˆæœŸåŒ–å¾…ã¡'
+		WHEN 1 THEN N'é–‹å§‹å¾…ã¡'
+		WHEN 2 THEN N'ã‚¢ã‚¯ãƒ†ã‚£ãƒ–'
+		WHEN 3 THEN N'çµ‚äº†'
+		WHEN 4 THEN N'åˆ†æ•£ãƒˆãƒ©ãƒ³ã‚¶ã‚¯ã‚·ãƒ§ãƒ³ã‚³ãƒŸãƒƒãƒˆé–‹å§‹'
+		WHEN 5 THEN N'è§£æ±ºå¾…ã¡'
+		WHEN 6 THEN N'ã‚³ãƒŸãƒƒãƒˆå®Œäº†'
+		WHEN 7 THEN N'ãƒ­ãƒ¼ãƒ«ãƒãƒƒã‚¯ä¸­'
+		WHEN 8 THEN N'ãƒ­ãƒ¼ãƒ«ãƒãƒƒã‚¯å®Œäº†'
 		ELSE CAST(at.transaction_type AS nvarchar(50))
 	END AS transaction_state,		at.transaction_id,
 	at.transaction_uow,

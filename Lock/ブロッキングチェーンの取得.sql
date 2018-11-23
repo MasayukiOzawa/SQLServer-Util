@@ -1,10 +1,18 @@
-﻿DECLARE @headblocker bit = 0	-- HeadBlocker のみを取得するか
+﻿DECLARE @headblocker bit = 0	-- Head Blocker のみを取得するか (0 : ブロッキングをすべて取得 / 1 : Head Blocker のみを取得)
 DECLARE @level int = 100		-- 何レベルまで取得するか
 
 ;WITH 
 -- プロセス一覧
 sp AS(
-	SELECT spid, blocked, cmd, lastwaittype,waitresource,status, text 
+	SELECT 
+		spid, 
+		blocked, 
+		cmd, 
+		lastwaittype,
+		waitresource,
+		status, 
+		open_tran,
+		text 
 	FROM sys.sysprocesses 
 	CROSS APPLY sys.dm_exec_sql_text(sql_handle)
 	WHERE spid > 50
@@ -23,8 +31,9 @@ SELECT
 	RTRIM(cmd) AS cmd,
 	RTRIM(lastwaittype) AS lastwaittype,
 	RTRIM(waitresource) AS waitresource,
-	RTRIM(status) AS status
-	,text
+	RTRIM(status) AS status,
+	open_tran,
+	text
 FROM
 	sp
 WHERE
@@ -51,6 +60,7 @@ SELECT
 	RTRIM(r.lastwaittype) AS lastwaittype,
 	RTRIM(r.waitresource) AS waitresource,
 	RTRIM(r.status) AS status,
+	r.open_tran,
 	r.text
 FROM
 	sp r
@@ -70,24 +80,25 @@ SELECT
 	END	AS blocked_path,
 	er.start_time,
 	at.transaction_begin_time,
-	datediff(MILLISECOND, er.start_time,GETDATE()) AS epalsed_time_ms,
+	datediff(SECOND, er.start_time,GETDATE()) AS elapsed_time_sec,
 	at.name AS transaction_name,
 	CASE at.transaction_type -- 読み取り専用トランザクションのトランザクション経過時間はトランザクション解析のノイズになる可能性があるため、Elapsed で判断
 		WHEN 2 THEN NULL
-		ELSE datediff(MILLISECOND, at.transaction_begin_time, GETDATE())
-	END AS transaction_elapsed_time_ms,
+		ELSE datediff(SECOND, at.transaction_begin_time, GETDATE())
+	END AS transaction_elapsed_time_sec,
 	er.wait_time,
-	er.status,
+	er.status AS er_status,
 	BlockList.cmd, 
 	er.wait_type,
 	BlockList.lastwaittype, 
 	er.wait_resource AS er_wait_resource,
 	BlockList.waitresource AS BlockList_wait_resource, 
-	BlockList.status, 
+	BlockList.status AS blocklist_status, 
 	es.host_name,
 	es.program_name,
 	es.login_name,
 	er.open_transaction_count,
+	BlockList.open_tran AS sysprocess_open_tran_count,
 	CASE at.transaction_type
 		WHEN 1 THEN N'読み取り/書き込み'
 		WHEN 2 THEN N'読み取り専用'
@@ -106,7 +117,8 @@ SELECT
 		WHEN 7 THEN N'ロールバック中'
 		WHEN 8 THEN N'ロールバック完了'
 		ELSE CAST(at.transaction_type AS nvarchar(50))
-	END AS transaction_state,		at.transaction_id,
+	END AS transaction_state,		
+	at.transaction_id,
 	at.transaction_uow,
 	BlockList.text,
 		SUBSTRING(st.text, (er.statement_start_offset/2)+1,   
@@ -114,13 +126,17 @@ SELECT
 		WHEN -1 THEN DATALENGTH(st.text)  
 		ELSE er.statement_end_offset  
 		END - er.statement_start_offset)/2) + 1) AS statement_text ,
-	st.text AS st_text,
+	st.text AS exec_request_text,
 	qp.query_plan
+
 FROM 
 	BlockList
 	LEFT JOIN sys.dm_exec_requests AS er ON er.session_id = BlockList.spid
-	LEFT JOIN sys.dm_tran_active_transactions AS at ON at.transaction_id = er.transaction_id
 	LEFT JOIN sys.dm_exec_sessions as es ON es.session_id = BlockList.spid
+	
+	LEFT JOIN sys.dm_tran_session_transactions AS tst WITH(NOLOCK) ON tst.session_id = BlockList.spid
+	LEFT JOIN sys.dm_tran_active_transactions AS at ON at.transaction_id = tst.transaction_id
+
 	OUTER APPLY sys.dm_exec_query_plan(er.plan_handle) AS qp
 	OUTER APPLY sys.dm_exec_sql_text(er.sql_handle) AS st
 WHERE

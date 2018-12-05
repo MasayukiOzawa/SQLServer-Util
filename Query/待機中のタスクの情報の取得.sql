@@ -58,7 +58,6 @@ SELECT
 	er.blocking_session_id AS er_blocking_session_id,
 	es.host_name,
 	es.program_name,
-	es.login_name,
 	es.client_interface_name,
 	last_request_start_time,
 	last_request_end_time,

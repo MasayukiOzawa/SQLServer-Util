@@ -13,7 +13,7 @@ SELECT
 	, OBJECT_NAME(si.object_id) AS [object_name]
 	, si.name
 	, si.index_id
-	, ios.hobt_id
+	-- , ios.hobt_id -- SQL Server 2016 以降
 	, dps.partition_number
 	, si.type
 	, si.type_desc
@@ -51,6 +51,10 @@ SELECT
 	, ios.page_lock_count
 	, ios.page_lock_wait_count
 	, ios.page_lock_wait_in_ms
+	, ios.index_lock_promotion_count
+	, ios.index_lock_promotion_attempt_count
+	, ios.page_compression_attempt_count
+	, ios.page_compression_success_count
 	, ss.name AS stats_name
 	, STATS_DATE(si.object_id, si.index_id) AS [stats_date]
 	, ss.auto_created

@@ -4,18 +4,21 @@ GO
 /*********************************************/
 -- tempdb の使用状況の取得
 /*********************************************/
-USE [tempdb]
-GO
 SELECT
 	DB_NAME([database_id]) AS [DatabaseName],
 	FILE_NAME([file_id]) AS [FileName],
-	[unallocated_extent_page_count],
-	[version_store_reserved_page_count],
-	[user_object_reserved_page_count],
-	[internal_object_reserved_page_count],
-	[mixed_extent_page_count]
+	/*
+	[total_page_count] * 8 / 1024 AS total_page_mb,
+	[allocated_extent_page_count] * 8 / 1024 AS allocated_extent_page_mb,
+	[modified_extent_page_count] * 8 / 1024 AS modified_extent_page_mb,
+	*/
+	[unallocated_extent_page_count] * 8 / 1024 AS unallocated_extent_page_mb,
+	[version_store_reserved_page_count] * 8 / 1024 AS version_store_reserved_page_mb,
+	[user_object_reserved_page_count] * 8 / 1024 AS [user_object_reserved_page_mb],
+	[internal_object_reserved_page_count] * 8 / 1024 AS internal_object_reserved_page_mb,
+	[mixed_extent_page_count] * 8 / 1024 AS mixed_extent_page_mb
 FROM
-	[sys].[dm_db_file_space_usage]
+	[tempdb].[sys].[dm_db_file_space_usage] WITH(NOLOCK)
 OPTION (RECOMPILE)
 GO
 

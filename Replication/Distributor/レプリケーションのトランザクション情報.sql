@@ -1,4 +1,9 @@
-SELECT TOP 200
+-- ’¼‹ß 6 ŽžŠÔ‚Ìî•ñ‚ðŽæ“¾
+DECLARE @targetTime datetime
+SET @targetTime = DATEADD(mm, -6, GETDATE())
+
+
+SELECT
 	dh.time,
 	pd.publisher_db,
 	CASE dh.runstatus
@@ -33,5 +38,7 @@ FROM
 	pd.id = rt.publisher_database_id
 WHERE
 	dh.time IS NOT NULL
+	AND
+	dh.time >= @targetTime
 ORDER BY
 	dh.time DESC

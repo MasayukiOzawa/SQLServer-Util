@@ -1,4 +1,3 @@
-
 SELECT 
 	si.publisher,
 	si.subscriber,
@@ -27,10 +26,11 @@ SELECT
 	END AS frequency_type,
 	ss.frequency_interval
 FROM 
-	distribution.dbo.MSsubscriber_info AS si
+	distribution.dbo.MSsubscriber_info AS si WITH(NOLOCK)
 	LEFT JOIN
-	distribution.dbo.MSsubscriber_schedule AS ss
+	distribution.dbo.MSsubscriber_schedule AS ss WITH(NOLOCK)
 	ON
 	si.publisher = ss.publisher
 	AND
 	si.subscriber = ss.subscriber
+OPTION (RECOMPILE, MAXDOP 1)

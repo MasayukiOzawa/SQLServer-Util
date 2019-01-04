@@ -3,6 +3,7 @@
 -- SQL Server 2014 SP2 / SQL Server 2016 SP1 以降は TF7412 を使用することで、軽量プロファイルを用いた情報の取得が可能
 -- https://blogs.msdn.microsoft.com/sql_server_team/query-progress-anytime-anywhere/ 
 -- DBCC TRACEON(7412, -1)
+-- SQL Server 2017 からはデフォルトで軽量プロファイリングが有効
 
 DECLARE @starttime datetime = (SELECT sqlserver_start_time FROM sys.dm_os_sys_info)
 SELECT

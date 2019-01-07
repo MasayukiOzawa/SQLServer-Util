@@ -19,13 +19,13 @@ SELECT
 	sj.subsystem,
 	sj.command,
 	CASE ss.freq_type
-		WHEN 1 THEN '1 ‰ñ‚Ì‚Ý'
-		WHEN 4 THEN '–ˆ“ú'
-		WHEN 8 THEN '–ˆT'
-		WHEN 16 THEN '–ˆŒŽ'
-		WHEN 32 THEN '–ˆŒŽ (‘Š‘ÎŽw’è)'
-		WHEN 64 THEN '‹N“®Žž (˜A‘±ŽÀs)'
-		WHEN 128 THEN 'ƒAƒCƒhƒ‹Žž'
+		WHEN 1 THEN '1 å›žã®ã¿'
+		WHEN 4 THEN 'æ¯Žæ—¥'
+		WHEN 8 THEN 'æ¯Žé€±'
+		WHEN 16 THEN 'æ¯Žæœˆ'
+		WHEN 32 THEN 'æ¯Žæœˆ (ç›¸å¯¾æŒ‡å®š)'
+		WHEN 64 THEN 'èµ·å‹•æ™‚ (é€£ç¶šå®Ÿè¡Œ)'
+		WHEN 128 THEN 'ã‚¢ã‚¤ãƒ‰ãƒ«æ™‚'
 		ELSE CAST(ss.freq_type AS sysname)
 	END AS freq_type
 FROM 
@@ -62,17 +62,17 @@ SELECT
 	da.local_job,
 	ji.freq_type,
 	CASE s.sync_type 
-		WHEN 1 THEN 'Ž©“®'
-		WHEN 2 THEN '“¯Šú–³‚µ(Žè“®“¯Šú)'
+		WHEN 1 THEN 'è‡ªå‹•'
+		WHEN 2 THEN 'åŒæœŸç„¡ã—(æ‰‹å‹•åŒæœŸ)'
 		ELSE CAST(s.sync_type AS sysname)
 	END AS sync_type,
 	CASE dh.runstatus
-		WHEN 1 THEN 'ŠJŽn'
-		WHEN 2 THEN '¬Œ÷'
-		WHEN 3 THEN 'ŽÀs’†'
-		WHEN 4 THEN 'ƒAƒCƒhƒ‹ó‘Ô'
-		WHEN 5 THEN 'ÄŽŽs'
-		WHEN 6 THEN 'Ž¸”s'
+		WHEN 1 THEN 'é–‹å§‹'
+		WHEN 2 THEN 'æˆåŠŸ'
+		WHEN 3 THEN 'å®Ÿè¡Œä¸­'
+		WHEN 4 THEN 'ã‚¢ã‚¤ãƒ‰ãƒ«çŠ¶æ…‹'
+		WHEN 5 THEN 'å†è©¦è¡Œ'
+		WHEN 6 THEN 'å¤±æ•—'
 		ELSE CAST(dh.runstatus AS sysname)
 	END as runstatus,
 	dh.comments,

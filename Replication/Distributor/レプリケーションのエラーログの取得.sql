@@ -1,4 +1,4 @@
--- ’¼‹ß 6 ŠÔ‚Ìî•ñ‚ğæ“¾
+-- ç›´è¿‘ 6 æ™‚é–“ã®æƒ…å ±ã‚’å–å¾—
 DECLARE @targetTime datetime
 SET @targetTime = DATEADD(mm, -6, GETDATE())
 
@@ -38,7 +38,7 @@ WHERE
 	ra.time >= @targetTime
 )
 
--- ƒŒƒvƒŠƒP[ƒVƒ‡ƒ“‚ÌƒGƒ‰[‚ğæ“¾
+-- ãƒ¬ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã®ã‚¨ãƒ©ãƒ¼ã‚’å–å¾—
 SELECT 
 	re.time,
 	ra.agent_type_desc,

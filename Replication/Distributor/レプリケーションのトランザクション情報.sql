@@ -1,4 +1,4 @@
--- ’¼‹ß 6 ŠÔ‚Ìî•ñ‚ğæ“¾
+-- ç›´è¿‘ 6 æ™‚é–“ã®æƒ…å ±ã‚’å–å¾—
 DECLARE @targetTime datetime
 SET @targetTime = DATEADD(mm, -6, GETDATE())
 
@@ -7,12 +7,12 @@ SELECT
 	dh.time,
 	pd.publisher_db,
 	CASE dh.runstatus
-		WHEN 1 THEN 'ŠJn'
-		WHEN 2 THEN '¬Œ÷'
-		WHEN 3 THEN 'Às’†'
-		WHEN 4 THEN 'ƒAƒCƒhƒ‹'
-		WHEN 5 THEN 'Äs'
-		WHEN 6 THEN '¸”s'
+		WHEN 1 THEN 'é–‹å§‹'
+		WHEN 2 THEN 'æˆåŠŸ'
+		WHEN 3 THEN 'å®Ÿè¡Œä¸­'
+		WHEN 4 THEN 'ã‚¢ã‚¤ãƒ‰ãƒ«'
+		WHEN 5 THEN 'å†è©¦è¡Œ'
+		WHEN 6 THEN 'å¤±æ•—'
 	END AS runstatus,
 	rt.entry_time,
 	dh.start_time,

@@ -1,11 +1,11 @@
--- ’¼‹ß 6 ŽžŠÔ‚Ìî•ñ‚ðŽæ“¾
+-- ç›´è¿‘ 6 æ™‚é–“ã®æƒ…å ±ã‚’å–å¾—
 DECLARE @targetTime datetime
 SET @targetTime = DATEADD(mm, -6, GETDATE())
 
--- ƒG[ƒWƒFƒ“ƒg‚ÌŽÀs—š—ð‚Ìî•ñ‚ÌŽæ“¾
--- ƒG[ƒWƒFƒ“ƒgƒWƒ‡ƒu‚Í‰‰ñ‹N“®ŒãAƒvƒƒZƒX‚ªí’“‚·‚é‚½‚ßAƒWƒ‡ƒu‚Ì‹N“®“ú‚Å‚Í‚È‚­AƒƒbƒZ[ƒW‚Ìo—Í“ú‚ð‹N“_‚ÉÝ’è
+-- ã‚¨ãƒ¼ã‚¸ã‚§ãƒ³ãƒˆã®å®Ÿè¡Œå±¥æ­´ã®æƒ…å ±ã®å–å¾—
+-- ã‚¨ãƒ¼ã‚¸ã‚§ãƒ³ãƒˆã‚¸ãƒ§ãƒ–ã¯åˆå›žèµ·å‹•å¾Œã€ãƒ—ãƒ­ã‚»ã‚¹ãŒå¸¸é§ã™ã‚‹ãŸã‚ã€ã‚¸ãƒ§ãƒ–ã®èµ·å‹•æ—¥ã§ã¯ãªãã€ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®å‡ºåŠ›æ—¥ã‚’èµ·ç‚¹ã«è¨­å®š
 
--- ƒfƒBƒXƒgƒŠƒrƒ…[ƒVƒ‡ƒ“ ƒG[ƒWƒFƒ“ƒg‚Ì—š—ð‚ðŽæ“¾
+-- ãƒ‡ã‚£ã‚¹ãƒˆãƒªãƒ“ãƒ¥ãƒ¼ã‚·ãƒ§ãƒ³ ã‚¨ãƒ¼ã‚¸ã‚§ãƒ³ãƒˆã®å±¥æ­´ã‚’å–å¾—
 SELECT 
 	'distribution_agent' AS log_type,
 	dh.time, 
@@ -16,12 +16,12 @@ SELECT
 	da.subscriber_db,
 	dh.comments,
 	CASE dh.runstatus
-		WHEN 1 THEN 'ŠJŽn'
-		WHEN 2 THEN '¬Œ÷'
-		WHEN 3 THEN 'ŽÀs’†'
-		WHEN 4 THEN 'ƒAƒCƒhƒ‹ó‘Ô'
-		WHEN 5 THEN 'ÄŽŽs'
-		WHEN 6 THEN 'Ž¸”s'
+		WHEN 1 THEN 'é–‹å§‹'
+		WHEN 2 THEN 'æˆåŠŸ'
+		WHEN 3 THEN 'å®Ÿè¡Œä¸­'
+		WHEN 4 THEN 'ã‚¢ã‚¤ãƒ‰ãƒ«çŠ¶æ…‹'
+		WHEN 5 THEN 'å†è©¦è¡Œ'
+		WHEN 6 THEN 'å¤±æ•—'
 		ELSE CAST(dh.runstatus AS sysname)
 	END AS runstatus,
 	dh.duration,
@@ -49,7 +49,7 @@ ORDER BY
 OPTION (RECOMPILE, MAXDOP 1)
 
 
--- ƒƒOƒŠ[ƒ_[ ƒG[ƒWƒFƒ“ƒg‚Ì—š—ð‚ðŽæ“¾
+-- ãƒ­ã‚°ãƒªãƒ¼ãƒ€ãƒ¼ ã‚¨ãƒ¼ã‚¸ã‚§ãƒ³ãƒˆã®å±¥æ­´ã‚’å–å¾—
 SELECT 
 	'logreader_agent' AS log_type,
 	lh.time, 
@@ -59,12 +59,12 @@ SELECT
 	la.publication,
 	lh.comments,
 	CASE lh.runstatus
-		WHEN 1 THEN 'ŠJŽn'
-		WHEN 2 THEN '¬Œ÷'
-		WHEN 3 THEN 'ŽÀs’†'
-		WHEN 4 THEN 'ƒAƒCƒhƒ‹ó‘Ô'
-		WHEN 5 THEN 'ÄŽŽs'
-		WHEN 6 THEN 'Ž¸”s'
+		WHEN 1 THEN 'é–‹å§‹'
+		WHEN 2 THEN 'æˆåŠŸ'
+		WHEN 3 THEN 'å®Ÿè¡Œä¸­'
+		WHEN 4 THEN 'ã‚¢ã‚¤ãƒ‰ãƒ«çŠ¶æ…‹'
+		WHEN 5 THEN 'å†è©¦è¡Œ'
+		WHEN 6 THEN 'å¤±æ•—'
 		ELSE CAST(lh.runstatus AS sysname)
 	END as runstatus,
 	lh.duration,
@@ -88,7 +88,7 @@ ORDER BY
 	lh.time DESC
 OPTION (RECOMPILE, MAXDOP 1)
 
--- ƒXƒiƒbƒvƒVƒ‡ƒbƒgƒG[ƒWƒFƒ“ƒg‚Ì—š—ð‚ðŽæ“¾
+-- ã‚¹ãƒŠãƒƒãƒ—ã‚·ãƒ§ãƒƒãƒˆã‚¨ãƒ¼ã‚¸ã‚§ãƒ³ãƒˆã®å±¥æ­´ã‚’å–å¾—
 SELECT 
 	'snapshot_agent' AS log_type,
 	sh.time, 
@@ -98,12 +98,12 @@ SELECT
 	sa.publication,
 	sh.comments,
 	CASE sh.runstatus
-		WHEN 1 THEN 'ŠJŽn'
-		WHEN 2 THEN '¬Œ÷'
-		WHEN 3 THEN 'ŽÀs’†'
-		WHEN 4 THEN 'ƒAƒCƒhƒ‹ó‘Ô'
-		WHEN 5 THEN 'ÄŽŽs'
-		WHEN 6 THEN 'Ž¸”s'
+		WHEN 1 THEN 'é–‹å§‹'
+		WHEN 2 THEN 'æˆåŠŸ'
+		WHEN 3 THEN 'å®Ÿè¡Œä¸­'
+		WHEN 4 THEN 'ã‚¢ã‚¤ãƒ‰ãƒ«çŠ¶æ…‹'
+		WHEN 5 THEN 'å†è©¦è¡Œ'
+		WHEN 6 THEN 'å¤±æ•—'
 		ELSE CAST(sh.runstatus AS sysname)
 	END as runstatus,
 	sh.duration,

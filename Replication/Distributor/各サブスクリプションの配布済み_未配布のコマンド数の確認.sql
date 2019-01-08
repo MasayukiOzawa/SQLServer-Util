@@ -59,6 +59,12 @@ SELECT
 		WHEN 2 THEN 'Anonymous'
 		ELSE CAST(s.subscription_type AS sysname)
 	END AS subscription_type,
+	CASE s.status
+		WHEN 0 THEN '非アクティブ'
+		WHEN 1 THEN 'サブスクライブ済'
+		WHEN 2 THEN 'アクティブ'
+		ELSE CAST(s.status AS sysname)
+	END AS status,
 	da.local_job,
 	ji.freq_type,
 	CASE s.sync_type 
@@ -74,7 +80,7 @@ SELECT
 		WHEN 5 THEN '再試行'
 		WHEN 6 THEN '失敗'
 		ELSE CAST(dh.runstatus AS sysname)
-	END as runstatus,
+	END AS runstatus,
 	dh.comments,
 	dh.error_id,
 	re.error_detail,

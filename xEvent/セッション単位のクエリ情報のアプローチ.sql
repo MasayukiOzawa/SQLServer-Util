@@ -1,21 +1,20 @@
-SET NOCOUNT ON
-GO
+﻿SET NOCOUNT ON
 
 DECLARE @sessoin_id int = (SELECT @@SPID)
 DECLARE @file_name sysname =(SELECT  N'session_research_' + CAST(@sessoin_id AS varchar(6)) + '_' + FORMAT(GETDATE(), 'yyyyMMddHHmmss'))
 
--- �Z�b�V�����P�ʂ̑҂����ۂ͗݌v�l�ƂȂ邽�߁A���s�O�̏�Ԃ��擾
--- �A�����s��z�肵���l�������A�擾���̉�͂̑҂����v�コ��Ă��邽�߁A���܂���ʂ��Ȃ������c
+-- セッション単位の待ち事象は累計値となるため、実行前の状態を取得
+-- 連続実行を想定した考慮だが、取得情報の解析の待ちが計上されているため、あまり効果がないかも…
 DROP TABLE IF EXISTS  #session_wait_before
 SELECT * INTO #session_wait_before FROM sys.dm_exec_session_wait_stats WHERE session_id = @sessoin_id
 
--- �g���C�x���g�̑��݊m�F (���݂��Ă���ꍇ�͍폜)
+-- 拡張イベントの存在確認 (存在している場合は削除)
 IF EXISTS (SELECT 1 FROM sys.server_event_sessions WHERE name = 'session_research')
 BEGIN 
 	DROP EVENT SESSION [session_research] ON SERVER 
 END
 
--- ���Z�b�V������ ID �Ńt�B���^�[�����g���C�x���g���쐬
+-- 自セッションの ID でフィルターした拡張イベントを作成
 DECLARE @sql nvarchar(max) = N'
 CREATE EVENT SESSION [session_research] ON SERVER 
 
@@ -36,16 +35,16 @@ SET @sql = REPLACE(@sql, '@@file_name', @file_name)
 
 EXECUTE(@sql)
 
--- �C�x���g�Z�b�V�����̊J�n
+-- イベントセッションの開始
 ALTER EVENT SESSION [session_research] ON SERVER STATE = START
 
--- ���s���v�̎擾
+-- 実行統計の取得
 SET STATISTICS TIME ON
 SET STATISTICS IO ON
 
 
 /***********************************************************************/
--- �����m�F����N�G�����ȉ��ɋL�ڂ��Ď��s
+-- 情報を確認するクエリを以下に記載して実行
 USE tpch;
 SELECT COUNT(*) FROM REGION
 /***********************************************************************/
@@ -53,10 +52,10 @@ SELECT COUNT(*) FROM REGION
 SET STATISTICS TIME OFF
 SET STATISTICS IO OFF
 
--- �C�x���g�Z�b�V�����̒�~
+-- イベントセッションの停止
 ALTER EVENT SESSION [session_research] ON SERVER STATE = STOP
 
--- �Z�b�V�����̏����擾
+-- セッションの情報を取得
 SELECT 
 	session_id,
 	login_time,
@@ -80,7 +79,7 @@ FROM
 WHERE 
 	session_id = @@SPID
 
--- �Z�b�V�����̑҂����ۂ̏����擾
+-- セッションの待ち事象の情報を取得
 SELECT 
 	T1.session_id,
 	T1.wait_type,
@@ -107,7 +106,7 @@ WHERE
 ORDER BY 
 	T1.wait_time_ms DESC
 
--- tempdb �̎g�p�󋵂��擾
+-- tempdb の使用状況を取得
 SELECT 
 	* 
 FROM 
@@ -115,7 +114,7 @@ FROM
 WHERE 
 	session_id = @@SPID
 
--- �擾�����g���C�x���g�̃��O���ꎞ�e�[�u���Ɋi�[
+-- 取得した拡張イベントのログを一時テーブルに格納
 DROP TABLE IF EXISTS #tmp
 
 SELECT
@@ -131,7 +130,7 @@ ALTER TABLE #tmp ALTER COLUMN No int NOT NULL
 ALTER TABLE #tmp ADD CONSTRAINT PK_xevent_trace_tmp_index  PRIMARY KEY CLUSTERED (object_name, No)
 CREATE PRIMARY XML INDEX IX_xevent_trace_xml_index ON #tmp(event_data)
 
--- �҂����ۂ̏����m�F
+-- 待ち事象の情報を確認
 SELECT
 	wait_type,
 	COUNT(*) AS wait_count,
@@ -156,7 +155,7 @@ ORDER BY
 	SUM(duration_ms) DESC
 
 
--- �擾�����g���C�x���g���烍�b�N�̏����擾
+-- 取得した拡張イベントからロックの情報を取得
 SELECT
 	database_name,
 	resource_type,

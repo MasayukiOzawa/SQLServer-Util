@@ -1,6 +1,13 @@
-DECLARE @sessoin_id int = (SELECT @@SPID)
-DECLARE @file_name sysname =(SELECT  N'session_research' + FORMAT(GETDATE(), 'yyyyMMddHHmmss'))
+SET NOCOUNT ON
+GO
 
+DECLARE @sessoin_id int = (SELECT @@SPID)
+DECLARE @file_name sysname =(SELECT  N'session_research_' + CAST(@sessoin_id AS varchar(6)) + '_' + FORMAT(GETDATE(), 'yyyyMMddHHmmss'))
+
+-- セッション単位の待ち事象は累計値となるため、実行前の状態を取得
+-- 連続実行を想定した考慮だが、取得情報の解析の待ちが計上されているため、あまり効果がないかも…
+DROP TABLE IF EXISTS  #session_wait_before
+SELECT * INTO #session_wait_before FROM sys.dm_exec_session_wait_stats WHERE session_id = @sessoin_id
 
 -- 拡張イベントの存在確認 (存在している場合は削除)
 IF EXISTS (SELECT 1 FROM sys.server_event_sessions WHERE name = 'session_research')
@@ -38,12 +45,9 @@ SET STATISTICS IO ON
 
 
 /***********************************************************************/
--- ロックを確認するクエリの実行
+-- 情報を確認するクエリを以下に記載して実行
 USE tpch;
-BEGIN TRAN
-SET TRANSACTION ISOLATION LEVEL SERIALIZABLE
-SELECT * FROM REGION WITH(XLOCK, HOLDLOCK) WHERE R_REGIONKEY = 2
-ROLLBACK TRAN
+SELECT COUNT(*) FROM REGION
 /***********************************************************************/
 
 SET STATISTICS TIME OFF
@@ -78,13 +82,30 @@ WHERE
 
 -- セッションの待ち事象の情報を取得
 SELECT 
-	* 
+	T1.session_id,
+	T1.wait_type,
+	T1.waiting_tasks_count - COALESCE(T2.waiting_tasks_count, 0) AS waiting_tasks_count,
+	T1.wait_time_ms - COALESCE(T2.wait_time_ms, 0) AS wait_time_ms,
+	T1.max_wait_time_ms,
+	T1.signal_wait_time_ms - COALESCE(T2.signal_wait_time_ms, 0) AS signal_wait_time_ms
 FROM 
-	sys.dm_exec_session_wait_stats 
+	sys.dm_exec_session_wait_stats AS T1
+	LEFT JOIN
+	#session_wait_before AS T2
+	ON
+	T1.session_id = T2.session_id
+	AND 
+	T1.wait_type = T2.wait_type
 WHERE 
-	session_id = @@SPID 
+	T1.session_id = @@SPID 
+	AND
+	(
+		T1.waiting_tasks_count - T2.waiting_tasks_count > 0
+		OR
+		T1.signal_wait_time_ms - T2.signal_wait_time_ms > 0
+	)
 ORDER BY 
-	wait_time_ms DESC
+	T1.wait_time_ms DESC
 
 -- tempdb の使用状況を取得
 SELECT 
@@ -98,7 +119,7 @@ WHERE
 DROP TABLE IF EXISTS #tmp
 
 SELECT
-	ROW_NUMBER() OVER(ORDER BY timestamp_utc ASC) AS No, 
+	ROW_NUMBER() OVER(ORDER BY object_name ASC) AS No, 
 	timestamp_utc,
 	object_name,
 	CAST(event_data AS xml) AS event_data
@@ -135,8 +156,7 @@ ORDER BY
 	SUM(duration_ms) DESC
 
 
-
--- ロックの情報を取得
+-- 取得した拡張イベントからロックの情報を取得
 SELECT
 	database_name,
 	resource_type,
@@ -147,7 +167,7 @@ SELECT
 			WHEN resource_type = 'OBJECT' THEN 
 				OBJECT_NAME(object_id)
 			WHEN resource_type = 'METADATA' THEN
-				OBJECT_NAME(res_object)
+				OBJECT_NAME(resource_description_object_id)
 			ELSE object_id
 		END
 	WHEN database_name = 'master' AND resource_type = 'OBJECT' THEN
@@ -155,13 +175,20 @@ SELECT
 	ELSE
 		object_id
 	END AS object_name,
-	--MAX(resource_description) AS resouce_description_sample,
+	CASE
+		WHEN resource_description_stats_id IS NOT NULL THEN
+			(SELECT name FROM sys.stats AS s WHERE s.object_id = resource_description_object_id AND s.stats_id = resource_description_stats_id)
+		WHEN resource_description_index_or_stats_id IS NOT NULL THEN
+			(SELECT name FROM sys.stats AS s WHERE s.object_id = resource_description_object_id AND s.stats_id = resource_description_index_or_stats_id)
+		ELSE
+			NULL
+	END AS index_or_stats_name,
 	COUNT(*) AS count
 FROM
 (
 SELECT
 	No,
-	timestamp_utc,
+	--timestamp_utc,
 	object_name AS xevent_object_name,
 	event_data.value('(/event/data[@name="resource_type"]/text)[1]', 'sysname') AS resource_type,
 	event_data.value('(/event/data[@name="database_name"]/value)[1]', 'sysname') AS database_name,
@@ -173,7 +200,7 @@ SELECT
 	event_data.value('(/event/data[@name="resource_description"]/value)[1]', 'sysname') AS resource_description,
 	CASE 
 		WHEN 
-			CHARINDEX('object_id', event_data.value('(/event/data[@name="resource_description"]/value)[1]', 'sysname')) > 0
+			CHARINDEX('object_id = ', event_data.value('(/event/data[@name="resource_description"]/value)[1]', 'sysname')) > 0
 		THEN
 		SUBSTRING(
 			event_data.value('(/event/data[@name="resource_description"]/value)[1]', 'sysname'), 
@@ -184,23 +211,52 @@ SELECT
 		)
 	ELSE
 			event_data.value('(/event/data[@name="object_id"]/value)[1]', 'sysname')
-	END AS res_object
-	-- ,event_data
+	END AS resource_description_object_id,
+	CASE 
+		WHEN 
+		CHARINDEX(', stats_id = ', event_data.value('(/event/data[@name="resource_description"]/value)[1]', 'sysname')) > 0
+		THEN
+		SUBSTRING(
+			event_data.value('(/event/data[@name="resource_description"]/value)[1]', 'sysname'), 
+			CHARINDEX(', stats_id = ', event_data.value('(/event/data[@name="resource_description"]/value)[1]', 'sysname')) + LEN(', stats_id = ') + 1, 
+			LEN(event_data.value('(/event/data[@name="resource_description"]/value)[1]', 'sysname')) 
+			- 
+			CHARINDEX(', stats_id = ', event_data.value('(/event/data[@name="resource_description"]/value)[1]', 'sysname')) + LEN(', stats_id = ') + 1
+		)
+	ELSE
+		NULL
+	END AS resource_description_stats_id,
+	CASE 
+		WHEN 
+		CHARINDEX(', index_id or stats_id = ', event_data.value('(/event/data[@name="resource_description"]/value)[1]', 'sysname')) > 0
+		THEN
+		SUBSTRING(
+			event_data.value('(/event/data[@name="resource_description"]/value)[1]', 'sysname'), 
+			CHARINDEX(', index_id or stats_id = ', event_data.value('(/event/data[@name="resource_description"]/value)[1]', 'sysname')) + LEN(', index_id or stats_id = ') + 1, 
+			LEN(event_data.value('(/event/data[@name="resource_description"]/value)[1]', 'sysname')) 
+			- 
+			CHARINDEX(', index_id or stats_id = ', event_data.value('(/event/data[@name="resource_description"]/value)[1]', 'sysname')) + LEN(', index_id or stats_id = ') + 1
+		)
+	ELSE
+		NULL
+	END AS resource_description_index_or_stats_id
+	,event_data
 FROM
 	#tmp
 WHERE 
 	object_name = 'lock_acquired'
---ORDER BY 
---	No
---	-- AND event_data.value('(/event/data[@name="resource_type"]/text)[1]', 'sysname') = 'METADATA'
+	--AND event_data.value('(/event/data[@name="resource_type"]/text)[1]', 'sysname') = 'METADATA'
 ) AS T
 GROUP BY
 	resource_type,
 	database_name,
 	mode,
 	object_id,
-	res_object
+	resource_description_object_id,
+	resource_description_stats_id,
+	resource_description_index_or_stats_id
 ORDER BY
 	database_name,
 	resource_type,
-	mode
+	mode,
+	index_or_stats_name

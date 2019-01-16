@@ -119,7 +119,7 @@ DROP TABLE IF EXISTS #tmp
 
 SELECT
 	ROW_NUMBER() OVER(ORDER BY object_name ASC) AS No, 
-	timestamp_utc,
+	--timestamp_utc,
 	object_name,
 	CAST(event_data AS xml) AS event_data
 INTO #tmp
@@ -139,7 +139,7 @@ FROM
 (
 SELECT
 	No,
-	timestamp_utc,
+	--timestamp_utc,
 	object_name,
 	event_data.value('(/event/data[@name="wait_type"]/text)[1]', 'sysname') AS wait_type,
 	event_data.value('(/event/data[@name="duration"]/value)[1]', 'int') AS duration_ms

@@ -1,8 +1,12 @@
 ﻿SET NOCOUNT ON
+DBCC TRACEON(3656, -1) WITH NO_INFOMSGS
 GO
+IF OBJECT_ID('tempdb..#filename') IS NOT NULL
+BEGIN
+	DROP TABLE #filename
+END
 
 DECLARE @sessoin_id int = (SELECT @@SPID)
-DROP TABLE IF EXISTS #filename
 SELECT  N'query_analyze_' + CAST(@sessoin_id AS varchar(6)) + '_' + FORMAT(GETDATE(), 'yyyyMMddHHmmss') AS filename INTO #filename
 DECLARE @file_name sysname =(SELECT filename FROM #filename)
 
@@ -20,19 +24,19 @@ END
 DECLARE @sql nvarchar(max) = N'
 CREATE EVENT SESSION [query_analyze] ON SERVER 
 
---ADD EVENT sqlserver.lock_acquired(SET collect_database_name=(1),collect_resource_description=(1)
---	ACTION(package0.callstack,sqlserver.session_id,sqlserver.query_hash,sqlserver.query_plan_hash)
---	WHERE ([sqlserver].[session_id]=(@@session_id))),
+ADD EVENT sqlserver.lock_acquired(SET collect_database_name=(1),collect_resource_description=(1)
+	ACTION(package0.callstack,sqlserver.session_id,sqlserver.query_hash,sqlserver.query_plan_hash)
+	WHERE ([sqlserver].[session_id]=(@@session_id))),
 
- ADD EVENT sqlserver.rpc_completed(
-     ACTION(package0.callstack,sqlserver.session_id,sqlserver.query_hash,sqlserver.query_plan_hash)
+ADD EVENT sqlserver.rpc_completed(
+    ACTION(package0.callstack,sqlserver.session_id,sqlserver.query_hash,sqlserver.query_plan_hash)
  	WHERE ([sqlserver].[session_id]=(@@session_id))),
 
- ADD EVENT sqlserver.sp_statement_completed(SET collect_statement=(1)
-     ACTION(package0.callstack,sqlserver.session_id,sqlserver.query_hash,sqlserver.query_plan_hash)
+ADD EVENT sqlserver.sp_statement_completed(SET collect_statement=(1)
+    ACTION(package0.callstack,sqlserver.session_id,sqlserver.query_hash,sqlserver.query_plan_hash)
  	WHERE ([sqlserver].[session_id]=(@@session_id))),
 
-ADD EVENT sqlos.wait_completed(
+ADD EVENT sqlos.wait_info(
 	ACTION(package0.callstack,sqlserver.session_id,sqlserver.query_hash,sqlserver.query_plan_hash)  
 	WHERE ([sqlserver].[session_id]=(@@session_id))),
 
@@ -58,13 +62,18 @@ EXECUTE(@sql)
 --SET STATISTICS IO ON
 
 -- 各種累計値の実行前の状態を取得
-DROP TABLE IF EXISTS #session_tempdb_before
+IF OBJECT_ID('tempdb..#session_tempdb_before') IS NOT NULL
+BEGIN
+	DROP TABLE #session_tempdb_before
+END
+
 SELECT * INTO #session_tempdb_before FROM sys.dm_db_session_space_usage WHERE session_id = @sessoin_id
 
-DROP TABLE IF EXISTS #session_wait_before
-SELECT * INTO #session_wait_before FROM sys.dm_exec_session_wait_stats WHERE session_id = @sessoin_id
+IF OBJECT_ID('tempdb..#session_before') IS NOT NULL
+BEGIN
+	DROP TABLE #session_before
+END
 
-DROP TABLE IF EXISTS #session_before
 SELECT * INTO #session_before FROM sys.dm_exec_sessions WHERE session_id = @sessoin_id
 
 -- イベントセッションの開始
@@ -77,7 +86,33 @@ SET @start = (SELECT GETDATE())
 
 /***********************************************************************/
 -- 情報を確認するクエリを以下に記載して実行
+use tpch;
+--DBCC FREEPROCCACHE WITH NO_INFOMSGS 
+DBCC DROPCLEANBUFFERS WITH NO_INFOMSGS 
 
+SELECT TOP 100 S_ACCTBAL, S_NAME, N_NAME, P_PARTKEY, P_MFGR, S_ADDRESS, S_PHONE, S_COMMENT
+FROM PART, SUPPLIER, PARTSUPP, NATION, REGION
+WHERE P_PARTKEY = PS_PARTKEY AND S_SUPPKEY = PS_SUPPKEY AND P_SIZE = 15 AND
+P_TYPE LIKE '%%BRASS' AND S_NATIONKEY = N_NATIONKEY AND N_REGIONKEY = R_REGIONKEY AND
+R_NAME = 'EUROPE' AND
+PS_SUPPLYCOST = (SELECT MIN(PS_SUPPLYCOST) FROM PARTSUPP, SUPPLIER, NATION, REGION
+ WHERE P_PARTKEY = PS_PARTKEY AND S_SUPPKEY = PS_SUPPKEY
+ AND S_NATIONKEY = N_NATIONKEY AND N_REGIONKEY = R_REGIONKEY AND R_NAME = 'EUROPE')
+ORDER BY S_ACCTBAL DESC, N_NAME, S_NAME, P_PARTKEY
+OPTION(QUERYTRACEON 8675, QUERYTRACEON 3604);
+
+--DBCC FREEPROCCACHE WITH NO_INFOMSGS 
+DBCC DROPCLEANBUFFERS WITH NO_INFOMSGS 
+SELECT TOP 100 S_ACCTBAL, S_NAME, N_NAME, P_PARTKEY, P_MFGR, S_ADDRESS, S_PHONE, S_COMMENT
+FROM PART, SUPPLIER, PARTSUPP, NATION, REGION
+WHERE P_PARTKEY = PS_PARTKEY AND S_SUPPKEY = PS_SUPPKEY AND P_SIZE = 15 AND
+P_TYPE LIKE '%%BRASS' AND S_NATIONKEY = N_NATIONKEY AND N_REGIONKEY = R_REGIONKEY AND
+R_NAME = 'EUROPE' AND
+PS_SUPPLYCOST = (SELECT MIN(PS_SUPPLYCOST) FROM PARTSUPP, SUPPLIER, NATION, REGION
+ WHERE P_PARTKEY = PS_PARTKEY AND S_SUPPKEY = PS_SUPPKEY
+ AND S_NATIONKEY = N_NATIONKEY AND N_REGIONKEY = R_REGIONKEY AND R_NAME = 'EUROPE')
+ORDER BY S_ACCTBAL DESC, N_NAME, S_NAME, P_PARTKEY
+OPTION(QUERYTRACEON 8780,QUERYTRACEON 8757,  QUERYTRACEON 8675, QUERYTRACEON 3604);
 
 /***********************************************************************/
 PRINT 'Queyr End : Elapsed Time (ms) : ' + CAST(DATEDIFF(MILLISECOND, @start, GETDATE()) AS varchar(20))
@@ -134,37 +169,6 @@ WHERE
 
 PRINT 'session_info : Elapsed Time (ms) : ' + CAST(DATEDIFF(MILLISECOND, @start, GETDATE()) AS varchar(20))
 
--- セッションの待ち事象の情報を出力
-SET @start = (SELECT GETDATE())
-
-SELECT 
-	'session_wait_info' AS info_type,
-	T1.session_id,
-	T1.wait_type,
-	T1.waiting_tasks_count - COALESCE(T2.waiting_tasks_count, 0) AS waiting_tasks_count,
-	(T1.wait_time_ms - COALESCE(T2.wait_time_ms, 0)) / 1000.0 AS wait_time_sec,
-	(T1.max_wait_time_ms) / 1000.0 AS max_wait_time_sec,
-	(T1.signal_wait_time_ms - COALESCE(T2.signal_wait_time_ms, 0)) / 10000.0 AS signal_wait_time_sec
-FROM 
-	sys.dm_exec_session_wait_stats AS T1
-	LEFT JOIN
-	#session_wait_before AS T2
-	ON
-	T1.session_id = T2.session_id
-	AND 
-	T1.wait_type = T2.wait_type
-WHERE 
-	T1.session_id = @@SPID 
-	AND
-	(
-		T1.waiting_tasks_count - T2.waiting_tasks_count > 0
-		OR
-		T1.signal_wait_time_ms - T2.signal_wait_time_ms > 0
-	)
-ORDER BY 
-	T1.wait_time_ms DESC
-
-PRINT 'session_wait_info : Elapsed Time (ms) : ' + CAST(DATEDIFF(MILLISECOND, @start, GETDATE()) AS varchar(20))
 
 -- tempdb の使用状況を取得
 SET @start = (SELECT GETDATE())
@@ -173,7 +177,6 @@ SELECT
 	'tempdb_info' AS info_type,
 	(T1.user_objects_alloc_page_count - T2.user_objects_alloc_page_count) * 8.0 / 1024.0 AS user_objects_alloc_mb_count,
 	(T1.user_objects_dealloc_page_count - T2.user_objects_dealloc_page_count) * 8.0 / 1024.0 AS user_objects_dealloc_mb_count,
-	(T1.user_objects_deferred_dealloc_page_count - T2.user_objects_deferred_dealloc_page_count) * 8.0 / 1024.0 AS user_objects_deferred_dealloc_mb_count,
 	(T1.internal_objects_alloc_page_count - T2.internal_objects_alloc_page_count) * 8.0 / 1024.0 AS internal_objects_alloc_mb_count,
 	(T1.internal_objects_dealloc_page_count - T2.internal_objects_dealloc_page_count) * 8.0 / 1024.0 AS internal_objects_dealloc_mb_count
 FROM 
@@ -191,7 +194,10 @@ PRINT 'tempdb_info elapsed time (ms) : ' + CAST(DATEDIFF(MILLISECOND, @start, GE
 -- 取得した拡張イベントのログを一時テーブルに格納
 SET @start = (SELECT GETDATE())
 
-DROP TABLE IF EXISTS #tmp
+IF OBJECT_ID('tempdb..#tmp') IS NOT NULL
+BEGIN
+	DROP TABLE #tmp
+END
 
 SELECT
 	ROW_NUMBER() OVER(ORDER BY object_name ASC) AS No, 
@@ -218,35 +224,115 @@ PRINT 'xevent create index : Elapsed Time (ms) : ' + CAST(DATEDIFF(MILLISECOND, 
 SET @start = (SELECT GETDATE())
 
 SELECT
-	*
+	'xevent_statement_info' AS info_type,
+	T.statemet_text,
+	T2.query_object_name,
+	T2.query_object_type,
+	T2.query_plan,
+	T2.missing_index,
+	T.duration_sec,
+	T2.duration_sec AS plan_duration_sec,
+	T.cpu_time_sec,
+	T2.cpu_time_sec as plan_cpu_time_sec,
+	T2.CompileTime,
+	T2.CompileCPU,
+	T2.StatementOptmEarlyAbortReason,
+	T2.UsedThreads,
+	T2.estimated_cost,
+	T2.ideal_memory_kb,
+	T2.granted_memory_kb,
+	T2.used_memory_kb,
+	T.logical_reads_mb,
+	T.physical_reads_mb,
+	T.writes_mb,
+	T.spills_mb,
+	T.row_count,
+	T2.estimated_rows,
+	T2.dop
 FROM(
 	SELECT
-		'xevent_statement_info' AS info_type,
-		--timestamp_utc,
-		object_name,
-		event_data.value('(/event/@timestamp)[1]', 'datetime') AS query_timestamp,
-		event_data.value('(/event/action[@name="query_hash"])[1]', 'varchar(30)') AS query_hash,
-		event_data.value('(/event/data[@name="statement"]/value)[1]', 'nvarchar(max)') AS statemet_text,
-		event_data.value('(/event/data[@name="duration"]/value)[1]', 'int') / 1000.0 AS duration_sec,
-		event_data.value('(/event/data[@name="cpu_time"]/value)[1]', 'int') / 1000.0 AS cpu_time_sec,
-		event_data.value('(/event/data[@name="logical_reads"]/value)[1]', 'bigint')  * 8.0 / 1024.0 AS logical_reads_mb,
-		event_data.value('(/event/data[@name="physical_reads"]/value)[1]', 'bigint') * 8.0 / 1024.0 AS physical_reads_mb,
-		event_data.value('(/event/data[@name="writes"]/value)[1]', 'bigint') * 8.0 / 1024.0 AS writes_mb,
-		event_data.value('(/event/data[@name="spills"]/value)[1]', 'bigint')  * 8.0 / 1024.0 AS spills_mb,
-		event_data.value('(/event/data[@name="row_count"]/value)[1]', 'bigint') AS row_count,
-		event_Data
-	FROM
-		#tmp
-	WHERE 
-		object_name = 'sql_statement_completed'
-		OR
-		object_name = 'rpc_completed'
-		OR
-		object_name = 'sp_statement_completed'
+		*
+	FROM(
+		SELECT
+			--timestamp_utc,
+			object_name,
+			event_data.value('(/event/@timestamp)[1]', 'datetime') AS query_timestamp,
+			event_data.value('(/event/action[@name="query_hash"])[1]', 'varchar(30)') AS query_hash,
+			event_data.value('(/event/action[@name="query_plan_hash"])[1]', 'varchar(30)') AS query_plan_hash,
+			event_data.value('(/event/data[@name="statement"]/value)[1]', 'nvarchar(max)') AS statemet_text,
+			event_data.value('(/event/data[@name="duration"]/value)[1]', 'int') / 1000000.0 AS duration_sec,
+			event_data.value('(/event/data[@name="cpu_time"]/value)[1]', 'int') / 1000000.0 AS cpu_time_sec,
+			event_data.value('(/event/data[@name="logical_reads"]/value)[1]', 'bigint')  * 8.0 / 1024.0 AS logical_reads_mb,
+			event_data.value('(/event/data[@name="physical_reads"]/value)[1]', 'bigint') * 8.0 / 1024.0 AS physical_reads_mb,
+			event_data.value('(/event/data[@name="writes"]/value)[1]', 'bigint') * 8.0 / 1024.0 AS writes_mb,
+			event_data.value('(/event/data[@name="spills"]/value)[1]', 'bigint')  * 8.0 / 1024.0 AS spills_mb,
+			event_data.value('(/event/data[@name="row_count"]/value)[1]', 'bigint') AS row_count
+			-- ,event_Data
+		FROM
+			#tmp
+		WHERE 
+			object_name = 'sql_statement_completed'
+			OR
+			object_name = 'rpc_completed'
+			OR
+			object_name = 'sp_statement_completed'
+	) AS T
+	WHERE
+		query_hash <> '0'
 ) AS T
-WHERE
-	query_hash <> '0'
-ORDER BY query_timestamp ASC
+LEFT JOIN (
+	SELECT
+		*
+	FROM(
+		SELECT
+			'xevent_statement_info' AS info_type,
+			--timestamp_utc,
+			object_name,
+			T.query_plan.query('.') AS query_plan,
+			T.query_plan.query('declare default element namespace "http://schemas.microsoft.com/sqlserver/2004/07/showplan"; 
+			./descendant::MissingIndexes') AS  missing_index,
+			T.query_plan.value('declare default element namespace "http://schemas.microsoft.com/sqlserver/2004/07/showplan"; 
+			(./descendant::StmtSimple/@StatementOptmEarlyAbortReason)[1]', 'sysname') AS StatementOptmEarlyAbortReason,
+			T.query_plan.value('declare default element namespace "http://schemas.microsoft.com/sqlserver/2004/07/showplan"; 
+			(./descendant::StmtSimple/QueryPlan/@CachedPlanSize)[1]', 'int') AS CachedPlanSize,
+			event_data.value('(/event/@timestamp)[1]', 'datetime') AS query_timestamp,
+			T.query_plan.value('declare default element namespace "http://schemas.microsoft.com/sqlserver/2004/07/showplan"; 
+			(./descendant::StmtSimple/QueryPlan/@CompileTime)[1]', 'int') AS CompileTime,
+			T.query_plan.value('declare default element namespace "http://schemas.microsoft.com/sqlserver/2004/07/showplan"; 
+			(./descendant::StmtSimple/QueryPlan/@CompileCPU)[1]', 'int') AS CompileCPU,
+			T.query_plan.value('declare default element namespace "http://schemas.microsoft.com/sqlserver/2004/07/showplan"; 
+			(./descendant::StmtSimple/QueryPlan/@CompileMemory)[1]', 'int') AS CompileMemory,
+			T.query_plan.value('declare default element namespace "http://schemas.microsoft.com/sqlserver/2004/07/showplan"; 
+			(./descendant::StmtSimple/QueryPlan/ThreadStat/@UsedThreads)[1]', 'int') AS UsedThreads,
+			event_data.value('(/event/action[@name="query_hash"])[1]', 'varchar(30)') AS query_hash,
+			event_data.value('(/event/action[@name="query_plan_hash"])[1]', 'varchar(30)') AS query_plan_hash,
+			event_data.value('(/event/data[@name="dop"]/value)[1]', 'int') AS dop,
+			event_data.value('(/event/data[@name="cpu_time"]/value)[1]', 'int')/ 1000000.0 AS cpu_time_sec,
+			event_data.value('(/event/data[@name="estimated_rows"]/value)[1]', 'int') AS estimated_rows,
+			event_data.value('(/event/data[@name="estimated_cost"]/value)[1]', 'int') AS estimated_cost,
+			event_data.value('(/event/data[@name="serial_ideal_memory_kb"]/value)[1]', 'int') AS serial_ideal_memory_kb,
+			event_data.value('(/event/data[@name="requested_memory_kb"]/value)[1]', 'int') AS requested_memory_kb,
+			event_data.value('(/event/data[@name="used_memory_kb"]/value)[1]', 'int') AS used_memory_kb,
+			event_data.value('(/event/data[@name="ideal_memory_kb"]/value)[1]', 'int') AS ideal_memory_kb,
+			event_data.value('(/event/data[@name="granted_memory_kb"]/value)[1]', 'int') AS granted_memory_kb,
+			event_data.value('(/event/data[@name="duration"]/value)[1]', 'int') / 1000000.0 AS duration_sec,
+			event_data.value('(/event/data[@name="object_name"]/value)[1]', 'sysname') AS query_object_name,
+			event_data.value('(/event/data[@name="object_type"]/text)[1]', 'sysname') AS query_object_type,
+			event_Data
+		FROM
+			#tmp
+			OUTER APPLY #tmp.event_data.nodes('/event/data[@name="showplan_xml"]/value/*') as T(query_plan)
+		WHERE 
+			object_name = 'query_post_execution_showplan'
+	) AS T
+	WHERE
+		query_hash <> '0'
+) AS T2
+ON
+	T2.query_hash = T.query_hash
+	AND
+	T2.query_plan_hash =T.query_plan_hash
+ORDER BY T.query_timestamp ASC
 
 PRINT 'xevent_statement_info : Elapsed Time (ms) : ' + CAST(DATEDIFF(MILLISECOND, @start, GETDATE()) AS varchar(20))
 
@@ -255,10 +341,12 @@ SET @start = (SELECT GETDATE())
 
 SELECT
 	'xevent_wait_info' AS info_type,
+	T.query_hash,
+	T.query_plan_hash,
 	Q.statemet_text,
 	T.wait_type,
 	COUNT(*) AS wait_count,
-	(SUM(T.duration_ms)) / 10000.0 AS total_duration_sec
+	(SUM(T.duration_ms)) / 1000.0 AS total_duration_sec
 FROM
 (
 	SELECT
@@ -266,12 +354,13 @@ FROM
 		--timestamp_utc,
 		object_name,
 		event_data.value('(/event/action[@name="query_hash"])[1]', 'varchar(30)') AS query_hash,
+		event_data.value('(/event/action[@name="query_plan_hash"])[1]', 'varchar(30)') AS query_plan_hash,
 		event_data.value('(/event/data[@name="wait_type"]/text)[1]', 'sysname') AS wait_type,
 		event_data.value('(/event/data[@name="duration"]/value)[1]', 'int') AS duration_ms
 	FROM
 		#tmp
 	WHERE 
-		object_name = 'wait_completed'
+		object_name = 'wait_info'
 ) AS T
 LEFT JOIN
 (
@@ -280,6 +369,7 @@ LEFT JOIN
 	FROM(
 		SELECT
 			event_data.value('(/event/action[@name="query_hash"])[1]', 'varchar(30)') AS query_hash,
+			event_data.value('(/event/action[@name="query_plan_hash"])[1]', 'varchar(30)') AS query_plan_hash,
 			event_data.value('(/event/data[@name="statement"]/value)[1]', 'nvarchar(max)') AS statemet_text
 		FROM
 			#tmp
@@ -294,18 +384,21 @@ LEFT JOIN
 
 ON
 	T.query_hash = Q.query_hash
+	AND
+	T.query_plan_hash = Q.query_plan_hash
 WHERE
 	T.query_hash <> '0'
 GROUP BY
 	Q.statemet_text,
-	T.wait_type
+	T.wait_type,
+	T.query_hash,
+	T.query_plan_hash
 ORDER BY
 	Q.statemet_text, 
 	SUM(T.duration_ms) DESC
 
 PRINT 'xevent_wait_info : Elapsed Time (ms) : ' + CAST(DATEDIFF(MILLISECOND, @start, GETDATE()) AS varchar(20))
 
-/* -- ロックは情報量が多くなるため、必要に応じて取得 / 解析を実施する
 -- 取得した拡張イベントからロックの情報を取得
 SET @start = (SELECT GETDATE())
 
@@ -417,7 +510,6 @@ ORDER BY
 	index_or_stats_name
 
 PRINT 'xevent_lock_info : Elapsed Time (ms) : ' + CAST(DATEDIFF(MILLISECOND, @start, GETDATE()) AS varchar(20))
-*/
 
 ---- 使用した拡張イベントの削除
 --IF EXISTS (SELECT 1 FROM sys.server_event_sessions WHERE name = 'query_analyze')

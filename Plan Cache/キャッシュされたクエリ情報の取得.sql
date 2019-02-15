@@ -87,14 +87,16 @@ SELECT TOP 300
 	ELSE [statement_end_offset]
 	END - [statement_start_offset]) / 2) + 1),CHAR(13), ' '), CHAR(10), ' '), CHAR(9), ' ') AS [stmt_text],
 	REPLACE(REPLACE(REPLACE([text],CHAR(13), ''), CHAR(10), ' '), CHAR(9), ' ') AS [text]
-	/* 実行プランは必要に応じて取得する */
-	--,query_plan
+	, qp.query_plan
+	,CAST(tqp.query_plan AS xml) AS query_plan_partial -- 文字列を XML にパースしているため、XML のネストが 128 以上あると CAST に失敗する
 FROM
 	[sys].[dm_exec_query_stats]
 	CROSS APPLY 
 	[sys].[dm_exec_sql_text]([sql_handle]) AS st
 	CROSS APPLY
-	[sys].[dm_exec_query_plan]([plan_handle])
+	[sys].[dm_exec_query_plan]([plan_handle]) AS qp
+	CROSS APPLY
+	[sys].[dm_exec_text_query_plan]([plan_handle], [statement_start_offset], [statement_end_offset]) AS tqp
 ORDER BY
 	CASE @mode
 		WHEN 1 THEN [execution_count]

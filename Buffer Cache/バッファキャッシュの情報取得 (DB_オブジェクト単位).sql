@@ -3,12 +3,11 @@
 /********************************************/  
 SELECT   
 	GETDATE() AS DATE,   
-	db_name(database_id) AS Database_name,  
-	OBJECT_NAME(p.object_id) AS object_name,  
-	p.index_id,  
-	p.partition_number,   
-	count(*) AS [Page Count],   
-	count(*) * 8 / 1024.0 AS [Page Size (MB)]  
+	DB_NAME(database_id) AS Database_name,  
+	OBJECT_NAME(p.object_id) AS object_name, 
+	bd.page_type,
+	COUNT_BIG(*) AS [Page Count],   
+	COUNT_BIG(*) * 8 / 1024.0 AS [Page Size (MB)]  
 FROM  
 	sys.dm_os_buffer_descriptors bd WITH (NOLOCK)  
 	LEFT JOIN   
@@ -23,15 +22,8 @@ WHERE
 	database_id = DB_ID()  
 	AND
 	OBJECT_SCHEMA_NAME(p.object_id) <> 'sys'
-	GROUP BY 
+GROUP BY 
 	database_id,
 	p.object_id,
-	p.index_id,
-	p.partition_number
-OPTION (RECOMPILE)
-
-
-/*
-DBCC DROPCLEANBUFFERS
-GO
-*/
+	bd.page_type
+OPTION (MAXDOP 1, RECOMPILE)

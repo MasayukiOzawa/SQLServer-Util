@@ -1,5 +1,5 @@
 ﻿SET NOCOUNT ON
-DBCC TRACEON(3656, -1) WITH NO_INFOMSGS
+-- DBCC TRACEON(3656, -1) WITH NO_INFOMSGS
 GO
 IF OBJECT_ID('tempdb..#filename') IS NOT NULL
 BEGIN
@@ -25,7 +25,11 @@ DECLARE @sql nvarchar(max) = N'
 CREATE EVENT SESSION [query_analyze] ON SERVER 
 
 ADD EVENT sqlserver.lock_acquired(SET collect_database_name=(1),collect_resource_description=(1)
-	ACTION(package0.callstack,sqlserver.session_id,sqlserver.query_hash,sqlserver.query_plan_hash)
+	ACTION(package0.callstack,sqlserver.session_id,sqlserver.query_hash,sqlserver.query_plan_hash,sql_text)
+	WHERE ([sqlserver].[session_id]=(@@session_id))),
+
+ADD EVENT sqlserver.lock_released(SET collect_database_name=(1),collect_resource_description=(1)
+	ACTION(package0.callstack,sqlserver.session_id,sqlserver.query_hash,sqlserver.query_plan_hash,sql_text)
 	WHERE ([sqlserver].[session_id]=(@@session_id))),
 
 ADD EVENT sqlserver.rpc_completed(
@@ -87,32 +91,33 @@ SET @start = (SELECT GETDATE())
 /***********************************************************************/
 -- 情報を確認するクエリを以下に記載して実行
 use tpch;
+SELECT * FROM REGION OPTION(RECOMPILE)
 --DBCC FREEPROCCACHE WITH NO_INFOMSGS 
-DBCC DROPCLEANBUFFERS WITH NO_INFOMSGS 
+--DBCC DROPCLEANBUFFERS WITH NO_INFOMSGS 
 
-SELECT TOP 100 S_ACCTBAL, S_NAME, N_NAME, P_PARTKEY, P_MFGR, S_ADDRESS, S_PHONE, S_COMMENT
-FROM PART, SUPPLIER, PARTSUPP, NATION, REGION
-WHERE P_PARTKEY = PS_PARTKEY AND S_SUPPKEY = PS_SUPPKEY AND P_SIZE = 15 AND
-P_TYPE LIKE '%%BRASS' AND S_NATIONKEY = N_NATIONKEY AND N_REGIONKEY = R_REGIONKEY AND
-R_NAME = 'EUROPE' AND
-PS_SUPPLYCOST = (SELECT MIN(PS_SUPPLYCOST) FROM PARTSUPP, SUPPLIER, NATION, REGION
- WHERE P_PARTKEY = PS_PARTKEY AND S_SUPPKEY = PS_SUPPKEY
- AND S_NATIONKEY = N_NATIONKEY AND N_REGIONKEY = R_REGIONKEY AND R_NAME = 'EUROPE')
-ORDER BY S_ACCTBAL DESC, N_NAME, S_NAME, P_PARTKEY
-OPTION(QUERYTRACEON 8675, QUERYTRACEON 3604);
+--SELECT TOP 100 S_ACCTBAL, S_NAME, N_NAME, P_PARTKEY, P_MFGR, S_ADDRESS, S_PHONE, S_COMMENT
+--FROM PART, SUPPLIER, PARTSUPP, NATION, REGION
+--WHERE P_PARTKEY = PS_PARTKEY AND S_SUPPKEY = PS_SUPPKEY AND P_SIZE = 15 AND
+--P_TYPE LIKE '%%BRASS' AND S_NATIONKEY = N_NATIONKEY AND N_REGIONKEY = R_REGIONKEY AND
+--R_NAME = 'EUROPE' AND
+--PS_SUPPLYCOST = (SELECT MIN(PS_SUPPLYCOST) FROM PARTSUPP, SUPPLIER, NATION, REGION
+-- WHERE P_PARTKEY = PS_PARTKEY AND S_SUPPKEY = PS_SUPPKEY
+-- AND S_NATIONKEY = N_NATIONKEY AND N_REGIONKEY = R_REGIONKEY AND R_NAME = 'EUROPE')
+--ORDER BY S_ACCTBAL DESC, N_NAME, S_NAME, P_PARTKEY
+--OPTION(QUERYTRACEON 8675, QUERYTRACEON 3604);
 
---DBCC FREEPROCCACHE WITH NO_INFOMSGS 
-DBCC DROPCLEANBUFFERS WITH NO_INFOMSGS 
-SELECT TOP 100 S_ACCTBAL, S_NAME, N_NAME, P_PARTKEY, P_MFGR, S_ADDRESS, S_PHONE, S_COMMENT
-FROM PART, SUPPLIER, PARTSUPP, NATION, REGION
-WHERE P_PARTKEY = PS_PARTKEY AND S_SUPPKEY = PS_SUPPKEY AND P_SIZE = 15 AND
-P_TYPE LIKE '%%BRASS' AND S_NATIONKEY = N_NATIONKEY AND N_REGIONKEY = R_REGIONKEY AND
-R_NAME = 'EUROPE' AND
-PS_SUPPLYCOST = (SELECT MIN(PS_SUPPLYCOST) FROM PARTSUPP, SUPPLIER, NATION, REGION
- WHERE P_PARTKEY = PS_PARTKEY AND S_SUPPKEY = PS_SUPPKEY
- AND S_NATIONKEY = N_NATIONKEY AND N_REGIONKEY = R_REGIONKEY AND R_NAME = 'EUROPE')
-ORDER BY S_ACCTBAL DESC, N_NAME, S_NAME, P_PARTKEY
-OPTION(QUERYTRACEON 8780,QUERYTRACEON 8757,  QUERYTRACEON 8675, QUERYTRACEON 3604);
+----DBCC FREEPROCCACHE WITH NO_INFOMSGS 
+--DBCC DROPCLEANBUFFERS WITH NO_INFOMSGS 
+--SELECT TOP 100 S_ACCTBAL, S_NAME, N_NAME, P_PARTKEY, P_MFGR, S_ADDRESS, S_PHONE, S_COMMENT
+--FROM PART, SUPPLIER, PARTSUPP, NATION, REGION
+--WHERE P_PARTKEY = PS_PARTKEY AND S_SUPPKEY = PS_SUPPKEY AND P_SIZE = 15 AND
+--P_TYPE LIKE '%%BRASS' AND S_NATIONKEY = N_NATIONKEY AND N_REGIONKEY = R_REGIONKEY AND
+--R_NAME = 'EUROPE' AND
+--PS_SUPPLYCOST = (SELECT MIN(PS_SUPPLYCOST) FROM PARTSUPP, SUPPLIER, NATION, REGION
+-- WHERE P_PARTKEY = PS_PARTKEY AND S_SUPPKEY = PS_SUPPKEY
+-- AND S_NATIONKEY = N_NATIONKEY AND N_REGIONKEY = R_REGIONKEY AND R_NAME = 'EUROPE')
+--ORDER BY S_ACCTBAL DESC, N_NAME, S_NAME, P_PARTKEY
+--OPTION(QUERYTRACEON 8780,QUERYTRACEON 8757,  QUERYTRACEON 8675, QUERYTRACEON 3604);
 
 /***********************************************************************/
 PRINT 'Queyr End : Elapsed Time (ms) : ' + CAST(DATEDIFF(MILLISECOND, @start, GETDATE()) AS varchar(20))
@@ -404,6 +409,8 @@ SET @start = (SELECT GETDATE())
 
 SELECT
 	'xevent_lock_info' AS info_type,
+	xevent_object_name,
+	event_timestamp,
 	database_name,
 	resource_type,
 	mode,
@@ -429,14 +436,18 @@ SELECT
 		ELSE
 			NULL
 	END AS index_or_stats_name,
-	SUM(duration) / 1000 AS total_duration_ms,
-	COUNT(*) AS count
+	resource_description,
+	duration,
+	sql_text
+	--,SUM(duration) / 1000 AS total_duration_ms
+	--,COUNT(*) AS count
 FROM
 (
 SELECT
 	No,
 	--timestamp_utc,
 	object_name AS xevent_object_name,
+	event_data.value('(/event/@timestamp)[1]', 'varchar(24)') as event_timestamp,
 	event_data.value('(/event/data[@name="resource_type"]/text)[1]', 'sysname') AS resource_type,
 	event_data.value('(/event/data[@name="database_name"]/value)[1]', 'sysname') AS database_name,
 	event_data.value('(/event/data[@name="mode"]/text)[1]', 'sysname') AS mode,
@@ -487,27 +498,29 @@ SELECT
 		)
 	ELSE
 		NULL
-	END AS resource_description_index_or_stats_id
-	,event_data
+	END AS resource_description_index_or_stats_id,
+	event_data.value('(/event/action[@name="sql_text"]/value)[1]', 'nvarchar(max)') AS sql_text,
+	event_data
 FROM
 	#tmp
 WHERE 
-	object_name = 'lock_acquired'
+	object_name IN('lock_acquired', 'lock_released')
 	--AND event_data.value('(/event/data[@name="resource_type"]/text)[1]', 'sysname') = 'METADATA'
 ) AS T
-GROUP BY
-	resource_type,
-	database_name,
-	mode,
-	object_id,
-	resource_description_object_id,
-	resource_description_stats_id,
-	resource_description_index_or_stats_id
+--GROUP BY
+--	resource_type,
+--	database_name,
+--	mode,
+--	object_id,
+--	resource_description_object_id,
+--	resource_description_stats_id,
+--	resource_description_index_or_stats_id
 ORDER BY
-	database_name,
-	resource_type,
-	mode,
-	index_or_stats_name
+	event_timestamp
+	--database_name,
+	--resource_type,
+	--mode,
+	--index_or_stats_name
 
 PRINT 'xevent_lock_info : Elapsed Time (ms) : ' + CAST(DATEDIFF(MILLISECOND, @start, GETDATE()) AS varchar(20))
 

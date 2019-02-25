@@ -14,6 +14,7 @@ GO
 SET NOCOUNT ON
 GO
 
+DECLARE @last_execution_time datetime = (SELECT DATEADD(HOUR, -8, GETDATE()))
 /*********************************************/
 -- mode
 -- 1 : 実行回数の高いクエリ
@@ -23,8 +24,28 @@ GO
 -- 5 : 平均書き込み回数の高いクエリ
 /*********************************************/
 
-DECLARE @mode int = 1
+DECLARE @mode int = 3
 
+SELECT 
+	*,
+	query_plan_partial.value(
+		'declare default element namespace "http://schemas.microsoft.com/sqlserver/2004/07/showplan"; 
+		(/descendant-or-self::QueryPlan/@CachedPlanSize)[1]'
+	, 'int') AS CachedPlanSize,
+	query_plan_partial.value(
+		'declare default element namespace "http://schemas.microsoft.com/sqlserver/2004/07/showplan"; 
+		(/descendant-or-self::QueryPlan/@CompileTime)[1]'
+	, 'int') AS CompileTime,
+	query_plan_partial.value(
+		'declare default element namespace "http://schemas.microsoft.com/sqlserver/2004/07/showplan"; 
+		(/descendant-or-self::QueryPlan/@CompileCPU)[1]'
+	, 'int') AS CompileCPU,
+	query_plan_partial.value(
+		'declare default element namespace "http://schemas.microsoft.com/sqlserver/2004/07/showplan"; 
+		(/descendant-or-self::QueryPlan/@CompileMemory)[1]'
+	, 'int') AS CompileMemory
+FROM
+(
 SELECT TOP 300
 	GETDATE() AS DATE,
 	CASE @mode 
@@ -97,6 +118,10 @@ FROM
 	[sys].[dm_exec_query_plan]([plan_handle]) AS qp
 	CROSS APPLY
 	[sys].[dm_exec_text_query_plan]([plan_handle], [statement_start_offset], [statement_end_offset]) AS tqp
+WHERE
+	last_execution_time >= @last_execution_time
+	AND
+	query_hash <> 0x0000000000000000
 ORDER BY
 	CASE @mode
 		WHEN 1 THEN [execution_count]
@@ -106,4 +131,5 @@ ORDER BY
 		WHEN 5 THEN [total_logical_writes]  / [execution_count]
 		ELSE [execution_count]
 	END DESC
+) AS T
 OPTION (RECOMPILE)

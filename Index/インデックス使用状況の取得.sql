@@ -58,11 +58,26 @@ SELECT
 	, ios.page_compression_success_count
 	, ss.name AS stats_name
 	, STATS_DATE(si.object_id, si.index_id) AS [stats_date]
+	, stp.rows
+	, stp.rows_sampled
+	, CASE
+		WHEN stp.rows = 0 THEN 0
+		ELSE CAST((1.0 * stp.rows_sampled / stp.rows) * 100 AS numeric(5,2)) 
+	  END AS rows_sampled_rate
+	, stp.steps
+	, stp.modification_counter
+	, CASE
+		WHEN stp.modification_counter = 0 THEN 0
+		ELSE CAST((1.0 * stp.rows / stp.modification_counter) * 100 AS numeric(5,2)) 
+	  END AS modification_rate
+-- 	, stp.persisted_sample_percent
 	, ss.auto_created
 	, ss.user_created
 	, ss.no_recompute
 	, so.create_date
 	, so.modify_date
+	, stp.last_updated
+	
 FROM
 	sys.indexes AS si
 	LEFT JOIN
@@ -97,6 +112,7 @@ FROM
 	si.object_id = ss.object_id
 	AND
 	si.index_id = ss.stats_id
+	OUTER APPLY sys.dm_db_stats_properties(ss.object_id, ss.stats_id) AS stp
 	LEFT JOIN
 	sys.partitions sp
 	ON

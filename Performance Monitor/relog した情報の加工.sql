@@ -124,4 +124,4 @@ PIVOT
 ORDER BY
 	CounterDateTime ASC,
 	ObjectName ASC
-OPTION(RECOMPILE, MAXDOP 0) -- 条件の変数化によりフィルタータイミングが後半になることを防ぐため、RECOMPILE による述語の調整
+--OPTION(RECOMPILE, MAXDOP 0) -- 条件の変数化によりフィルタータイミングが後半になることを防ぐため、RECOMPILE による述語の調整

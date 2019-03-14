@@ -1,4 +1,4 @@
-﻿SELECT 
+SELECT 
 	dot.session_id,
 	der.blocking_session_id,
 	dot.exec_context_id,
@@ -26,7 +26,6 @@
 	des.host_name,
 	des.program_name,
 	des.login_name,
-	der.dop,
 	des.cpu_time AS des_cpu_time,
 	der.cpu_time AS der_cpu_time,
 	des.total_scheduled_time,
@@ -72,7 +71,8 @@ FROM
 	LEFT JOIN sys.dm_os_waiting_tasks AS dowt
 		ON dowt.session_id = dot.session_id
 		AND dowt.exec_context_id = dot.exec_context_id
-		AND dowt.blocking_task_address IS NOT NULL
+		AND dowt.session_id <> dowt.blocking_session_id
+		AND dowt.resource_description IS NOT NULL
 	OUTER APPLY sys.dm_exec_sql_text(sql_handle) AS dest
 	OUTER APPLY sys.dm_exec_query_plan(der.plan_handle) AS deqp
 	OUTER APPLY sys.dm_exec_text_query_plan(der.plan_handle, der.statement_start_offset, der.statement_end_offset) AS detqp

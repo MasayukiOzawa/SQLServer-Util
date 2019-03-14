@@ -72,6 +72,7 @@ FROM
 	LEFT JOIN sys.dm_os_waiting_tasks AS dowt
 		ON dowt.session_id = dot.session_id
 		AND dowt.exec_context_id = dot.exec_context_id
+		AND dowt.blocking_task_address IS NOT NULL
 	OUTER APPLY sys.dm_exec_sql_text(sql_handle) AS dest
 	OUTER APPLY sys.dm_exec_query_plan(der.plan_handle) AS deqp
 	OUTER APPLY sys.dm_exec_text_query_plan(der.plan_handle, der.statement_start_offset, der.statement_end_offset) AS detqp

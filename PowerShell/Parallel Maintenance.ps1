@@ -3,7 +3,7 @@ $runspaceSize = 5
 
 $results = New-Object System.Collections.ArrayList
 
-Write-Host ("{0} : Process Start." -f (Get-Date).tostring("yyyy/MM/dd hh:mm:ss.fff"))
+Write-Host ("{0} : Process Start." -f (Get-Date).tostring("yyyy/MM/dd HH:mm:ss.fff"))
 $sw = [system.diagnostics.stopwatch]::startNew()
 
 # DB の接続情報
@@ -120,7 +120,7 @@ try {
                 $ret = $runspace.posh.EndInvoke($runspace.Runspace)
                 $runspace.posh.Dispose()
                 Write-Host ("{0} : No.{1} ({2}.{3}.{4}) Completed.[Start : {5}] [End : {6}]" -f `
-                    (Get-Date).tostring("yyyy/MM/dd hh:mm:ss.fff"), `
+                    (Get-Date).tostring("yyyy/MM/dd HH:mm:ss.fff"), `
                         $runspace.No, `
                         $runspace.target.schema_name, `
                         $runspace.target.object_name, `
@@ -163,7 +163,7 @@ finally {
     $runspacePool.Close()
     $runspacePool.Dispose()
 
-    Write-Host ("{0} : Process End." -f (Get-Date).tostring("yyyy/MM/dd hh:mm:ss.fff"))
+    Write-Host ("{0} : Process End." -f (Get-Date).tostring("yyyy/MM/dd HH:mm:ss.fff"))
     [void]$sw.stop
     Write-Host ("Total Elapsed Time : {0}" -f $sw.Elapsed)
 }

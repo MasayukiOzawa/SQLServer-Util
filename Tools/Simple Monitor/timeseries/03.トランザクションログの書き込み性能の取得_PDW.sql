@@ -1,36 +1,34 @@
-﻿SET NOCOUNT ON
-
--- トランザクションログの書き込み状況
-/*
-DROP TABLE #T1
-DROP TABLE #T2
-*/
+﻿SET NOCOUNT ON;
 
 SELECT
 	GETDATE() counter_date, 
 	* 
 INTO #T1
 FROM
-	sys.dm_pdw_nodes_os_performance_counters
+	sys.dm_pdw_nodes_os_performance_counters WITH(NOLOCK)
 WHERE 
 	object_name LIKE '%:Databases%'
 	AND
 	counter_name IN ('Log Flushes/sec', 'Log Bytes Flushed/sec', 'Log Flush Waits/sec', 'Log Flush Wait Time')
 	AND
 	instance_name NOT IN ('master', '_Total','msdb', 'model', 'mssqlsystemresource', 'model_userdb', 'tempdb', 'model_masterdb')
+OPTION(RECOMPILE, MAXDOP 1);
+
+WAITFOR DELAY '00:00:03';
 
 SELECT
 	GETDATE() counter_date, 
 	* 
 INTO #T2
 FROM
-	sys.dm_pdw_nodes_os_performance_counters
+	sys.dm_pdw_nodes_os_performance_counters WITH(NOLOCK)
 WHERE 
 	object_name LIKE '%:Databases%'
 	AND
 	counter_name IN ('Log Flushes/sec', 'Log Bytes Flushed/sec', 'Log Flush Waits/sec', 'Log Flush Wait Time')
 	AND
 	instance_name NOT IN ('master', '_Total','msdb', 'model', 'mssqlsystemresource', 'model_userdb', 'tempdb', 'model_masterdb')
+OPTION(RECOMPILE, MAXDOP 1);
 
 SELECT 
     #T2.counter_date,
@@ -58,3 +56,4 @@ FROM #T1
 ORDER BY
 	type,
 	instance_name
+OPTION(RECOMPILE, MAXDOP 1);

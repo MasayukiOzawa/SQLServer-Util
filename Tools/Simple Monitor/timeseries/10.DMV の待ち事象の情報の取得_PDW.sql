@@ -1,25 +1,26 @@
-﻿/*
-DROP TABLE #T1
-DROP TABLE #T2
-*/
+﻿SET NOCOUNT ON;
 
 SELECT
 	GETDATE() AS counter_date,
 	*
 INTO #T1
 FROM
-	sys.dm_pdw_nodes_os_wait_stats
+	sys.dm_pdw_nodes_os_wait_stats WITH(NOLOCK)
 WHERE
 	waiting_tasks_count > 0
+OPTION (RECOMPILE, MAXDOP 1);
+
+WAITFOR DELAY '00:00:03';
 
 SELECT
 	GETDATE() AS counter_date,
 	*
 INTO #T2
 FROM
-	sys.dm_pdw_nodes_os_wait_stats
+	sys.dm_pdw_nodes_os_wait_stats WITH(NOLOCK)
 WHERE
 	waiting_tasks_count > 0
+OPTION (RECOMPILE, MAXDOP 1);
 
 SELECT
 	#T2.counter_date,
@@ -49,3 +50,4 @@ WHERE
 ORDER BY
 	n.type DESC,
 	#T2.pdw_node_id ASC
+OPTION (RECOMPILE, MAXDOP 1);

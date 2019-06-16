@@ -1,12 +1,4 @@
-﻿SET NOCOUNT ON
-
--- ファイル I/O の取得
--- DROP TABLE IF EXISTS #T1
--- DROP TABLE IF EXISTS #T2
-IF (OBJECT_ID('tempdb..#T1') IS NOT NULL)
-	DROP TABLE #T1
-IF (OBJECT_ID('tempdb..#T2') IS NOT NULL)
-	DROP TABLE #T2
+﻿SET NOCOUNT ON;
 
 SELECT
 	GETDATE() AS counter_date,
@@ -37,9 +29,10 @@ FROM
 		fn_virtualfilestats.DbId = [sys].[master_files].[database_id]
 		AND
 		fn_virtualfilestats.FileId = [sys].[master_files].[file_id]
-OPTION (RECOMPILE)
+OPTION (RECOMPILE, MAXDOP 1);
 
-WAITFOR DELAY '00:00:01'
+WAITFOR DELAY '00:00:03';
+
 SELECT
 	GETDATE() AS counter_date,
 	DB_NAME([sys].[master_files].[database_id]) AS [DatabaseName], 
@@ -69,7 +62,7 @@ FROM
 		fn_virtualfilestats.DbId = [sys].[master_files].[database_id]
 		AND
 		fn_virtualfilestats.FileId = [sys].[master_files].[file_id]
-OPTION (RECOMPILE)
+OPTION (RECOMPILE, MAXDOP 1);
 
 SELECT
 	#T2.counter_date,
@@ -86,3 +79,4 @@ FROM
 	#T2
 	ON
 	#T1.name = #T2.name
+OPTION (RECOMPILE, MAXDOP 1);

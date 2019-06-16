@@ -1,9 +1,7 @@
-﻿SET NOCOUNT ON
+﻿SET NOCOUNT ON;
 
 SELECT
 	GETDATE() AS counter_date,
-	pdw_node_id,
-	type,
 	instance_name,
 	CAST([CPU usage %] AS float) / CAST([CPU usage % base] AS float) * 100.0 AS [CPU Usage],
 	[Max memory (KB)] / 1024.0 AS [Max memory (MB)],
@@ -18,17 +16,11 @@ SELECT
 FROM
 	(
 	SELECT
-		RTRIM(p.instance_name) AS instance_name,
-		RTRIM(p.counter_name) AS counter_name,
-		p.pdw_node_id,
-		n.type,
-		p.cntr_value
+		RTRIM(instance_name) AS instance_name,
+		RTRIM(counter_name) AS counter_name,
+		cntr_value
 	FROM 
-		sys.dm_pdw_nodes_os_performance_counters p
-		LEFT JOIN
-		sys.dm_pdw_nodes n
-		ON
-		n.pdw_node_id = p.pdw_node_id
+		sys.dm_os_performance_counters WITH(NOLOCK)
 	WHERE 
 		object_name like '%Resource Pool Stats%'
 		AND
@@ -65,6 +57,5 @@ PIVOT
 	)
 ) AS PVT
 ORDER BY
-	type DESC,
-	pdw_node_id ASC, 
 	instance_name ASC
+OPTION(RECOMPILE, MAXDOP 1);

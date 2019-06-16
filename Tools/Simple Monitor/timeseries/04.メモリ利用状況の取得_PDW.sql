@@ -1,4 +1,5 @@
-﻿-- メモリ利用状況の取得
+﻿SET NOCOUNT ON;
+
 SELECT
 	GETDATE() AS counter_date,
 	p.pdw_node_id,
@@ -8,10 +9,11 @@ SELECT
 	RTRIM(p.instance_name) AS instance_name,
 	p.cntr_value 
 FROM 
-	sys.dm_pdw_nodes_os_performance_counters p
+	sys.dm_pdw_nodes_os_performance_counters p WITH(NOLOCK)
 	LEFT JOIN
-	sys.dm_pdw_nodes n
+	sys.dm_pdw_nodes n WITH(NOLOCK)
 	ON
 	n.pdw_node_id = p.pdw_node_id
 WHERE
 	p.object_name LIKE '%Memory Manager%'
+OPTION(RECOMPILE, MAXDOP 1);

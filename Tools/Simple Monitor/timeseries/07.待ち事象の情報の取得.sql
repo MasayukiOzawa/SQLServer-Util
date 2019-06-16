@@ -1,4 +1,5 @@
-﻿SET NOCOUNT ON
+﻿SET NOCOUNT ON;
+
 IF (SERVERPROPERTY('ProductMajorVersion') IS NOT NULL)
 BEGIN
 	SELECT
@@ -15,7 +16,7 @@ BEGIN
 			RTRIM(counter_name) AS counter_name,
 			cntr_value
 		FROM 
-			sys.dm_os_performance_counters
+			sys.dm_os_performance_counters WITH(NOLOCK)
 		WHERE 
 			object_name like '%Wait Statistics%'
 		) AS T
@@ -31,6 +32,7 @@ BEGIN
 		)
 	) AS PVT
 	ORDER BY counter_name
+	OPTION(RECOMPILE, MAXDOP 1);
 END
 ELSE
 BEGIN
@@ -48,7 +50,7 @@ BEGIN
 			RTRIM(counter_name) AS counter_name,
 			cntr_value
 		FROM 
-			sys.dm_os_performance_counters
+			sys.dm_os_performance_counters WITH(NOLOCK)
 		WHERE 
 			object_name like '%Wait Statistics%'
 		) AS T
@@ -64,4 +66,5 @@ BEGIN
 		)
 	) AS PVT
 	ORDER BY counter_name
-END
+	OPTION(RECOMPILE, MAXDOP 1);
+END;

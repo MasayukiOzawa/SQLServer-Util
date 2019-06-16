@@ -106,7 +106,7 @@ try{
 
         $powershell = [PowerShell]::Create().AddScript($Command).AddArgument($constring).AddArgument($Source)
         $powershell.RunspacePool = $runspacePool
-                [void]$RunspaceCollection.Add([PSCustomObject] @{
+        [void]$RunspaceCollection.Add([PSCustomObject] @{
             QueryNo = $cnt
             Runspace = $powershell.BeginInvoke();
             PowerShell = $powershell

@@ -1,4 +1,4 @@
-﻿SET NOCOUNT ON
+﻿SET NOCOUNT ON;
 
 SELECT
 	GETDATE() as counter_date,
@@ -18,9 +18,9 @@ FROM
 		n.type,
 		p.cntr_value
 	FROM 
-		sys.dm_pdw_nodes_os_performance_counters p
+		sys.dm_pdw_nodes_os_performance_counters p WITH(NOLOCK)
 		LEFT JOIN
-		sys.dm_pdw_nodes n
+		sys.dm_pdw_nodes n WITH(NOLOCK)
 		ON
 		n.pdw_node_id = p.pdw_node_id
 	WHERE 
@@ -41,3 +41,4 @@ ORDER BY
 	type DESC,
 	pdw_node_id ASC,
 	counter_name ASC
+OPTION(RECOMPILE, MAXDOP 1);

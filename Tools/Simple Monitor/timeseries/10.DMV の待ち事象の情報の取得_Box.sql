@@ -1,30 +1,26 @@
-﻿-- DROP TABLE IF EXISTS #T1
--- DROP TABLE IF EXISTS #T2
-IF (OBJECT_ID('tempdb..#T1') IS NOT NULL)
-	DROP TABLE #T1
-IF (OBJECT_ID('tempdb..#T2') IS NOT NULL)
-	DROP TABLE #T2
-
+﻿SET NOCOUNT ON;
 
 SELECT
 	GETDATE() AS counter_date,
 	*
 INTO #T1
 FROM
-	sys.dm_os_wait_stats
+	sys.dm_os_wait_stats WITH(NOLOCK)
 WHERE
 	waiting_tasks_count > 0
+OPTION (RECOMPILE, MAXDOP 1);
 
-WAITFOR DELAY '00:00:01'
+WAITFOR DELAY '00:00:03';
 
 SELECT
 	GETDATE() AS counter_date,
 	*
 INTO #T2
 FROM
-	sys.dm_os_wait_stats
+	sys.dm_os_wait_stats WITH(NOLOCK)
 WHERE
 	waiting_tasks_count > 0
+OPTION (RECOMPILE, MAXDOP 1);
 
 SELECT
 	#T2.counter_date,
@@ -43,3 +39,4 @@ WHERE
 	#T2.waiting_tasks_count - #T1.waiting_tasks_count > 0
 	AND
 	#T2.wait_type <> 'WAITFOR'
+OPTION (RECOMPILE, MAXDOP 1);

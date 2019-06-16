@@ -1,9 +1,10 @@
-﻿SET NOCOUNT ON
+﻿SET NOCOUNT ON;
 
+/*
 -- ファイル I/O の取得
 DROP TABLE IF EXISTS #T1
 DROP TABLE IF EXISTS #T2
-
+*/
 SELECT 
 	GETDATE() AS counter_date,
 	[database_files].[name], 
@@ -27,11 +28,12 @@ INTO #T1
 FROM 
 	fn_virtualfilestats(DB_ID(), NULL) 
 	LEFT JOIN
-	sys.database_files
+	sys.database_files WITH(NOLOCK)
 	ON
 	database_files.file_id  = fn_virtualfilestats.FileId
+OPTION(RECOMPILE, MAXDOP 1);
 
-WAITFOR DELAY '00:00:01'
+WAITFOR DELAY '00:00:03';
 
 SELECT 
 	GETDATE() AS counter_date,
@@ -56,9 +58,10 @@ INTO #T2
 FROM 
 	fn_virtualfilestats(DB_ID(), NULL) 
 	LEFT JOIN
-	sys.database_files
+	sys.database_files WITH(NOLOCK)
 	ON
 	database_files.file_id  = fn_virtualfilestats.FileId
+OPTION(RECOMPILE, MAXDOP 1);
 
 SELECT
 	#T2.counter_date,
@@ -75,3 +78,4 @@ FROM
 	#T2
 	ON
 	#T1.name = #T2.name
+OPTION(RECOMPILE, MAXDOP 1);

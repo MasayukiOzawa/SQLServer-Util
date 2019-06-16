@@ -98,10 +98,18 @@ if (-not (Test-Path $timeseriespath)){
     New-Item -Path $timeseriespath -ItemType Directory | Out-Null
 }
 
-# Time Series Directory
+# Snapshot Directory
 $snapshotpath = (Join-Path $outfilepath "snapshot")
 if (-not (Test-Path $snapshotpath)){
     New-Item -Path $snapshotpath -ItemType Directory | Out-Null
+}
+$snapshot_before_path = (Join-Path $snapshotpath "before")
+if (-not (Test-Path $snapshot_before_path)){
+    New-Item -Path $snapshot_before_path -ItemType Directory | Out-Null
+}
+$snapshot_after_path = (Join-Path $snapshotpath "after")
+if (-not (Test-Path $snapshot_after_path)){
+    New-Item -Path $snapshot_after_path -ItemType Directory | Out-Null
 }
 
 
@@ -156,12 +164,13 @@ $ExecuteSql = {
     }
 }
 
-Write-Message "Start collecting snapshot data."
-# Collect Snapshot Data
+# Collect Snapshot Data (Before)
+Write-Message "Start collecting snapshot data.（Before Data)"
+
 try{
     foreach($sqlfile in $snapshotSqllist){
         $outfile = ($sqlfile.BaseName -split "_")[0] + ".txt"
-        $outFileFullName = (Join-Path $snapshotpath $outfile)
+        $outFileFullName = (Join-Path $snapshot_before_path $outfile)
         $ExecuteSql.Invoke(
             $param,
             $sqlfile.FullName,
@@ -170,7 +179,7 @@ try{
 }catch{
     Write-ErrorMessage ("{0} | {1}" -f $sqlfile, $Error[0].Exception.Message)
 }
-Write-Message "End collecting snapshot data."
+Write-Message "End collecting snapshot data. (Before Data)"
 
 # Collect Time Series Data
 $minpoolsize = $maxpoolsize = $RunspaceSize
@@ -229,6 +238,23 @@ try{
     Write-Error $Error[0]
 }
 finally{
+    # Collect Snapshot Data (Before)
+    Write-Message "Start collecting snapshot data.（After Data)"
+
+    try{
+        foreach($sqlfile in $snapshotSqllist){
+            $outfile = ($sqlfile.BaseName -split "_")[0] + ".txt"
+            $outFileFullName = (Join-Path $snapshot_after_path $outfile)
+            $ExecuteSql.Invoke(
+                $param,
+                $sqlfile.FullName,
+                $outFileFullName)
+        }
+    }catch{
+        Write-ErrorMessage ("{0} | {1}" -f $sqlfile, $Error[0].Exception.Message)
+    }
+    Write-Message "End collecting snapshot data. (（After Data)"
+
     Write-Message "Stop collecting time series data."
     Write-Message "Stop collecting metrics. "
 }

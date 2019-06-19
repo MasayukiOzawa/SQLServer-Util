@@ -6,6 +6,7 @@ param(
     $password = "",
     $outputdir = "C:\Simple Monitor",
     $interval = 10,
+    $commandTimeout = 30,
     [switch]$isAzure ,
     [switch]$isPDW
 )
@@ -14,21 +15,6 @@ $dateFormat = "yyyy/MM/dd HH:mm:ss"
 $RunspaceSize = 5
 
 Clear-Host
-
-# Verify that Invoke-SqlCmd is Installed
-if($null -eq (Get-Command | Where-Object Name -eq "Invoke-SqlCmd")){
-    Write-Host @"
-Invoke-SqlCmd is not installed."
-Please install SQL Server PowerShell referring to the information of the following URL.
-https://www.powershellgallery.com/packages/Sqlserver
-
-You can also install it with the following command:.
-====
-Install-Module SqlServer
-===
-"@
-    exit -1
-}
 
 Function Write-Message($message){
     Write-Host ("{0} | {1} " -f (Get-Date).ToString($dateFormat), $message)
@@ -42,7 +28,7 @@ Write-Message "Start collecting metrics. "
 
 # Connect Test
 try{
-    Write-Message "Test the connection."
+    Write-Message "Test connection."
     $con = New-Object System.Data.SqlClient.SqlConnection
     $con.ConnectionString = ("Data Source={0};Initial Catalog={1};User Id={2};Password={3};Connection Timeout=5" -f $server, $database, $user, $password)
     $con.Open()
@@ -132,7 +118,8 @@ $ExecuteSql = {
     param(
         $sqlparam,
         $inputFile,
-        $outFileFullName
+        $outFileFullName,
+        $commandTimeout
     )
     try{
         # if ($PSVersionTable.PSVersion.Major -lt 6){
@@ -147,9 +134,10 @@ $ExecuteSql = {
         $dt = New-Object System.Data.DataTable
         $cmd = $con.CreateCommand()
         $cmd.CommandText = (Get-Content $inputFile)
+        $cmd.CommandTimeout = $commandTimeout
         $da.SelectCommand = $cmd
         [void]$da.Fill($dt)
-        $dt | Export-Csv -Path $outFileFullName -NoTypeInformation -Append -Force 
+        $dt | Export-Csv -Path $outFileFullName -NoTypeInformation -Append -Force -Encoding UTF8
 
     }catch{
         throw $Error[0].Exception.Message
@@ -174,7 +162,8 @@ try{
         $ExecuteSql.Invoke(
             $param,
             $sqlfile.FullName,
-            $outFileFullName)
+            $outFileFullName,
+            $commandTimeout)
     }
 }catch{
     Write-ErrorMessage ("{0} | {1}" -f $sqlfile, $Error[0].Exception.Message)
@@ -200,7 +189,8 @@ try{
                 $powershell = [PowerShell]::Create().AddScript($ExecuteSql).`
                     AddArgument($param).`
                     AddArgument($sqlfile.FullName).`
-                    AddArgument($outFileFullName)
+                    AddArgument($outFileFullName). `
+                    AddArgument($commandTimeout)
                 $powershell.RunspacePool = $runspacePool
                 [void]$RunspaceCollection.Add([PSCustomObject] @{
                     FileName = $sqlfile.Name
@@ -248,7 +238,8 @@ finally{
             $ExecuteSql.Invoke(
                 $param,
                 $sqlfile.FullName,
-                $outFileFullName)
+                $outFileFullName,
+                $commandTimeout)
         }
     }catch{
         Write-ErrorMessage ("{0} | {1}" -f $sqlfile, $Error[0].Exception.Message)

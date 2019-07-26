@@ -62,13 +62,13 @@ SELECT
 	, stp.rows_sampled
 	, CASE
 		WHEN stp.rows = 0 THEN 0
-		ELSE CAST((1.0 * stp.rows_sampled / stp.rows) * 100 AS numeric(5,2)) 
+		ELSE CAST((1.0 * stp.rows_sampled / stp.rows) * 100 AS numeric(7,2)) 
 	  END AS rows_sampled_rate
 	, stp.steps
 	, stp.modification_counter
 	, CASE
 		WHEN stp.modification_counter = 0 THEN 0
-		ELSE CAST((1.0 * stp.rows / stp.modification_counter) * 100 AS numeric(5,2)) 
+		ELSE CAST((1.0 * stp.rows / stp.modification_counter) * 100 AS numeric(7,2)) 
 	  END AS modification_rate
 -- 	, stp.persisted_sample_percent
 	, ss.auto_created

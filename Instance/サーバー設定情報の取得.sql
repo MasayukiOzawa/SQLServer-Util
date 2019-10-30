@@ -86,12 +86,12 @@ OPTION (RECOMPILE)
 -- SQL Server 2017 以降の Linux 対応
 SELECT * FROM  sys.dm_os_host_info
 OPTION (RECOMPILE)
-
 GO
 
 
 /*********************************************/
--- ソース情報
+-- リソース情報
+-- OS のリソース情報の Memory Model から LPM の情報を取得可能
 /*********************************************/
 -- OS のリソース情報
 SELECT GETDATE() AS DATE,* FROM sys.dm_os_sys_info
@@ -104,7 +104,6 @@ OPTION (RECOMPILE)
 -- プロセスのメモリ情報
 SELECT GETDATE() AS DATE, * FROM sys.dm_os_process_memory 
 OPTION (RECOMPILE)
-
 GO
 
 /*********************************************/
@@ -118,15 +117,14 @@ OPTION (RECOMPILE)
 -- NUMA ノード メモリ情報
 SELECT GETDATE() AS DATE, * FROM sys.dm_os_memory_nodes
 OPTION (RECOMPILE)
-
 GO
 
 /*********************************************/
 -- サービス情報
+-- ファイルの瞬時初期化の設定についても取得可能
 /*********************************************/
 SELECT GETDATE() AS DATE, * FROM sys.dm_server_services
 OPTION (RECOMPILE)
-
 GO
 
 /*********************************************/
@@ -134,5 +132,4 @@ GO
 /*********************************************/
 SELECT GETDATE() AS DATE, * FROM sys.dm_server_registry
 OPTION (RECOMPILE)
-
 GO

@@ -35,6 +35,8 @@ SELECT TOP 300
 		WHEN 5 THEN 'HighAvgWrite'
 		ELSE 'HighExecution' 
 	END AS type, 
+	DB_NAME(st.dbid) AS db_name,
+	OBJECT_NAME(st.objectid,st.dbid) AS object_name,
 	[total_elapsed_time] / [execution_count] / 1000.0 AS [Average Elapsed Time (ms)], 
 	[total_worker_time]  / [execution_count] / 1000.0 AS [Average Worker Time (ms)], 
 	[total_physical_reads] / [execution_count] AS [Average Physical Read Count], 
@@ -55,7 +57,6 @@ SELECT TOP 300
 	[last_execution_time],
 	[query_hash],
 	[query_plan_hash],
-	DB_NAME(st.dbid) AS db_name,
 	REPLACE(REPLACE(REPLACE(SUBSTRING(text, 
 	([statement_start_offset] / 2) + 1, 
 	((CASE [statement_end_offset]
@@ -64,6 +65,8 @@ SELECT TOP 300
 	END - [statement_start_offset]) / 2) + 1),CHAR(13), ' '), CHAR(10), ' '), CHAR(9), ' ') AS [stmt_text],
 	REPLACE(REPLACE(REPLACE([text],CHAR(13), ''), CHAR(10), ' '), CHAR(9), ' ') AS [text]
 	, qp.query_plan
+	--, plan_handle
+	--, sql_handle
 FROM
 	[sys].[dm_exec_query_stats]
 	CROSS APPLY 

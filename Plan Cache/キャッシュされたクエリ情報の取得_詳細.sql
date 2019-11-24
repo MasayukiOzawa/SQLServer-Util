@@ -56,6 +56,8 @@ SELECT TOP 300
 		WHEN 5 THEN 'HighAvgWrite'
 		ELSE 'HighExecution' 
 	END AS type, 
+	DB_NAME(st.dbid) AS db_name,
+	OBJECT_NAME(st.objectid,st.dbid) AS object_name,
 	[total_elapsed_time] / [execution_count] / 1000.0 AS [Average Elapsed Time (ms)], 
 	[total_worker_time]  / [execution_count] / 1000.0 AS [Average Worker Time (ms)], 
 	[total_physical_reads] / [execution_count] AS [Average Physical Read Count], 
@@ -100,7 +102,6 @@ SELECT TOP 300
 	[last_execution_time],
 	[query_hash],
 	[query_plan_hash],
-	DB_NAME(st.dbid) AS db_name,
 	REPLACE(REPLACE(REPLACE(SUBSTRING(text, 
 	([statement_start_offset] / 2) + 1, 
 	((CASE [statement_end_offset]

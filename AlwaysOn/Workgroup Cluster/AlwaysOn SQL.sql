@@ -1,0 +1,103 @@
+﻿use master
+/*
+初期化
+DROP ENDPOINT AlwaysOnEndpoint
+DROP CERTIFICATE AlwaysOnEndpoint_Cert
+DROP USER AlwaysOnEndpoint
+DROP LOGIN AlwaysOnEndpoint
+DROP MASTER KEY
+*/
+
+-- マスターキーの作成 (各レプリカで実行)
+CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'MASTER KEY Passw0rd'
+
+-- エンドポイントの接続用ログイン/ユーザーを作成 (各レプリカで実行)
+DECLARE @password varchar(36) = (SELECT NEWID())
+EXECUTE ('CREATE LOGIN AlwaysOnEndpoint WITH PASSWORD = ''' +  @password + ''',CHECK_EXPIRATION=OFF')
+CREATE USER AlwaysOnEndpoint FOR LOGIN AlwaysOnEndpoint
+ 
+
+-- エンドポイントの接続に使用する証明書にユーザーをマッピング (プライマリで実行)
+CREATE CERTIFICATE AlwaysOnEndpoint_Cert 
+AUTHORIZATION AlwaysOnEndpoint 
+WITH SUBJECT = 'AlwaysOn Endpoint',START_DATE = '01/01/2015',EXPIRY_DATE = '01/01/2100'
+
+-- 証明書のバックアップを取得し、2 台目のノードにコピー
+BACKUP CERTIFICATE AlwaysOnEndpoint_Cert 
+TO FILE = 'D:\CertBackup\certbackup.cer'
+WITH PRIVATE KEY (FILE='D:\CertBackup\certbackup.pvk', ENCRYPTION BY PASSWORD='Enc Passw0rd')
+
+-- バックアップした証明書を使用して証明書を作成 (セカンダリで実行)
+CREATE CERTIFICATE AlwaysOnEndpoint_Cert 
+AUTHORIZATION AlwaysOnEndpoint 
+FROM FILE='D:\CertBackup\certbackup.cer' 
+WITH PRIVATE KEY (FILE='D:\CertBackup\certbackup.pvk', DECRYPTION BY PASSWORD='Enc Passw0rd')
+
+
+-- エンドポイントの作成 (各レプリカで実行)
+CREATE ENDPOINT AlwaysOnEndpoint
+STATE = STARTED
+AS TCP (LISTENER_PORT = 5022, LISTENER_IP = ALL)
+FOR DATABASE_MIRRORING (AUTHENTICATION = CERTIFICATE AlwaysOnEndpoint_Cert,ROLE = ALL)
+GRANT CONNECT ON ENDPOINT::AlwaysOnEndpoint TO AlwaysOnEndpoint
+
+-- AG のクラスターリソースからのアクセス用に権限を付与 (各レプリカで実行)
+ALTER SERVER ROLE [sysadmin] ADD MEMBER [NT AUTHORITY\SYSTEM]
+
+-- 可用性グループの作成 (プライマリで実行)
+CREATE AVAILABILITY GROUP [AG01]
+WITH (AUTOMATED_BACKUP_PREFERENCE = SECONDARY,
+DB_FAILOVER = ON,
+DTC_SUPPORT = PER_DB,
+CLUSTER_TYPE = WSFC,
+REQUIRED_SYNCHRONIZED_SECONDARIES_TO_COMMIT = 0)
+FOR DATABASE [AGDB01]
+REPLICA ON 
+  N'SQLVM-01' WITH (
+	ENDPOINT_URL = N'TCP://SQLVM-01.alwayson.local:5022', 
+	FAILOVER_MODE = AUTOMATIC, 
+	AVAILABILITY_MODE = SYNCHRONOUS_COMMIT, 
+	SESSION_TIMEOUT = 10, 
+	BACKUP_PRIORITY = 50, 
+	SEEDING_MODE = AUTOMATIC, 
+	PRIMARY_ROLE(
+		ALLOW_CONNECTIONS = ALL,
+		READ_ONLY_ROUTING_LIST = ('SQLVM-02', 'SQLVM-01'),
+        READ_WRITE_ROUTING_URL = 'TCP://SQLVM-01.alwayson.local:1433'
+	), 
+	SECONDARY_ROLE(
+		ALLOW_CONNECTIONS = ALL,
+		READ_ONLY_ROUTING_URL = 'TCP://SQLVM-01.alwayson.local:1433'
+	)
+)
+ ,N'SQLVM-02' WITH (
+	ENDPOINT_URL = N'TCP://SQLVM-02.alwayson.local:5022',
+	FAILOVER_MODE = AUTOMATIC, 
+	AVAILABILITY_MODE = SYNCHRONOUS_COMMIT, 
+	SESSION_TIMEOUT = 10, 
+	BACKUP_PRIORITY = 50, 
+	SEEDING_MODE = AUTOMATIC, 
+	PRIMARY_ROLE(
+		ALLOW_CONNECTIONS = ALL,
+		READ_ONLY_ROUTING_LIST = ('SQLVM-01', 'SQLVM-02'),
+		READ_WRITE_ROUTING_URL = 'TCP://SQLVM-02.alwayson.local:1433'
+	), 
+	SECONDARY_ROLE(
+		ALLOW_CONNECTIONS = ALL,
+		READ_ONLY_ROUTING_URL = 'TCP://SQLVM-02.alwayson.local:1433'
+	)
+)
+GO
+
+-- 可用性グループの参加 (セカンダリで実行)
+ALTER AVAILABILITY GROUP [AG01] JOIN
+
+-- 自動シード処理の有効化 (各レプリカで実行)
+ALTER AVAILABILITY GROUP AG01 GRANT CREATE ANY DATABASE
+
+-- リスナーの作成 (プライマリで実行)
+ALTER AVAILABILITY GROUP [AG01]
+ADD LISTENER N'AG-LN' (
+WITH IP((N'10.1.6.11', N'255.255.255.0'))
+, PORT=1433)
+

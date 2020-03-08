@@ -3,7 +3,8 @@ CREATE TABLE Analyze(KeyColumn int primary key, QueryPlan xml)
 GO
 CREATE PRIMARY XML INDEX XML_Analyze ON Analyze (QueryPlan)
 GO
-
+-- DROP INDEX XML_Analyze ON Analyze
+GO 
 INSERT INTO Analyze
 SELECT 5, CAST(C AS XML) FROM OPENROWSET(BULK N'E:\temp\TPCH_ALL.sqlplan', SINGLE_BLOB) AST(C)
 GO

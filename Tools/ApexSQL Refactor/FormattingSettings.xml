@@ -1,0 +1,483 @@
+<?xml version="1.0"?>
+<PublicOptions>
+  <ActiveProfile>ApexSQL</ActiveProfile>
+  <LanguagesOptionsPublic>
+    <Name>Java</Name>
+    <Prefix>String sql = "</Prefix>
+    <Suffix>";</Suffix>
+    <EscapeCharsForQuotes>\</EscapeCharsForQuotes>
+    <LengthLimit>40</LengthLimit>
+    <LineSeparator>\n"
+           + "</LineSeparator>
+    <IsEnable>true</IsEnable>
+  </LanguagesOptionsPublic>
+  <LanguagesOptionsPublic>
+    <Name>VB .NET</Name>
+    <Prefix>Dim sql As String
+sql = "</Prefix>
+    <Suffix>"</Suffix>
+    <EscapeCharsForQuotes>"</EscapeCharsForQuotes>
+    <LengthLimit>40</LengthLimit>
+    <LineSeparator>" + char(10) _
+    + "</LineSeparator>
+    <IsEnable>true</IsEnable>
+  </LanguagesOptionsPublic>
+  <LanguagesOptionsPublic>
+    <Name>C#</Name>
+    <Prefix>string sql = "</Prefix>
+    <Suffix>";</Suffix>
+    <EscapeCharsForQuotes>\</EscapeCharsForQuotes>
+    <LengthLimit>40</LengthLimit>
+    <LineSeparator>\n"
+           + "</LineSeparator>
+    <IsEnable>true</IsEnable>
+  </LanguagesOptionsPublic>
+  <LanguagesOptionsPublic>
+    <Name>Perl</Name>
+    <Prefix>$sql = '</Prefix>
+    <Suffix>';</Suffix>
+    <EscapeCharsForQuotes>\</EscapeCharsForQuotes>
+    <LengthLimit>40</LengthLimit>
+    <LineSeparator>\n'
+     . '</LineSeparator>
+    <IsEnable>true</IsEnable>
+  </LanguagesOptionsPublic>
+  <LanguagesOptionsPublic>
+    <Name>PHP</Name>
+    <Prefix>$sql = "</Prefix>
+    <Suffix>";</Suffix>
+    <EscapeCharsForQuotes>\</EscapeCharsForQuotes>
+    <LengthLimit>40</LengthLimit>
+    <LineSeparator>\n"
+     . "</LineSeparator>
+    <IsEnable>true</IsEnable>
+  </LanguagesOptionsPublic>
+  <LanguagesOptionsPublic>
+    <Name>Delphi</Name>
+    <Prefix>var
+  sql: string;
+begin
+  sql := '</Prefix>
+    <Suffix>';
+end;</Suffix>
+    <EscapeCharsForQuotes>'</EscapeCharsForQuotes>
+    <LengthLimit>40</LengthLimit>
+    <LineSeparator>' + #10
+       + '</LineSeparator>
+    <IsEnable>true</IsEnable>
+  </LanguagesOptionsPublic>
+  <LanguagesOptionsPublic>
+    <Name>Ruby</Name>
+    <Prefix>sql = '</Prefix>
+    <Suffix>'</Suffix>
+    <EscapeCharsForQuotes>'</EscapeCharsForQuotes>
+    <LengthLimit>40</LengthLimit>
+    <LineSeparator>\n'
+   &lt;&lt; '</LineSeparator>
+    <IsEnable>true</IsEnable>
+  </LanguagesOptionsPublic>
+  <LanguagesOptionsPublic>
+    <Name>C++</Name>
+    <Prefix>std::string sql;
+sql = "</Prefix>
+    <Suffix>";</Suffix>
+    <EscapeCharsForQuotes>\</EscapeCharsForQuotes>
+    <LengthLimit>40</LengthLimit>
+    <LineSeparator>\n"
+           + "</LineSeparator>
+    <IsEnable>true</IsEnable>
+  </LanguagesOptionsPublic>
+  <DefaultLanguageOptionsPublic>Java</DefaultLanguageOptionsPublic>
+  <FormattingOptionsPublic>
+    <Name>Standard Format</Name>
+    <Description />
+    <Author>Masayuki.Ozawa</Author>
+    <ListOptions>
+      <ListFormattingOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="Columns">
+        <FormatList>true</FormatList>
+        <PlaceListOnNewLine>true</PlaceListOnNewLine>
+        <FirstItemIndentType>Fixed</FirstItemIndentType>
+        <FirstItemIndentSize>4</FirstItemIndentSize>
+        <PlaceEachItemOnSeparateLine>true</PlaceEachItemOnSeparateLine>
+        <CommaPosition>AfterItem</CommaPosition>
+        <DoNotIndentComma>false</DoNotIndentComma>
+      </ListFormattingOptions>
+      <ListFormattingOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="MultiRowValues">
+        <FormatList>false</FormatList>
+        <PlaceListOnNewLine>false</PlaceListOnNewLine>
+        <FirstItemIndentType>Fixed</FirstItemIndentType>
+        <FirstItemIndentSize>0</FirstItemIndentSize>
+        <PlaceEachItemOnSeparateLine>false</PlaceEachItemOnSeparateLine>
+        <CommaPosition>AfterItem</CommaPosition>
+        <DoNotIndentComma>false</DoNotIndentComma>
+      </ListFormattingOptions>
+      <ListFormattingOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="Values">
+        <FormatList>true</FormatList>
+        <PlaceListOnNewLine>false</PlaceListOnNewLine>
+        <FirstItemIndentType>AlignWithKeyword</FirstItemIndentType>
+        <FirstItemIndentSize>5</FirstItemIndentSize>
+        <PlaceEachItemOnSeparateLine>true</PlaceEachItemOnSeparateLine>
+        <CommaPosition>AfterItem</CommaPosition>
+        <DoNotIndentComma>false</DoNotIndentComma>
+      </ListFormattingOptions>
+      <ListFormattingOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="Parameters">
+        <FormatList>true</FormatList>
+        <PlaceListOnNewLine>true</PlaceListOnNewLine>
+        <FirstItemIndentType>AlignWithKeyword</FirstItemIndentType>
+        <FirstItemIndentSize>5</FirstItemIndentSize>
+        <PlaceEachItemOnSeparateLine>true</PlaceEachItemOnSeparateLine>
+        <CommaPosition>AfterItem</CommaPosition>
+        <DoNotIndentComma>false</DoNotIndentComma>
+      </ListFormattingOptions>
+      <ListFormattingOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="Variables">
+        <FormatList>true</FormatList>
+        <PlaceListOnNewLine>false</PlaceListOnNewLine>
+        <FirstItemIndentType>AlignWithKeyword</FirstItemIndentType>
+        <FirstItemIndentSize>5</FirstItemIndentSize>
+        <PlaceEachItemOnSeparateLine>true</PlaceEachItemOnSeparateLine>
+        <CommaPosition>AfterItem</CommaPosition>
+        <DoNotIndentComma>true</DoNotIndentComma>
+      </ListFormattingOptions>
+      <ListFormattingOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="WhereInValues">
+        <FormatList>true</FormatList>
+        <PlaceListOnNewLine>true</PlaceListOnNewLine>
+        <FirstItemIndentType>Fixed</FirstItemIndentType>
+        <FirstItemIndentSize>3</FirstItemIndentSize>
+        <PlaceEachItemOnSeparateLine>false</PlaceEachItemOnSeparateLine>
+        <CommaPosition>AfterItem</CommaPosition>
+        <DoNotIndentComma>false</DoNotIndentComma>
+      </ListFormattingOptions>
+      <ListFormattingOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="Assignments">
+        <FormatList>true</FormatList>
+        <PlaceListOnNewLine>true</PlaceListOnNewLine>
+        <FirstItemIndentType>AlignWithKeyword</FirstItemIndentType>
+        <FirstItemIndentSize>3</FirstItemIndentSize>
+        <PlaceEachItemOnSeparateLine>true</PlaceEachItemOnSeparateLine>
+        <CommaPosition>AfterItem</CommaPosition>
+        <DoNotIndentComma>false</DoNotIndentComma>
+      </ListFormattingOptions>
+      <ListFormattingOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="Tables">
+        <FormatList>true</FormatList>
+        <PlaceListOnNewLine>true</PlaceListOnNewLine>
+        <FirstItemIndentType>Fixed</FirstItemIndentType>
+        <FirstItemIndentSize>4</FirstItemIndentSize>
+        <PlaceEachItemOnSeparateLine>true</PlaceEachItemOnSeparateLine>
+        <CommaPosition>AfterItem</CommaPosition>
+        <DoNotIndentComma>false</DoNotIndentComma>
+      </ListFormattingOptions>
+    </ListOptions>
+    <ParenthesisOptions>
+      <ParenthesisTypeOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="Arithmetic">
+        <FormatParenthesisOnOff>true</FormatParenthesisOnOff>
+        <AddSpaceInsideParenthesis>false</AddSpaceInsideParenthesis>
+        <AddSpaceOutsideParenthesis>false</AddSpaceOutsideParenthesis>
+        <DontMoveToNewLineIfNoNewLinesInBetween>false</DontMoveToNewLineIfNoNewLinesInBetween>
+        <DontFormatIfNested>false</DontFormatIfNested>
+        <OpeningParenthesisMoveToNewLineOnOff>false</OpeningParenthesisMoveToNewLineOnOff>
+        <OpeningParenthesisNewLineIndentType>PlaceAtSamePosition</OpeningParenthesisNewLineIndentType>
+        <OpeningParenthesisMoveToNewLineIndentSize>3</OpeningParenthesisMoveToNewLineIndentSize>
+        <ClosingParenthesisMoveToNewLineOnOff>false</ClosingParenthesisMoveToNewLineOnOff>
+        <ClosingParenthesisNewLineIndentType>AlignToEndOfPreviousLine</ClosingParenthesisNewLineIndentType>
+        <ClosingParenthesisMoveToNewLineIndentSize>3</ClosingParenthesisMoveToNewLineIndentSize>
+        <CodeBetweenParenthesisMoveToNewLineOnOff>false</CodeBetweenParenthesisMoveToNewLineOnOff>
+        <CodeBetweenParenthesisNewLineIndentType>PlaceAtSamePosition</CodeBetweenParenthesisNewLineIndentType>
+        <CodeBetweenParenthesisMoveToNewLineIndentSize>3</CodeBetweenParenthesisMoveToNewLineIndentSize>
+      </ParenthesisTypeOptions>
+      <ParenthesisTypeOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="Comparison">
+        <FormatParenthesisOnOff>true</FormatParenthesisOnOff>
+        <AddSpaceInsideParenthesis>false</AddSpaceInsideParenthesis>
+        <AddSpaceOutsideParenthesis>false</AddSpaceOutsideParenthesis>
+        <DontMoveToNewLineIfNoNewLinesInBetween>false</DontMoveToNewLineIfNoNewLinesInBetween>
+        <DontFormatIfNested>false</DontFormatIfNested>
+        <OpeningParenthesisMoveToNewLineOnOff>false</OpeningParenthesisMoveToNewLineOnOff>
+        <OpeningParenthesisNewLineIndentType>PlaceAtSamePosition</OpeningParenthesisNewLineIndentType>
+        <OpeningParenthesisMoveToNewLineIndentSize>3</OpeningParenthesisMoveToNewLineIndentSize>
+        <ClosingParenthesisMoveToNewLineOnOff>false</ClosingParenthesisMoveToNewLineOnOff>
+        <ClosingParenthesisNewLineIndentType>AlignToEndOfPreviousLine</ClosingParenthesisNewLineIndentType>
+        <ClosingParenthesisMoveToNewLineIndentSize>3</ClosingParenthesisMoveToNewLineIndentSize>
+        <CodeBetweenParenthesisMoveToNewLineOnOff>false</CodeBetweenParenthesisMoveToNewLineOnOff>
+        <CodeBetweenParenthesisNewLineIndentType>PlaceAtSamePosition</CodeBetweenParenthesisNewLineIndentType>
+        <CodeBetweenParenthesisMoveToNewLineIndentSize>3</CodeBetweenParenthesisMoveToNewLineIndentSize>
+      </ParenthesisTypeOptions>
+      <ParenthesisTypeOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="Logical">
+        <FormatParenthesisOnOff>true</FormatParenthesisOnOff>
+        <AddSpaceInsideParenthesis>false</AddSpaceInsideParenthesis>
+        <AddSpaceOutsideParenthesis>false</AddSpaceOutsideParenthesis>
+        <DontMoveToNewLineIfNoNewLinesInBetween>false</DontMoveToNewLineIfNoNewLinesInBetween>
+        <DontFormatIfNested>false</DontFormatIfNested>
+        <OpeningParenthesisMoveToNewLineOnOff>false</OpeningParenthesisMoveToNewLineOnOff>
+        <OpeningParenthesisNewLineIndentType>Fixed</OpeningParenthesisNewLineIndentType>
+        <OpeningParenthesisMoveToNewLineIndentSize>3</OpeningParenthesisMoveToNewLineIndentSize>
+        <ClosingParenthesisMoveToNewLineOnOff>false</ClosingParenthesisMoveToNewLineOnOff>
+        <ClosingParenthesisNewLineIndentType>AlignWithOpeningParenthesis</ClosingParenthesisNewLineIndentType>
+        <ClosingParenthesisMoveToNewLineIndentSize>3</ClosingParenthesisMoveToNewLineIndentSize>
+        <CodeBetweenParenthesisMoveToNewLineOnOff>false</CodeBetweenParenthesisMoveToNewLineOnOff>
+        <CodeBetweenParenthesisNewLineIndentType>Fixed</CodeBetweenParenthesisNewLineIndentType>
+        <CodeBetweenParenthesisMoveToNewLineIndentSize>3</CodeBetweenParenthesisMoveToNewLineIndentSize>
+      </ParenthesisTypeOptions>
+      <ParenthesisTypeOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="Columns">
+        <FormatParenthesisOnOff>true</FormatParenthesisOnOff>
+        <AddSpaceInsideParenthesis>false</AddSpaceInsideParenthesis>
+        <AddSpaceOutsideParenthesis>false</AddSpaceOutsideParenthesis>
+        <DontMoveToNewLineIfNoNewLinesInBetween>true</DontMoveToNewLineIfNoNewLinesInBetween>
+        <DontFormatIfNested>false</DontFormatIfNested>
+        <OpeningParenthesisMoveToNewLineOnOff>true</OpeningParenthesisMoveToNewLineOnOff>
+        <OpeningParenthesisNewLineIndentType>Fixed</OpeningParenthesisNewLineIndentType>
+        <OpeningParenthesisMoveToNewLineIndentSize>0</OpeningParenthesisMoveToNewLineIndentSize>
+        <ClosingParenthesisMoveToNewLineOnOff>true</ClosingParenthesisMoveToNewLineOnOff>
+        <ClosingParenthesisNewLineIndentType>AlignWithOpeningParenthesis</ClosingParenthesisNewLineIndentType>
+        <ClosingParenthesisMoveToNewLineIndentSize>3</ClosingParenthesisMoveToNewLineIndentSize>
+        <CodeBetweenParenthesisMoveToNewLineOnOff>false</CodeBetweenParenthesisMoveToNewLineOnOff>
+        <CodeBetweenParenthesisNewLineIndentType>Fixed</CodeBetweenParenthesisNewLineIndentType>
+        <CodeBetweenParenthesisMoveToNewLineIndentSize>4</CodeBetweenParenthesisMoveToNewLineIndentSize>
+      </ParenthesisTypeOptions>
+      <ParenthesisTypeOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="Values">
+        <FormatParenthesisOnOff>true</FormatParenthesisOnOff>
+        <AddSpaceInsideParenthesis>false</AddSpaceInsideParenthesis>
+        <AddSpaceOutsideParenthesis>false</AddSpaceOutsideParenthesis>
+        <DontMoveToNewLineIfNoNewLinesInBetween>true</DontMoveToNewLineIfNoNewLinesInBetween>
+        <DontFormatIfNested>false</DontFormatIfNested>
+        <OpeningParenthesisMoveToNewLineOnOff>true</OpeningParenthesisMoveToNewLineOnOff>
+        <OpeningParenthesisNewLineIndentType>Fixed</OpeningParenthesisNewLineIndentType>
+        <OpeningParenthesisMoveToNewLineIndentSize>0</OpeningParenthesisMoveToNewLineIndentSize>
+        <ClosingParenthesisMoveToNewLineOnOff>true</ClosingParenthesisMoveToNewLineOnOff>
+        <ClosingParenthesisNewLineIndentType>AlignWithOpeningParenthesis</ClosingParenthesisNewLineIndentType>
+        <ClosingParenthesisMoveToNewLineIndentSize>3</ClosingParenthesisMoveToNewLineIndentSize>
+        <CodeBetweenParenthesisMoveToNewLineOnOff>false</CodeBetweenParenthesisMoveToNewLineOnOff>
+        <CodeBetweenParenthesisNewLineIndentType>Fixed</CodeBetweenParenthesisNewLineIndentType>
+        <CodeBetweenParenthesisMoveToNewLineIndentSize>4</CodeBetweenParenthesisMoveToNewLineIndentSize>
+      </ParenthesisTypeOptions>
+      <ParenthesisTypeOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="WhereInValues">
+        <FormatParenthesisOnOff>true</FormatParenthesisOnOff>
+        <AddSpaceInsideParenthesis>false</AddSpaceInsideParenthesis>
+        <AddSpaceOutsideParenthesis>false</AddSpaceOutsideParenthesis>
+        <DontMoveToNewLineIfNoNewLinesInBetween>true</DontMoveToNewLineIfNoNewLinesInBetween>
+        <DontFormatIfNested>false</DontFormatIfNested>
+        <OpeningParenthesisMoveToNewLineOnOff>true</OpeningParenthesisMoveToNewLineOnOff>
+        <OpeningParenthesisNewLineIndentType>Fixed</OpeningParenthesisNewLineIndentType>
+        <OpeningParenthesisMoveToNewLineIndentSize>0</OpeningParenthesisMoveToNewLineIndentSize>
+        <ClosingParenthesisMoveToNewLineOnOff>true</ClosingParenthesisMoveToNewLineOnOff>
+        <ClosingParenthesisNewLineIndentType>AlignWithOpeningParenthesis</ClosingParenthesisNewLineIndentType>
+        <ClosingParenthesisMoveToNewLineIndentSize>3</ClosingParenthesisMoveToNewLineIndentSize>
+        <CodeBetweenParenthesisMoveToNewLineOnOff>false</CodeBetweenParenthesisMoveToNewLineOnOff>
+        <CodeBetweenParenthesisNewLineIndentType>Fixed</CodeBetweenParenthesisNewLineIndentType>
+        <CodeBetweenParenthesisMoveToNewLineIndentSize>4</CodeBetweenParenthesisMoveToNewLineIndentSize>
+      </ParenthesisTypeOptions>
+      <ParenthesisTypeOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="NestedSelect">
+        <FormatParenthesisOnOff>true</FormatParenthesisOnOff>
+        <AddSpaceInsideParenthesis>false</AddSpaceInsideParenthesis>
+        <AddSpaceOutsideParenthesis>false</AddSpaceOutsideParenthesis>
+        <DontMoveToNewLineIfNoNewLinesInBetween>false</DontMoveToNewLineIfNoNewLinesInBetween>
+        <DontFormatIfNested>false</DontFormatIfNested>
+        <OpeningParenthesisMoveToNewLineOnOff>true</OpeningParenthesisMoveToNewLineOnOff>
+        <OpeningParenthesisNewLineIndentType>Fixed</OpeningParenthesisNewLineIndentType>
+        <OpeningParenthesisMoveToNewLineIndentSize>0</OpeningParenthesisMoveToNewLineIndentSize>
+        <ClosingParenthesisMoveToNewLineOnOff>true</ClosingParenthesisMoveToNewLineOnOff>
+        <ClosingParenthesisNewLineIndentType>Fixed</ClosingParenthesisNewLineIndentType>
+        <ClosingParenthesisMoveToNewLineIndentSize>0</ClosingParenthesisMoveToNewLineIndentSize>
+        <CodeBetweenParenthesisMoveToNewLineOnOff>true</CodeBetweenParenthesisMoveToNewLineOnOff>
+        <CodeBetweenParenthesisNewLineIndentType>Fixed</CodeBetweenParenthesisNewLineIndentType>
+        <CodeBetweenParenthesisMoveToNewLineIndentSize>4</CodeBetweenParenthesisMoveToNewLineIndentSize>
+      </ParenthesisTypeOptions>
+      <ParenthesisTypeOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="Nothing">
+        <FormatParenthesisOnOff>false</FormatParenthesisOnOff>
+        <AddSpaceInsideParenthesis>false</AddSpaceInsideParenthesis>
+        <AddSpaceOutsideParenthesis>false</AddSpaceOutsideParenthesis>
+        <DontMoveToNewLineIfNoNewLinesInBetween>false</DontMoveToNewLineIfNoNewLinesInBetween>
+        <DontFormatIfNested>false</DontFormatIfNested>
+        <OpeningParenthesisMoveToNewLineOnOff>false</OpeningParenthesisMoveToNewLineOnOff>
+        <OpeningParenthesisNewLineIndentType>PlaceAtSamePosition</OpeningParenthesisNewLineIndentType>
+        <OpeningParenthesisMoveToNewLineIndentSize>3</OpeningParenthesisMoveToNewLineIndentSize>
+        <ClosingParenthesisMoveToNewLineOnOff>false</ClosingParenthesisMoveToNewLineOnOff>
+        <ClosingParenthesisNewLineIndentType>AlignWithOpeningParenthesis</ClosingParenthesisNewLineIndentType>
+        <ClosingParenthesisMoveToNewLineIndentSize>3</ClosingParenthesisMoveToNewLineIndentSize>
+        <CodeBetweenParenthesisMoveToNewLineOnOff>false</CodeBetweenParenthesisMoveToNewLineOnOff>
+        <CodeBetweenParenthesisNewLineIndentType>AlignWithKeyword</CodeBetweenParenthesisNewLineIndentType>
+        <CodeBetweenParenthesisMoveToNewLineIndentSize>3</CodeBetweenParenthesisMoveToNewLineIndentSize>
+      </ParenthesisTypeOptions>
+      <ParenthesisTypeOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="Parameters">
+        <FormatParenthesisOnOff>true</FormatParenthesisOnOff>
+        <AddSpaceInsideParenthesis>false</AddSpaceInsideParenthesis>
+        <AddSpaceOutsideParenthesis>false</AddSpaceOutsideParenthesis>
+        <DontMoveToNewLineIfNoNewLinesInBetween>true</DontMoveToNewLineIfNoNewLinesInBetween>
+        <DontFormatIfNested>false</DontFormatIfNested>
+        <OpeningParenthesisMoveToNewLineOnOff>true</OpeningParenthesisMoveToNewLineOnOff>
+        <OpeningParenthesisNewLineIndentType>Fixed</OpeningParenthesisNewLineIndentType>
+        <OpeningParenthesisMoveToNewLineIndentSize>0</OpeningParenthesisMoveToNewLineIndentSize>
+        <ClosingParenthesisMoveToNewLineOnOff>true</ClosingParenthesisMoveToNewLineOnOff>
+        <ClosingParenthesisNewLineIndentType>Fixed</ClosingParenthesisNewLineIndentType>
+        <ClosingParenthesisMoveToNewLineIndentSize>0</ClosingParenthesisMoveToNewLineIndentSize>
+        <CodeBetweenParenthesisMoveToNewLineOnOff>false</CodeBetweenParenthesisMoveToNewLineOnOff>
+        <CodeBetweenParenthesisNewLineIndentType>Fixed</CodeBetweenParenthesisNewLineIndentType>
+        <CodeBetweenParenthesisMoveToNewLineIndentSize>4</CodeBetweenParenthesisMoveToNewLineIndentSize>
+      </ParenthesisTypeOptions>
+      <ParenthesisTypeOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="Assignments">
+        <FormatParenthesisOnOff>true</FormatParenthesisOnOff>
+        <AddSpaceInsideParenthesis>false</AddSpaceInsideParenthesis>
+        <AddSpaceOutsideParenthesis>false</AddSpaceOutsideParenthesis>
+        <DontMoveToNewLineIfNoNewLinesInBetween>true</DontMoveToNewLineIfNoNewLinesInBetween>
+        <DontFormatIfNested>false</DontFormatIfNested>
+        <OpeningParenthesisMoveToNewLineOnOff>true</OpeningParenthesisMoveToNewLineOnOff>
+        <OpeningParenthesisNewLineIndentType>Fixed</OpeningParenthesisNewLineIndentType>
+        <OpeningParenthesisMoveToNewLineIndentSize>0</OpeningParenthesisMoveToNewLineIndentSize>
+        <ClosingParenthesisMoveToNewLineOnOff>true</ClosingParenthesisMoveToNewLineOnOff>
+        <ClosingParenthesisNewLineIndentType>Fixed</ClosingParenthesisNewLineIndentType>
+        <ClosingParenthesisMoveToNewLineIndentSize>0</ClosingParenthesisMoveToNewLineIndentSize>
+        <CodeBetweenParenthesisMoveToNewLineOnOff>false</CodeBetweenParenthesisMoveToNewLineOnOff>
+        <CodeBetweenParenthesisNewLineIndentType>Fixed</CodeBetweenParenthesisNewLineIndentType>
+        <CodeBetweenParenthesisMoveToNewLineIndentSize>4</CodeBetweenParenthesisMoveToNewLineIndentSize>
+      </ParenthesisTypeOptions>
+    </ParenthesisOptions>
+    <GeneralSpaceCountInTab>4</GeneralSpaceCountInTab>
+    <GeneralReplaceTabsWithSpaces>false</GeneralReplaceTabsWithSpaces>
+    <SmartIndent>false</SmartIndent>
+    <GeneralIndentType>Spaces</GeneralIndentType>
+    <GeneralAddSpacesAroundAssignmentOperators>true</GeneralAddSpacesAroundAssignmentOperators>
+    <ExpressionsAddSpacesAroundArithmeticOperators>true</ExpressionsAddSpacesAroundArithmeticOperators>
+    <ExpressionsAddSpacesAroundComparisonOperators>true</ExpressionsAddSpacesAroundComparisonOperators>
+    <GeneralAddSpacesBeforeCommas>false</GeneralAddSpacesBeforeCommas>
+    <GeneralAddSpacesAfterCommas>false</GeneralAddSpacesAfterCommas>
+    <GeneralRemoveUnnecessaryBrackets>false</GeneralRemoveUnnecessaryBrackets>
+    <GeneralRemoveBracketsSystemName>false</GeneralRemoveBracketsSystemName>
+    <GeneralAddStatementTerminator>true</GeneralAddStatementTerminator>
+    <GeneralEncloseIdentifiersInBrackets>false</GeneralEncloseIdentifiersInBrackets>
+    <GeneralEncloseColumnsInBrackets>false</GeneralEncloseColumnsInBrackets>
+    <GeneralQualifyObjectNames>false</GeneralQualifyObjectNames>
+    <GeneralWrapText>false</GeneralWrapText>
+    <GeneralCharactersToWrap>75</GeneralCharactersToWrap>
+    <GeneralManageWhiteSpace>true</GeneralManageWhiteSpace>
+    <GeneralManageWhiteSpaceType>RemoveEmptyLines</GeneralManageWhiteSpaceType>
+    <GeneralKeepEmptyLineAroundComments>true</GeneralKeepEmptyLineAroundComments>
+    <GeneralKeepEmptyLineBeforeStatement>false</GeneralKeepEmptyLineBeforeStatement>
+    <GeneralInsertEmptyLineBeforeEachStatement>true</GeneralInsertEmptyLineBeforeEachStatement>
+    <GeneralKeepEmptyLinesBeforeAfterScript>true</GeneralKeepEmptyLinesBeforeAfterScript>
+    <SqlTypesFormatting>true</SqlTypesFormatting>
+    <SqlTypeAlign>Left</SqlTypeAlign>
+    <SqlTypesIndenSize>1</SqlTypesIndenSize>
+    <IsUseCommentsOptions>true</IsUseCommentsOptions>
+    <CommentsInsertLineBeforeBlockComment>true</CommentsInsertLineBeforeBlockComment>
+    <CommentsInsertLineAfterBlockComment>true</CommentsInsertLineAfterBlockComment>
+    <CommentsAddRowOfCharacterToFirstLine>false</CommentsAddRowOfCharacterToFirstLine>
+    <CommentsAddRowToFirstLineCharacter>42</CommentsAddRowToFirstLineCharacter>
+    <CommentsAddRowOfCharacterToLastLine>false</CommentsAddRowOfCharacterToLastLine>
+    <CommentsAddRowToLastLineCharacter>42</CommentsAddRowToLastLineCharacter>
+    <CommentsEnforceCommentType>Block</CommentsEnforceCommentType>
+    <CommentsEnforceComments>true</CommentsEnforceComments>
+    <CommentsRemoveBlockComments>false</CommentsRemoveBlockComments>
+    <CommentsRemoveLineComments>false</CommentsRemoveLineComments>
+    <OperationsArithmeticFormat>true</OperationsArithmeticFormat>
+    <OperationsArithmeticExceptIfOperationLengthIsLess>true</OperationsArithmeticExceptIfOperationLengthIsLess>
+    <OperationsArithmeticExceptCharactersCount>15</OperationsArithmeticExceptCharactersCount>
+    <OperationsArithmeticMoveOperationOnNewLine>false</OperationsArithmeticMoveOperationOnNewLine>
+    <OperationsArithmeticOperationIndentType>Fixed</OperationsArithmeticOperationIndentType>
+    <OperationsArithmeticOperationIndent>7</OperationsArithmeticOperationIndent>
+    <OperationsArithmeticShowOnMultipleLines>false</OperationsArithmeticShowOnMultipleLines>
+    <OperationsArithmeticShowOnMultipleLinesPositionType>PlaceOperatorBeforeOperand</OperationsArithmeticShowOnMultipleLinesPositionType>
+    <OperationsComparisonFormat>true</OperationsComparisonFormat>
+    <OperationsComparisonExceptIfOperationLengthIsLess>true</OperationsComparisonExceptIfOperationLengthIsLess>
+    <OperationsComparisonExceptCharactersCount>15</OperationsComparisonExceptCharactersCount>
+    <OperationsComparisonMoveOperationOnNewLine>false</OperationsComparisonMoveOperationOnNewLine>
+    <OperationsComparisonMoveOperationOnNewLineType>Fixed</OperationsComparisonMoveOperationOnNewLineType>
+    <OperationsComparisonOperationIndent>7</OperationsComparisonOperationIndent>
+    <OperationsComparisonShowOnMultipleLines>false</OperationsComparisonShowOnMultipleLines>
+    <OperationsComparisonShowOnMultipleLinesPositionType>PlaceOperatorOnSeparateLine</OperationsComparisonShowOnMultipleLinesPositionType>
+    <OperationsLogicalFormat>true</OperationsLogicalFormat>
+    <OperationsLogicalExceptIfOperationLengthIsLess>false</OperationsLogicalExceptIfOperationLengthIsLess>
+    <OperationsLogicalExceptCharactersCount>20</OperationsLogicalExceptCharactersCount>
+    <OperationsLogicalMoveOperationOnNewLine>false</OperationsLogicalMoveOperationOnNewLine>
+    <OperationsLogicalOperationIndentType>Fixed</OperationsLogicalOperationIndentType>
+    <OperationsLogicalOperationIndent>12</OperationsLogicalOperationIndent>
+    <OperationsLogicalShowOnMultipleLines>true</OperationsLogicalShowOnMultipleLines>
+    <OperationsLogicalShowOnMultipleLinesPositionType>PlaceOperatorBeforeOperand</OperationsLogicalShowOnMultipleLinesPositionType>
+    <QueriesFormatDataStatements>true</QueriesFormatDataStatements>
+    <QueriesFormatDataStatementsExceptWithLength>false</QueriesFormatDataStatementsExceptWithLength>
+    <QueriesFormatDataStatementsMinLength>25</QueriesFormatDataStatementsMinLength>
+    <QueriesPlaceFromOnNewLine>true</QueriesPlaceFromOnNewLine>
+    <QueriesPlaceFromIndentType>Fixed</QueriesPlaceFromIndentType>
+    <QueriesPlaceFromFixedIndentSize>0</QueriesPlaceFromFixedIndentSize>
+    <QueriesPlaceWhereOnNewLine>true</QueriesPlaceWhereOnNewLine>
+    <QueriesPlaceWhereIndentType>Fixed</QueriesPlaceWhereIndentType>
+    <QueriesPlaceWhereFixedIndentSize>0</QueriesPlaceWhereFixedIndentSize>
+    <QueriesPlaceOrderByOnNewLine>true</QueriesPlaceOrderByOnNewLine>
+    <QueriesPlaceOrderByIndentType>Fixed</QueriesPlaceOrderByIndentType>
+    <QueriesPlaceOrderByFixedIndentSize>0</QueriesPlaceOrderByFixedIndentSize>
+    <QueriesPlaceSetOnNewLine>true</QueriesPlaceSetOnNewLine>
+    <QueriesPlaceSetIndentType>Fixed</QueriesPlaceSetIndentType>
+    <QueriesPlaceSetFixedIndentSize>2</QueriesPlaceSetFixedIndentSize>
+    <QueriesAliasesPlaceAsOnNewLine>false</QueriesAliasesPlaceAsOnNewLine>
+    <QueriesAliasesPlaceAsIndentType>AlignWithKeyword</QueriesAliasesPlaceAsIndentType>
+    <QueriesAliasesPlaceAsFixedIndentSize>3</QueriesAliasesPlaceAsFixedIndentSize>
+    <QueriesAliasesAlignAllAliasNames>false</QueriesAliasesAlignAllAliasNames>
+    <QueriesAliasesAlwaysUseAsForAliases>true</QueriesAliasesAlwaysUseAsForAliases>
+    <QueriesOtherAlwaysUseIntoInInsertStatements>true</QueriesOtherAlwaysUseIntoInInsertStatements>
+    <AlignSelectWithInsert>true</AlignSelectWithInsert>
+    <JoinsFormatJoinStatements>true</JoinsFormatJoinStatements>
+    <JoinsExceptFormatJoinsStatementWithLength>false</JoinsExceptFormatJoinsStatementWithLength>
+    <JoinsExceptFormatJoinsStatementMinLength>20</JoinsExceptFormatJoinsStatementMinLength>
+    <JoinsMoveJoinOperationToNewLine>true</JoinsMoveJoinOperationToNewLine>
+    <JoinsJoinStatementsIndentType>AlignWithPreviousKeyword</JoinsJoinStatementsIndentType>
+    <JoinsJoinStatementsFixedIndentSize>5</JoinsJoinStatementsFixedIndentSize>
+    <JoinsPlaceJoinObjectOnNewLine2>false</JoinsPlaceJoinObjectOnNewLine2>
+    <JoinsPlaceJoinObjectIndent2>true</JoinsPlaceJoinObjectIndent2>
+    <JoinsPlaceJoinObjectFixedIndentSize2>4</JoinsPlaceJoinObjectFixedIndentSize2>
+    <JoinsPlaceJoinKeywordOnNewLine>true</JoinsPlaceJoinKeywordOnNewLine>
+    <JoinsPlaceJoinKeywordIndent>false</JoinsPlaceJoinKeywordIndent>
+    <JoinsPlaceJoinKeywordFixedIndentSize>5</JoinsPlaceJoinKeywordFixedIndentSize>
+    <JoinsJoinKeywordAlignment>AlignWithTable</JoinsJoinKeywordAlignment>
+    <JoinsPlaceOnKeywordOnNewLine>true</JoinsPlaceOnKeywordOnNewLine>
+    <JoinsPlaceOnKeywordIndentType>AlignWithJoinKeyword</JoinsPlaceOnKeywordIndentType>
+    <JoinsPlaceOnKeywordFixedIndent>false</JoinsPlaceOnKeywordFixedIndent>
+    <JoinsPlaceOnKeywordFixedIndentSize>0</JoinsPlaceOnKeywordFixedIndentSize>
+    <JoinsPlaceNestedJoinStatementsOnSeparateLines>true</JoinsPlaceNestedJoinStatementsOnSeparateLines>
+    <JoinsPlaceNestedJoinStatementsIndentType>AlignWithPreviousJoinKeyword</JoinsPlaceNestedJoinStatementsIndentType>
+    <JoinsPlaceNestedJoinStatementsFixedIndent>false</JoinsPlaceNestedJoinStatementsFixedIndent>
+    <JoinsPlaceNestedJoinStatementsFixedIndentSize>0</JoinsPlaceNestedJoinStatementsFixedIndentSize>
+    <CaseEnforceCapitalization>true</CaseEnforceCapitalization>
+    <CaseModifyKeywordCase>true</CaseModifyKeywordCase>
+    <CaseKeywordCase>Upper</CaseKeywordCase>
+    <CaseKeywordProperOffset>0</CaseKeywordProperOffset>
+    <CaseModifyTypeCase>true</CaseModifyTypeCase>
+    <CaseTypeCase>Lower</CaseTypeCase>
+    <CaseTypeProperOffset>0</CaseTypeProperOffset>
+    <CaseModifySystemFunctionCase>true</CaseModifySystemFunctionCase>
+    <CaseSystemFunctionCase>Upper</CaseSystemFunctionCase>
+    <CaseSystemFunctionProperOffset>0</CaseSystemFunctionProperOffset>
+    <CaseModifyIdentifierCase>false</CaseModifyIdentifierCase>
+    <CaseIdentifierCase>Upper</CaseIdentifierCase>
+    <CaseIdentifierProperOffset>0</CaseIdentifierProperOffset>
+    <CaseModifyVariableCase>false</CaseModifyVariableCase>
+    <CaseVariableCase>Lower</CaseVariableCase>
+    <CaseVariableProperOffset>0</CaseVariableProperOffset>
+    <DefinitionsPlaceBodyOnNewLine>true</DefinitionsPlaceBodyOnNewLine>
+    <DefinitionsPlaceBodyOnNewLineIndent>true</DefinitionsPlaceBodyOnNewLineIndent>
+    <DefinitionsPlaceBodyOnNewLineIndentSize>5</DefinitionsPlaceBodyOnNewLineIndentSize>
+    <KeywordsAlwaysUseBeginAndEndInIfStatement>false</KeywordsAlwaysUseBeginAndEndInIfStatement>
+    <KeywordsAlwaysUseBeginAndEndInCreateProc>false</KeywordsAlwaysUseBeginAndEndInCreateProc>
+    <KeywordsPlaceWhenOnNewLine>true</KeywordsPlaceWhenOnNewLine>
+    <KeywordsIndentWhen>true</KeywordsIndentWhen>
+    <KeywordsIndentWhenSpaceCount>4</KeywordsIndentWhenSpaceCount>
+    <KeywordsPlaceThenOnNewLine>true</KeywordsPlaceThenOnNewLine>
+    <KeywordsIndentThen>true</KeywordsIndentThen>
+    <KeywordsIndentThenSpaceCount>4</KeywordsIndentThenSpaceCount>
+    <KeywordsPlaceElseOnNewLine>true</KeywordsPlaceElseOnNewLine>
+    <KeywordsIndentElse>true</KeywordsIndentElse>
+    <KeywordsIndentElseSpaceCount>4</KeywordsIndentElseSpaceCount>
+    <KeywordsIndentBeginEnd>true</KeywordsIndentBeginEnd>
+    <KeywordsIndentWithinBeginEnd>true</KeywordsIndentWithinBeginEnd>
+    <KeywordsIndentBeginEndSpaceCount>4</KeywordsIndentBeginEndSpaceCount>
+    <KeywordsIndentWithinBeginEndSpaceCount>4</KeywordsIndentWithinBeginEndSpaceCount>
+    <ConditionBodyStatementIndent>true</ConditionBodyStatementIndent>
+    <ConditionBodyStatementIndentSize>4</ConditionBodyStatementIndentSize>
+    <CheckForUpdatesAtStartup>false</CheckForUpdatesAtStartup>
+    <ShowPatches>false</ShowPatches>
+    <DontShowRenewal>false</DontShowRenewal>
+  </FormattingOptionsPublic>
+  <ToolbarOptions>
+    <ToolbarVisibilitySSMS>true</ToolbarVisibilitySSMS>
+    <ToolbarVisibilityMSVS>true</ToolbarVisibilityMSVS>
+    <OptionsFormHeight>650</OptionsFormHeight>
+    <OptionsFormWidth>1200</OptionsFormWidth>
+  </ToolbarOptions>
+  <AzureInteractiveClientId />
+  <AzureInteractiveRedirectUrl />
+</PublicOptions>

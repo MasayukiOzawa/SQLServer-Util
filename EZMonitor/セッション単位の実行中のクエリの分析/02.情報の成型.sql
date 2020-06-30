@@ -10,6 +10,7 @@ FROM
 WHERE
     wait_type <> 'WAITFOR'
     AND collect_date >= DATEADD(hh,-1, GETDATE())
+    AND program_name <> 'Microsoft SQL Server Management Studio'
 ORDER BY 
      session_id ASC, collect_date ASC
 
@@ -49,6 +50,7 @@ FROM
     WHERE
         w.wait_type <> ''WAITFOR''
         AND collect_date >= DATEADD(hh,-1, GETDATE())
+        AND program_name <> ''Microsoft SQL Server Management Studio''
 ) AS T
 PIVOT(
     MAX(wait_time_ms)

@@ -37,5 +37,5 @@ WHERE
 PIVOT
 (
     MAX(total_query_wait_time_ms)
-    FOR wait_category_desc IN ([Unknown], [CPU], [Worker Thread], [Lock], [Latch], [Buffer Latch], [Buffer IO], [Compilation*], [SQL CLR], [Mirroring], [Transaction], [Idle], [Preemptive], [Service Broker], [Tran Log IO], [Network IO], [Parallelism], [Memory], [User Wait], [Tracing])
+    FOR wait_category_desc IN ([Unknown], [CPU], [Worker Thread], [Lock], [Latch], [Buffer Latch], [Buffer IO], [Compilation], [SQL CLR], [Mirroring], [Transaction], [Idle], [Preemptive], [Service Broker], [Tran Log IO], [Network IO], [Parallelism], [Memory], [User Wait], [Tracing])
 ) AS PVT

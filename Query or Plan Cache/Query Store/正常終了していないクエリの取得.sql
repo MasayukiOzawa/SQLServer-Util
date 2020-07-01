@@ -8,6 +8,7 @@ SELECT
 	st.query_sql_text,
 	sq.query_hash,
 	rs.runtime_stats_id,
+   sq.query_id,
 	rs.plan_id,
 	rs.runtime_stats_interval_id,
 	rs.execution_type,
@@ -98,3 +99,4 @@ WHERE
 	AND rs.execution_type <> 0
 ORDER BY
 	SWITCHOFFSET(rsi.start_time, DATEPART(tz, SYSDATETIMEOFFSET())) DESC
+

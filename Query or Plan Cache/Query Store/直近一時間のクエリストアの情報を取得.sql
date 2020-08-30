@@ -8,6 +8,7 @@ SELECT
     SWITCHOFFSET(rs.last_execution_time, DATEPART(tz, SYSDATETIMEOFFSET())) AS last_execution_time_local, 
 	st.query_sql_text,
 	sq.query_hash,
+   sq.query_id,
 	rs.runtime_stats_id,
 	rs.plan_id,
 	rs.runtime_stats_interval_id,

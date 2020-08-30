@@ -1,5 +1,5 @@
-﻿--sp_query_store_flush_db 
-
+﻿-- EXEC sp_query_store_flush_db 
+-- ALTER DATABASE CURRENT SET QUERY_STORE CLEAR
 
 SELECT
 	SWITCHOFFSET(rsi.start_time, DATEPART(tz, SYSDATETIMEOFFSET())) AS start_time,

@@ -104,7 +104,7 @@ SELECT
                             'IO_RETRY'
                             ) THEN 'other_disk_io'
         WHEN wait_type LIKE 'SE_REPL_%' 
-                OR (wait_type LIKE 'HADR%' AND wait_type <> 'HADR_THROTTLE_LOG_RATE_GOVERNOR), PWAIT_HADR_%, REPLICA_WRITES, FCB_REPLICA_WRITE, FCB_REPLICA_READ, PWAIT_HADRSIM')
+                OR (wait_type LIKE 'HADR%' AND wait_type <> 'HADR_THROTTLE_LOG_RATE_GOVERNOR')
                 OR wait_type LIKE 'PWAIT_HADR_%'
                 OR wait_type IN(
                             'REPLICA_WRITES',

@@ -106,6 +106,7 @@ SELECT
         WHEN wait_type LIKE 'SE_REPL_%' 
                 OR (wait_type LIKE 'HADR%' AND wait_type <> 'HADR_THROTTLE_LOG_RATE_GOVERNOR')
                 OR wait_type LIKE 'PWAIT_HADR_%'
+                OR wait_type LIKE 'REPL_%'
                 OR wait_type IN(
                             'REPLICA_WRITES',
                             'FCB_REPLICA_WRITE',

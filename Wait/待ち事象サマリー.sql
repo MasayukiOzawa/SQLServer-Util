@@ -1,16 +1,24 @@
 -- https://docs.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-query-store-wait-stats-transact-sql
 
 SELECT
-    *
+    GETDATE() AS collect_date,
+    *,
+    CAST(waiting_tasks_count * 1.0 / SUM(waiting_tasks_count) OVER() AS numeric(6,3)) * 100 AS waiting_tasks_count_percentage,
+    CAST(wait_time_ms * 1.0 / SUM(wait_time_ms) OVER() AS numeric(6,3)) * 100 AS wait_time_ms_percentage
 FROM
 (
 SELECT
+    wait_type,
+    waiting_tasks_count,
     wait_time_ms,
+    max_wait_time_ms,
+    signal_wait_time_ms,
     CASE
         WHEN wait_type = 'SOS_SCHEDULER_YIELD' THEN 'cpu'
         WHEN wait_type = 'THREADPOOL' THEN 'worker_thread'
         WHEN wait_type LIKE 'LCK_M_%' THEN 'lock'
         WHEN wait_type LIKE 'LATCH_%' THEN 'latch'
+        WHEN wait_type LIKE 'BTREE_INSERT_FLOW_CONTROL' THEN 'sequential_key'
         WHEN wait_type LIKE 'PAGELATCH_%' THEN 'buffer_latch'
         WHEN wait_type LIKE 'PAGEIOLATCH_%' THEN 'buffer_io'
         WHEN wait_type ='RESOURCE_SEMAPHORE_QUERY_COMPILE' THEN 'compilation'
@@ -54,6 +62,10 @@ SELECT
                             'EXTERNAL_SCRIPT_NETWORK_IOF') THEN 'network_io'
         WHEN wait_type IN(
                             'CXPACKET',
+                            'CXSYNC_CONSUMER',
+                            'CXSYNC_PORT',
+                            'CXCONSUMER',
+                            'CXROWSET_SYNC',
                             'EXCHANGE'
                         ) THEN 'parallelism'
         WHEN wait_type IN(
@@ -124,38 +136,10 @@ SELECT
         ELSE 'unknown'
     END AS wait_category
 FROM
-sys.dm_os_wait_stats
+    sys.dm_os_wait_stats
 ) AS T
-PIVOT(
-    SUM(wait_time_ms)
-    FOR wait_category
-   IN(
-        [backup],
-        [buffer_io],
-        [buffer_latch],
-        [compilation],
-        [cpu],
-        [full_text_search],
-        [hs_remote_block_io],
-        [latch],
-        [lock],
-        [log_rate_governor],
-        [memory],
-        [mirroring],
-        [network_io],
-        [other_disk_io],
-        [parallelism],
-        [preemptive],
-        [replication],
-        [service_broker],
-        [sql_clr],
-        [tracing],
-        [tran_log_io],
-        [transaction],
-        [worker_thread],
-        [idle],
-        [user_wait],
-        [unknown]
-    )
-) AS PVT
-OPTION(RECOMPILE, MAXDOP 1)
+WHERE
+    wait_category NOT IN('unknown', 'idle', 'replication','service_broker', 'sql_clr', 'preemptive', 'full_text_search')
+    AND waiting_tasks_count > 0
+ORDER BY 
+    waiting_tasks_count_percentage DESC

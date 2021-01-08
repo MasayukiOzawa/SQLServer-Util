@@ -32,7 +32,10 @@ SELECT
         WHEN dpe.class_desc = 'SCHEMA' THEN SCHEMA_NAME(major_id)
         WHEN dpe.class_desc = 'OBJECT_OR_COLUMN' AND dpe.minor_id = 0 THEN OBJECT_SCHEMA_NAME(dpe.major_id) + '.' +  OBJECT_NAME(dpe.major_id)
         WHEN dpe.class_desc = 'OBJECT_OR_COLUMN' AND dpe.minor_id > 0 THEN OBJECT_SCHEMA_NAME(dpe.major_id) + '.' +  OBJECT_NAME(dpe.major_id) + '(' + (SELECT name FROM sys.columns WHERE object_id = dpe.major_id AND column_id = dpe.minor_id) + ')'
-    END AS major_name
+    END AS major_name,
+    minor_id,
+    -- (SELECT name FROM sys.database_principals WHERE principal_id = grantee_principal_id) AS grantee_principal_name,
+    (SELECT name FROM sys.database_principals WHERE principal_id = grantor_principal_id) AS grantor_principal_name
 FROM 
     database_role_member AS rm
     LEFT JOIN sys.database_permissions AS dpe
@@ -55,16 +58,20 @@ SELECT
         WHEN dpe.class_desc = 'SCHEMA' THEN SCHEMA_NAME(major_id)
         WHEN dpe.class_desc = 'OBJECT_OR_COLUMN' AND dpe.minor_id = 0 THEN OBJECT_SCHEMA_NAME(dpe.major_id) + '.' +  OBJECT_NAME(dpe.major_id)
         WHEN dpe.class_desc = 'OBJECT_OR_COLUMN' AND dpe.minor_id > 0 THEN OBJECT_SCHEMA_NAME(dpe.major_id) + '.' +  OBJECT_NAME(dpe.major_id) + '(' + (SELECT name FROM sys.columns WHERE object_id = dpe.major_id AND column_id = dpe.minor_id) + ')'
-    END AS major_name
+    END AS major_name,
+    minor_id,
+    --(SELECT name FROM sys.database_principals WHERE principal_id = grantee_principal_id) AS grantee_principal_name,
+    (SELECT name FROM sys.database_principals WHERE principal_id = grantor_principal_id) AS grantor_principal_name
 FROM
     sys.database_principals AS dp
     LEFT JOIN sys.database_permissions AS dpe
         ON dpe.grantee_principal_id = dp.principal_id
 WHERE
-    dp.type_desc IN('WINDOWS_USER', 'SQL_USER', 'EXTERNAL_USER', 'EXTERNAL_GROUP')
+    dp.type_desc IN('WINDOWS_USER', 'SQL_USER', 'EXTERNAL_USER', 'EXTERNAL_GROUP', 'DATABASE_ROLE')
 )
 
 SELECT * FROM role_permission
 UNION ALL
 SELECT * FROM user_permission
+WHERE name NOT IN ('public', 'guest', 'sys','dbo', 'INFORMATION_SCHEMA')
 ORDER BY principal_id ASC

@@ -1,0 +1,90 @@
+SELECT 
+    wt.session_id,
+    s.STATUS,
+    wt.exec_context_id,
+    wt.wait_duration_ms,
+    wt.wait_type,
+    wt.blocking_session_id,
+    wt.blocking_exec_context_id,
+    wt.resource_description,
+    s.host_name,
+    s.program_name,
+    s.login_name,
+    s.context_info,
+    s.cpu_time,
+    s.memory_usage,
+    s.total_scheduled_time,
+    s.total_elapsed_time,
+    s.endpoint_id,
+    s.last_request_start_time,
+    s.last_request_end_time,
+    s.reads,
+    s.writes,
+    s.logical_reads,
+    s.is_user_process,
+    s.text_size,
+    s.language,
+    s.date_format,
+    s.date_first,
+    s.quoted_identifier,
+    s.arithabort,
+    s.ansi_null_dflt_on,
+    s.ansi_defaults,
+    s.ansi_warnings,
+    s.ansi_padding,
+    s.ansi_nulls,
+    s.concat_null_yields_null,
+    s.transaction_isolation_level,
+    s.lock_timeout,
+    s.deadlock_priority,
+    s.row_count,
+    s.prev_error,
+    s.page_server_reads,
+    s.contained_availability_group_id,
+    er.wait_resource,
+    er.wait_time,
+    er.last_wait_type,
+    ot.context_switches_count,
+    ot.pending_io_count,
+    ot.pending_io_byte_count,
+    ot.pending_io_byte_average,
+    ot.scheduler_id,
+    ot.session_id,
+    ot.exec_context_id,
+    ot.request_id,
+    ow.STATUS,
+    ow.is_preemptive,
+    ow.is_fiber,
+    ow.is_sick,
+    ow.is_in_cc_exception,
+    ow.is_fatal_exception,
+    ow.is_inside_catch,
+    ow.is_in_polling_io_completion_routine,
+    ow.context_switch_count,
+    ow.pending_io_count,
+    ow.pending_io_byte_count,
+    ow.pending_io_byte_average,
+    ow.wait_started_ms_ticks,
+    ow.wait_resumed_ms_ticks,
+    ow.[state],
+    ow.last_wait_type,
+    ow.return_code,
+    ow.quantum_used,
+    ow.max_quantum,
+    st.text
+FROM 
+     sys.dm_os_waiting_tasks AS wt
+     INNER JOIN sys.dm_exec_sessions AS s
+     ON wt.session_id = s.session_id
+        AND s.is_user_process = 1
+     INNER JOIN sys.dm_os_tasks AS ot
+     ON ot.task_address = wt.waiting_task_address
+     INNER JOIN sys.dm_os_workers AS ow
+     ON ow.worker_address = ot.worker_address
+     LEFT JOIN sys.dm_exec_requests AS er
+     ON er.session_id = wt.session_id
+     OUTER APPLY sys.dm_exec_sql_text(er.sql_handle) AS st
+WHERE wt.session_id <> @@SPID
+ORDER BY 
+    wt.session_id ASC,
+    wt.exec_context_id ASC;

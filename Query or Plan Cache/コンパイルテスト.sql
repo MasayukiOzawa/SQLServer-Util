@@ -45,6 +45,6 @@ BEGIN
     END
     SET @rowCount += 1
 END
-
+SET @insertRows = @insertRows + ' OPTION(RECOMPILE, QUERYTRACEON 3604, QUERYTRACEON 8675)'
 SET STATISTICS TIME ON;
 EXEC(@insertRows)

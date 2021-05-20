@@ -39,9 +39,11 @@ FROM
 		ON st.query_text_id = sq.query_text_id
 	LEFT JOIN sys.query_store_wait_stats AS ws
 		ON ws.plan_id = rs.plan_id
-		   AND ws.runtime_stats_interval_id = rs.runtime_stats_interval_id
-WHERE 
+		AND ws.runtime_stats_interval_id = rs.runtime_stats_interval_id
+         	AND rs.execution_type = ws.execution_type
+WHERE    
 	rs.last_execution_time >= DATEADD(hh,@time,CAST(SYSDATETIMEOFFSET() AS datetimeoffset))
+	and rs.execution_type <> 0 -- Aborted しているクエリを取得
 ORDER BY 
 	query_id ASC,
 	SWITCHOFFSET(rsi.start_time, DATEPART(tz, SYSDATETIMEOFFSET())) DESC

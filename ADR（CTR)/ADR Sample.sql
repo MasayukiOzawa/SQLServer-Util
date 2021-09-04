@@ -31,6 +31,10 @@ CHECKPOINT
 ALTER INDEX ALL ON T1 REBUILD
 GO
 
+SELECT * FROM sys.system_internals_allocation_units 
+WHERE container_id = (SELECT hobt_id FROM sys.partitions WHERE object_id = OBJECT_ID('T1') )
+
+
 -- 他のセッションで以下のクエリを実行
 BEGIN TRAN
 UPDATE T1 SET C2 = NEWID() WHEre C1 = 255
@@ -47,16 +51,17 @@ FROM sys.dm_db_index_physical_stats(DB_ID(), OBJECT_ID('T1'), NULL, NULL, 'DETAI
 SELECT * FROM sys.dm_tran_persistent_version_store  -- sys.persistent_version_store 相当の情報を取得するための DMV (PVS は DB 単位に独立している)
 SELECT * FROM sys.dm_tran_persistent_version_store_stats WHERE database_id = DB_ID()
 
--- DAC で、select * from sys.persistent_version_store  OUTER APPLY sys.fn_PhysLocCracker(%%physloc%%) を実行するか次のクエリで、使用ページを把握
+-- DAC で、select * from sys.persistent_version_store  OUTER APPLY sys.fn_PhysLocCracker(%%physloc%%) を実行するか次のクエリで、PVS で使用されているページを把握
 SELECT * FROM sys.system_internals_allocation_units 
 WHERE container_id = (SELECT hobt_id FROM sys.partitions WHERE object_id = OBJECT_ID('sys.persistent_version_store') )
 
 SELECT * FROM T1 OUTER APPLY sys.fn_PhysLocCracker(%%physloc%%) where c1 = 1
 
+DBCC TRACEON(3604)
 DBCC PAGE('ADR_TEST', 1, 1,3) -- PFS にバージョン情報が含まれるかが格納されている
 DBCC PAGE('ADR_TEST', 1, 150,3)
 DBCC PAGE('ADR_TEST', 1, 264,3)
-DBCC PAGE('ADR_TEST', 1, 2335,3)
+DBCC PAGE('ADR_TEST', 1, 2480,3)
 GO
 
 -- Aborted Transaction の実行

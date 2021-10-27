@@ -1,9 +1,9 @@
-/* DAC ‚ÌƒZƒbƒVƒ‡ƒ“‚ÅÀs‰Â”\‚ÈƒNƒGƒŠ */
+/* DAC ã®ã‚»ãƒƒã‚·ãƒ§ãƒ³ã§å®Ÿè¡Œå¯èƒ½ãªã‚¯ã‚¨ãƒª */
 
 USE changetracking
 GO
 
--- ƒVƒXƒeƒ€ƒe[ƒuƒ‹‚ÌŠm”F
+-- ã‚·ã‚¹ãƒ†ãƒ ãƒ†ãƒ¼ãƒ–ãƒ«ã®ç¢ºèª
 SELECT
 	*,
 	'0x' + SUBSTRING(ts,7,2) + SUBSTRING(ts,5,2) + SUBSTRING(ts,3,2) AS warter_mark
@@ -18,7 +18,7 @@ ORDER BY
 	commit_ts DESC
 ) AS T
 
--- ƒEƒH[ƒ^[ƒ}[ƒN‚ÌŠm”F
+-- ã‚¦ã‚©ãƒ¼ã‚¿ãƒ¼ãƒãƒ¼ã‚¯ã®ç¢ºèª
 SELECT TOP 10 * FROM sys.syscommittab ORDER BY commit_time DESC
 
 SELECT * FROM sys.change_tracking_tables
@@ -31,6 +31,10 @@ where value = (
 )
 
 
+select * from sys.sysobjvalues  where valclass = 7 AND objid IN (1003,1004)
+-- 1003 : ä¿æŒæœŸé–“ãŒåˆ‡ã‚Œã¦ã„ã‚‹ç„¡åŠ¹ã«ãªã£ãŸãƒ‡ãƒ¼ã‚¿ã® Time Stamp
+-- 1004 : ã‚¯ãƒªãƒ¼ãƒ³ã‚¢ãƒƒãƒ—ãŒå®Œäº†ã—ãŸãƒ‡ãƒ¼ã‚¿ã® Time Stamp
+
 select * from sys.sysobjvalues 
 cross apply sys.fn_PhysLocCracker(%%physloc%%)
 where valclass = 7 and objid in(1003,1004) or
@@ -42,7 +46,7 @@ where value IN(1617786, 1613942, 2319385)
 
 
 select * from sys.sysobjvalues WHERE objid = 581577110
--- Water Mark ‚Ì‹­§XV
+-- Water Mark ã®å¼·åˆ¶æ›´æ–°
 SELECT TOP 10000 * from [sys].[change_tracking_581577110] order by 1 ASC
 GO
 
@@ -58,21 +62,21 @@ DBCC PAGE('changetracking', 1, 128,1)
 DBCC PAGE('changetracking', 1, 2336,1)
 GO
 
--- ƒIƒtƒZƒbƒg+26 Bytes
+-- ã‚ªãƒ•ã‚»ãƒƒãƒˆ+26 Bytes
 DBCC WRITEPAGE('changetracking', 1, 128,6450, 3 , 0x69B040, 0)
 DBCC WRITEPAGE('changetracking', 1, 128,6484, 3 , 0x69B040, 0)
 DBCC WRITEPAGE('changetracking', 1, 2336,482, 3 , 0x23E520, 0)
 
 SELECT * FROM sys.change_tracking_tables
 
--- è“®ƒNƒŠ[ƒ“ƒAƒbƒv—pƒXƒgƒAƒhƒvƒƒV[ƒWƒƒ‚ÌÀs
--- change_tracking_[ƒIƒuƒWƒFƒNƒg ID] ‚ğíœ‚µ‚Ä‚©‚çAsys.syscommittab ‚ğíœ
+-- æ‰‹å‹•ã‚¯ãƒªãƒ¼ãƒ³ã‚¢ãƒƒãƒ—ç”¨ã‚¹ãƒˆã‚¢ãƒ‰ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£ã®å®Ÿè¡Œ
+-- change_tracking_[ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ ID] ã‚’å‰Šé™¤ã—ã¦ã‹ã‚‰ã€sys.syscommittab ã‚’å‰Šé™¤
 EXEC dbo.sp_flush_CT_internal_table_on_demand @TableToClean = 'CT_01'
 EXEC sys.sp_flush_commit_table_on_demand
 CHECKPOINT
 select * from sys.fn_dblog(NULL, NULL)
 
--- ƒf[ƒ^Œ”‚ÌŠm”F
+-- ãƒ‡ãƒ¼ã‚¿ä»¶æ•°ã®ç¢ºèª
 SELECT 
 	object_name(p.object_id) as name, p.index_id, p.rows 
 FROM 
@@ -83,7 +87,7 @@ WHERE
 	(p.object_id = object_id('sys.syscommittab') OR o.name LIKE 'change[_]tracking[_]%')
 	AND p.index_id = 1
 
--- “Œvî•ñ‚ÌXV
+-- çµ±è¨ˆæƒ…å ±ã®æ›´æ–°
 UPDATE STATISTICS sys.[change_tracking_581577110]  WITH FULLSCAN
 
 SELECT * FROM sys.syscommittab 

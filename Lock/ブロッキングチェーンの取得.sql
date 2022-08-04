@@ -14,7 +14,7 @@ sp AS(
 		open_tran,
 		text 
 	FROM sys.sysprocesses 
-	CROSS APPLY sys.dm_exec_sql_text(sql_handle)
+	OUTER APPLY sys.dm_exec_sql_text(sql_handle)
 	WHERE spid > 50
 ),
 -- ブロッキングリスト

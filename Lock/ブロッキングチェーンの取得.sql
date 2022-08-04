@@ -15,7 +15,7 @@ sp AS(
 		text 
 	FROM sys.sysprocesses 
 	OUTER APPLY sys.dm_exec_sql_text(sql_handle)
-	WHERE spid > 50
+	WHERE spid > 50 and spid <> blocked
 ),
 -- ブロッキングリスト
 BlockList AS(

@@ -80,3 +80,18 @@ Add-Type -Path "C:\sqlclient\System.Text.Encodings.Web.4.7.2\lib\net461\System.T
 Add-Type -Path "C:\sqlclient\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll"
 Add-Type -Path "C:\sqlclient\Azure.Core.1.24.0\lib\net461\Azure.Core.dll"
 Add-Type -Path "C:\sqlclient\Microsoft.Data.SqlClient.5.0.0\lib\net462\Microsoft.Data.SqlClient.dll"
+
+
+$Error[0].Exception.LoaderExceptions
+
+$con = New-Object Microsoft.Data.SqlClient.Sqlconnection("Server=tcp:localhost;Integrated Security=True")
+# $con = New-Object Microsoft.Data.SqlClient.Sqlconnection("Server=tcp:localhost;Integrated Security=True;Encrypt=Strict")
+# $con = New-Object Microsoft.Data.SqlClient.Sqlconnection("Server=tcp:localhost;Integrated Security=True;Encrypt=True;TrustServerCertificate=true")
+# $con = New-Object Microsoft.Data.SqlClient.Sqlconnection("Server=tcp:localhost;Integrated Security=True;Encrypt=False")
+
+$con.Open()
+
+$cmd = $con.CreateCommand()
+$cmd.CommandText ="SELECT @@VERSION"
+$cmd.ExecuteScalar()
+

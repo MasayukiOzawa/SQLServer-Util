@@ -15,9 +15,11 @@ FROM
 GO
 
 ALTER TABLE [blocked_report_yyyymmdd] ALTER COLUMN [no] bigint NOT NULL
-
-ALTER TABLE [blocked_report_yyyymmdd] ADD CONSTRAINT PK_blocked_report PRIMARY KEY CLUSTERED (no)
+GO
+ALTER TABLE [blocked_report_yyyymmdd] ADD CONSTRAINT [PK_blocked_report_yyyymmdd] PRIMARY KEY CLUSTERED (no)
+GO
 CREATE INDEX NCIX_blocked_report_IDX01 ON [blocked_report_yyyymmdd] (timestamp)
+GO
 CREATE PRIMARY XML INDEX [PrimaryXmlIndex-blocked_report] ON [dbo].[blocked_report_yyyymmdd]([event_data])
 GO
 */

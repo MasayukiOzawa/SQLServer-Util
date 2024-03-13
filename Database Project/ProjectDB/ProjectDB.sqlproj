@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build">
+  <Sdk Name="Microsoft.Build.Sql" Version="0.1.15-preview" />
+  <!--  https://learn.microsoft.com/en-us/dotnet/api/microsoft.data.tools.schema.tasks.sql.sqlbuildtask?view=sql-dacfx-162 -->
+  <PropertyGroup>
+    <Name>ProjectDB</Name>
+    <ProjectGuid>{05e11deb-9dec-4d9c-8a0d-d93287d3ce60}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql160DatabaseSchemaProvider</DSP>
+    <ModelCollation>1041,CI</ModelCollation>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <DefaultCollation>Japanese_CI_AS</DefaultCollation>
+    <QueryStoreDesiredState>ReadWrite</QueryStoreDesiredState>
+    <QueryStoreCaptureMode>Auto</QueryStoreCaptureMode>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="dbo" />
+    <Folder Include="dbo\Functions" />
+    <Folder Include="dbo\Stored Procedures" />
+    <Folder Include="dbo\Tables" />
+    <Folder Include="dbo\Views" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Remove="dbo\Tables\ddl.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Remove="work\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ProjectDB.publish.xml" />
+  </ItemGroup>
+  <Target Name="BeforeBuild">
+    <Delete Files="$(BaseIntermediateOutputPath)\project.assets.json" />
+  </Target>
+</Project>

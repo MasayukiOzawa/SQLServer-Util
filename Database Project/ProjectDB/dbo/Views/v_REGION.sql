@@ -1,0 +1,3 @@
+CREATE VIEW [dbo].[v_REGION]
+  AS 
+    SELECT * FROM [REGION]

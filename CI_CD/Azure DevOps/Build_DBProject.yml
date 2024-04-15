@@ -1,0 +1,41 @@
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    exclude:
+      - pipelines/*
+
+pool:
+  vmImage: windows-2022
+
+steps:
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    arguments: '--configuration Release'
+
+- task: SqlAzureDacpacDeployment@1
+  name: DacPacDeploy
+  inputs:
+    deployType: DacpacTask
+    DeploymentAction: Script
+    DacpacFile: '$(Build.Repository.LocalPath)/bin/Release/$(BACKPACKName)'
+    azureSubscription: $(AzureSubscription)
+    AuthenticationType: server
+    ServerName: $(ServerName)
+    DatabaseName: $(Databasename)
+    SqlUsername: $(LoginName)
+    SqlPassword: $(LoginPassword)
+    AdditionalArguments: '/p:ExcludeObjectTypes="Users" /p:CommentOutSetVarDeclarations=true'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.Repository.LocalPath)/bin/Release/$(BACKPACKName)'
+    ArtifactName: 'DACPAC'
+    publishLocation: Container
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(DacPacDeploy.SqlDeploymentOutputFile)'
+    ArtifactName: 'SQLScript'
+    publishLocation: Container

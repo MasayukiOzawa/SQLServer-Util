@@ -1,0 +1,36 @@
+init_config:
+
+instances:
+  - host: "%%env_DD_SERVER%%-fg.database.windows.net"
+    connector: "odbc"
+    driver: "/opt/microsoft/msodbcsql18/lib64/libmsodbcsql-18.3.so.2.1"
+    database: "%%env_DD_DATABASE%%"
+    username: "%%env_DD_USER%%"
+    password: "%%env_DD_USER_PASSWORD%%"
+    azure:
+      deployment_type: "sql_database"
+      fully_qualified_domain_name: "%%env_DD_SERVER%%-fg.database.windows.net"
+    dbm: true
+
+  - host: "%%env_DD_SERVER%%.database.windows.net"
+    connector: "odbc"
+    driver: "/opt/microsoft/msodbcsql18/lib64/libmsodbcsql-18.3.so.2.1"
+    database: "%%env_DD_DATABASE%%"
+    username: "%%env_DD_USER%%"
+    password: "%%env_DD_USER_PASSWORD%%"
+    azure:
+      deployment_type: "sql_database"
+      fully_qualified_domain_name: "%%env_DD_SERVER%%.database.windows.net"
+    dbm: true
+
+  - host: "%%env_DD_SERVER%%-dr.database.windows.net"
+    connector: "odbc"
+    driver: "/opt/microsoft/msodbcsql18/lib64/libmsodbcsql-18.3.so.2.1"
+    database: "%%env_DD_DATABASE%%"
+    username: "%%env_DD_USER%%"
+    password: "%%env_DD_USER_PASSWORD%%"
+    azure:
+      deployment_type: "sql_database"
+      fully_qualified_domain_name: "%%env_DD_SERVER%%-dr.database.windows.net"
+    dbm: true
+

@@ -11,9 +11,16 @@ DBCC DROPCLEANBUFFERS
 DBCC FREEPROCCACHE
 DBCC FLUSHPROCINDB(<DB ID>)
 
+
+-- キャッシュクリア
+DBCC FREESYSTEMCACHE('ALL')
+
+
 -- ページ情報の確認
 DBCC TRACEON(3604) 
-DBCC PAGE(N'TEST', 1, 128, 1) 
+DBCC PAGE(N'tpch', 1, 128, 1) 
+DBCC PAGE(N'tpch', 1, 128, 1) WITH TABLERESULTS -- 3604 を有効にしないでも出力可能
+DBCC PAGE(0, 1, 128, 1) WITH TABLERESULTS -- DBCC 全般として dbid=0 で 現在の DB の情報を出力
 DBCC TRACEOFF(3604)
 
 -- ページ情報の書き換え
@@ -33,3 +40,15 @@ DBCC CLONEDATABASE(AdventureWorks2014, AWCloneDB)
  
 
 
+-- DB の各種情報の取得
+DBCC TRACEON(3604)
+
+DBCC DBINFO -- Database Metadata
+
+DBCC PAGE('tpch',1,9,3); -- Boot Page でも DBINO 相当の情報を確認可能
+
+DBCC FILEHEADER(0,1) -- 現在の DB の  File ID 1 のヘッダー情報を出力
+
+DBCC DBTABLE('tpch') -- Database の DB テーブル構造を出力
+
+DBCC TRACEOFF(3604)

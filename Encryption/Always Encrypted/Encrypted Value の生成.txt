@@ -1,0 +1,39 @@
+Connect-AzAccount -UseDeviceAuthentication
+
+# 最初に CEK で使用する Encrypted Value の生成
+$keyVaulUrl="https://xxxxxxx.vault.azure.net/keys/Always-Encrypted-Auto1/xxxxxxxx"
+
+$cmkKeyVaultAccessToken = (Get-AzAccessToken -ResourceUrl https://vault.azure.net).Token
+$cmkSetting = New-SqlAzureKeyVaultColumnMasterKeySettings -KeyUrl $keyVaulUrl -KeyVaultAccessToken $cmkKeyVaultAccessToken 
+
+New-SqlColumnEncryptionKeyEncryptedValue -TargetColumnMasterKeySettings $cmkSetting -KeyVaultAccessToken $cmkKeyVaultAccessToken | Set-Clipboard
+
+
+# ローテーション (回転) する際に使用する Encrypted Value の生成
+
+$connStr = "Server=xxxxx; Database = AEDB; User=xxxxxx; Password=xxxxxxx;TrustServerCertificate=True"
+$database = Get-SqlDatabase -ConnectionString $connStr
+
+$cekName = "CEK"
+$cek = Get-SqlColumnEncryptionKey -InputObject $database -Name $cekName
+
+
+$encryptedValue = $cek.ColumnEncryptionKeyValues[0].EncryptedValueAsSqlBinaryString
+
+$oldKeyVaulUrl="https://xxxxxxxxx.vault.azure.net/keys/Always-Encrypted-Auto1/xxxxxxxxxxxx"
+
+$oldCmkKeyVaultAccessToken = (Get-AzAccessToken -ResourceUrl https://vault.azure.net).Token
+$oldCmkSetting = New-SqlAzureKeyVaultColumnMasterKeySettings -KeyUrl $oldKeyVaulUrl -KeyVaultAccessToken $oldCmkKeyVaultAccessToken 
+
+
+$newKeyVaulUrl="https://xxxxxxxxx.vault.azure.net/keys/Always-Encrypted-Auto1/xxxxxxxxxxxx"
+
+$newCmkKeyVaultAccessToken = (Get-AzAccessToken -ResourceUrl https://vault.azure.net).Token
+$newCmkSetting = New-SqlAzureKeyVaultColumnMasterKeySettings -KeyUrl $newKeyVaulUrl -KeyVaultAccessToken $newCmkKeyVaultAccessToken 
+
+
+New-SqlColumnEncryptionKeyEncryptedValue `
+    -TargetColumnMasterKeySettings $newCmkSetting `
+    -ColumnMasterKeySettings $oldCmkSetting `
+    -KeyVaultAccessToken $newCmkKeyVaultAccessToken `
+    -EncryptedValue $encryptedValue | Set-Clipboard

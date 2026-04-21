@@ -14,15 +14,6 @@ SELECT
 OPTION (RECOMPILE)
 GO
 
-/*********************************************/
--- フルテキストサービスのプロパティ
-/*********************************************/
-SELECT
-	GETDATE() AS [date],
-	*
-FROM sys.fulltext_service
-OPTION (RECOMPILE)
-GO
 
 /*********************************************/
 -- フルテキスト関連の構成値
@@ -45,3 +36,13 @@ WHERE name IN (
 ORDER BY name
 OPTION (RECOMPILE)
 GO
+
+/*********************************************/
+-- SQL Server 2025 以降のフルテキストインデックスのバージョン
+/*********************************************/
+SELECT 
+	* 
+FROM 
+	sys.database_scoped_configurations
+WHERE
+	NAME = 'FULLTEXT_INDEX_VERSION'

@@ -30,7 +30,8 @@ SELECT
 	ft.change_tracking_state_desc,
 	ft.has_crawl_completed,
 	ft.crawl_type_desc,
-	ft.is_paused,
+	ft.crawl_start_date,
+	ft.crawl_end_date,
 	catalog.name AS catalog_name,
 	stoplist.name AS stoplist_name
 FROM sys.fulltext_indexes AS ft
@@ -58,9 +59,7 @@ SELECT
 	obj.name AS object_name,
 	col.name AS column_name,
 	fic.language_id,
-	lang.name AS language_name,
-	fic.type_column_id,
-	type_col.name AS type_column_name
+	lang.name AS language_name
 FROM sys.fulltext_index_columns AS fic
 	INNER JOIN sys.objects AS obj
 	ON fic.object_id = obj.object_id
@@ -71,7 +70,7 @@ FROM sys.fulltext_index_columns AS fic
 	ON fic.object_id = type_col.object_id
 	AND fic.type_column_id = type_col.column_id
 	LEFT JOIN sys.fulltext_languages AS lang
-	ON fic.language_id = lang.language_id
+	ON fic.language_id = lang.lcid
 ORDER BY
 	schema_name,
 	object_name,
@@ -86,10 +85,11 @@ SELECT
 	DB_NAME() AS database_name,
 	SCHEMA_NAME(obj.schema_id) AS schema_name,
 	obj.name AS object_name,
+	OBJECT_NAME(frag.fragment_object_id) AS fragment_object_name,
 	frag.fragment_id,
-	frag.fragment_type,
-	frag.fragment_size,
-	frag.key_count
+	frag.status,
+	frag.data_size,
+	frag.row_count
 FROM sys.fulltext_index_fragments AS frag
 	INNER JOIN sys.objects AS obj
 	ON frag.table_id = obj.object_id

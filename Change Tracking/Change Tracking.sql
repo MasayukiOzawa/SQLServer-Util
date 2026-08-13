@@ -1,8 +1,8 @@
--- •ÏX‚Ì’ÇÕƒeƒXƒg—p DB ‚Ìì¬
+-- å¤‰æ›´ã®è¿½è·¡ãƒ†ã‚¹ãƒˆç”¨ DB ã®ä½œæˆ
 CREATE DATABASE changetracking
 go
 
--- •ÏX‚Ì’ÇÕ‚Ì—LŒø‰»
+-- å¤‰æ›´ã®è¿½è·¡ã®æœ‰åŠ¹åŒ–
 USE changetracking
 GO
 CREATE TABLE CT_01(C1 int identity  primary key , C2 varchar(36), C3 varchar(36), C4 varchar(36))
@@ -17,12 +17,12 @@ ALTER TABLE CT_01 DISABLE CHANGE_TRACKING
 ALTER TABLE CT_02 DISABLE CHANGE_TRACKING  
 GO
 
--- Change Tracking ‚Ìƒe[ƒuƒ‹‚ÌŠm”F
+-- Change Tracking ã®ãƒ†ãƒ¼ãƒ–ãƒ«ã®ç¢ºèª
 SELECT * FROM sys.internal_tables
 WHERE internal_type_desc IN('CHANGE_TRACKING', 'TRACKED_COMMITTED_TRANSACTIONS')
 GO
 
--- ƒeƒXƒg—pƒf[ƒ^‚Ì“Š“ü
+-- ãƒ†ã‚¹ãƒˆç”¨ãƒ‡ãƒ¼ã‚¿ã®æŠ•å…¥
 SET NOCOUNT ON
 GO
 
@@ -46,7 +46,7 @@ GO 1000
 
 
 
--- ƒf[ƒ^Œ”‚ÌŠm”F
+-- ãƒ‡ãƒ¼ã‚¿ä»¶æ•°ã®ç¢ºèª
 SELECT 
 	object_name(p.object_id) as name, p.index_id, p.rows 
 FROM 
@@ -57,10 +57,10 @@ WHERE
 	(p.object_id = object_id('sys.syscommittab') OR o.name LIKE 'change[_]tracking[_]%')
 	AND p.index_id = 1
 
--- Water Mark ‚ÌŠm”F
+-- Water Mark ã®ç¢ºèª
 SELECT * FROM sys.change_tracking_tables
 
--- è“®ƒNƒŠ[ƒ“ƒAƒbƒv—pƒXƒgƒAƒhƒvƒƒV[ƒWƒƒ‚ÌÀs
+-- æ‰‹å‹•ã‚¯ãƒªãƒ¼ãƒ³ã‚¢ãƒƒãƒ—ç”¨ã‚¹ãƒˆã‚¢ãƒ‰ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£ã®å®Ÿè¡Œ
 EXEC sys.sp_flush_commit_table_on_demand
 EXEC dbo.sp_flush_CT_internal_table_on_demand @TableToClean = 'CT_01'
 
@@ -70,7 +70,7 @@ EXEC sp_helptext 'sys.sp_flush_commit_table_on_demand '
 
 GO
 
--- Change Tracking ‚ÉŠÖ˜A‚·‚éƒNƒGƒŠ‚Ìæ“¾
+-- Change Tracking ã«é–¢é€£ã™ã‚‹ã‚¯ã‚¨ãƒªã®å–å¾—
 DBCC FREEPROCCACHE
 go
 

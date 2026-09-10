@@ -1,12 +1,12 @@
--- CDC —LŒø‰»ó‘Ô‚ÌŠm”F
+-- CDC æœ‰åŠ¹åŒ–çŠ¶æ…‹ã®ç¢ºèª
 SELECT name, is_cdc_enabled FROM sys.databases
 GO
 
--- CDC ‚Ì—LŒø‰»
+-- CDC ã®æœ‰åŠ¹åŒ–
 EXEC sys.sp_cdc_enable_db
 GO 
 
--- CDC ‚ÌƒIƒuƒWƒFƒNƒg‚ÌŠm”F
+-- CDC ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ç¢ºèª
 SELECT s.name,s.schema_id,o.name,o.type_desc
 FROM sys.schemas AS s
     INNER JOIN sys.all_objects AS o
@@ -15,21 +15,21 @@ WHERE s.name = 'cdc'
 ORDER BY o.type_desc ASC, o.name ASC
 
 
--- CDC ƒe[ƒuƒ‹‚Ìî•ñ
+-- CDC ãƒ†ãƒ¼ãƒ–ãƒ«ã®æƒ…å ±
 SELECT * FROM cdc.change_tables
 SELECT * FROM cdc.lsn_time_mapping
 SELECT * FROM cdc.cdc_jobs
 
 
 
--- CDC ‚Ì–³Œø‰» (‘ÎÛƒe[ƒuƒ‹‚Ìİ’è)
+-- CDC ã®ç„¡åŠ¹åŒ– (å¯¾è±¡ãƒ†ãƒ¼ãƒ–ãƒ«ã®è¨­å®š)
 EXEC sys.sp_cdc_disable_table  
 @source_schema = N'dbo',  
 @source_name   = N'orders',  
 @capture_instance = N'dbo_orders'  
 GO
 
--- CDC ‚Ì—LŒø‰» (‘ÎÛƒe[ƒuƒ‹‚Ìİ’è)
+-- CDC ã®æœ‰åŠ¹åŒ– (å¯¾è±¡ãƒ†ãƒ¼ãƒ–ãƒ«ã®è¨­å®š)
 EXEC sys.sp_cdc_enable_table  
 @source_schema = N'dbo',  
 @source_name   = N'orders',  
@@ -37,8 +37,47 @@ EXEC sys.sp_cdc_enable_table
 @supports_net_changes = 1  
 
 
--- CDC ‚ÌƒWƒ‡ƒu‚Ìİ’è
+-- CDC ã®ã‚¸ãƒ§ãƒ–ã®è¨­å®š
 SELECT * FROM cdc.cdc_jobs
 
--- ƒWƒ‡ƒu‚Ì•ÏX (SQL DB ‚Ìê‡Asp_cdc_stop_job / sp_cdc_start_job ‚Ì–¾¦“I‚ÈÄ‹N“®‚Í•s—v)
+-- ã‚¸ãƒ§ãƒ–ã®å¤‰æ›´ (SQL DB ã®å ´åˆã€sp_cdc_stop_job / sp_cdc_start_job ã®æ˜ç¤ºçš„ãªå†èµ·å‹•ã¯ä¸è¦)
 EXEC sys.sp_cdc_change_job @job_type = 'cleanup', @retention='30'
+
+
+-- ä»¶æ•°ã®å–å¾—
+
+SELECT 
+	OBJECT_NAME(ct.object_id) AS object_name, 
+	OBJECT_NAME(ct.source_object_id) AS source_object_name,
+	ct.capture_instance,
+	ct.start_lsn, ct.end_lsn, ct.supports_net_changes,
+	ct.create_date,
+	row_count, used_page_count, reserved_page_count
+FROM 
+	cdc.change_tables AS ct
+	LEFT JOIN sys.dm_db_partition_stats AS ps
+		ON ps.object_id = ct.object_id AND ps.index_id <= 1
+GO
+
+
+SELECT OBJECT_NAME(object_id) AS name, row_count, used_page_count, reserved_page_count
+FROM sys.dm_db_partition_stats 
+WHERE (object_id IN (OBJECT_ID('cdc.lsn_time_mapping')) OR OBJECT_NAME(object_id) LIKE '%[_]CT')
+AND index_id = 1
+ORDER BY OBJECT_SCHEMA_NAME(object_id),  OBJECT_NAME(object_id)  ASC
+GO
+
+
+
+SELECT * FROM sys.dm_cdc_log_scan_sessions
+SELECT * FROM sys.dm_cdc_errors
+
+SELECT TOP 10  * FROM cdc.lsn_time_mapping
+SELECT * FROM msdb.dbo.cdc_jobs
+SELECT * FROM msdb.dbo.cdc_jobs_view
+
+-- ã‚¯ãƒªãƒ¼ãƒ³ã‚¢ãƒƒãƒ—ã®è¨­å®šå¤‰æ›´
+EXEC sys.sp_cdc_change_job @job_type = 'cleanup', @retention = 10
+
+SELECT * FROM msdb.dbo.cdc_jobs WHERE job_type = 'cleanup'
+
